@@ -14,6 +14,18 @@ function addDays(days) {
 const today = addDays(0);
 const tomorrow = addDays(1);
 
+export const user = {
+  nickname: "행성지킴이",
+  email: "planit.user@example.com",
+  points: 120,
+  planet: "earth",
+};
+
+export const planets = [
+  { id: "earth", name: "지구", image: "/images/front_titi.png" },
+  { id: "moon", name: "달", image: "/images/moon.png" },
+];
+
 export const plans = [
   { id: "p1", date: today, time: "07:00", title: "모닝 러닝 하기", done: true, pinned: false },
   { id: "p2", date: today, time: "08:34", title: "통근 버스 탑승", done: false, pinned: false },

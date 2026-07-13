@@ -3,10 +3,25 @@
   참조: blueprint.md §3 shared/js/api.js
 */
 
-import { plans } from "./data.js";
+import { plans, user } from "./data.js";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function getProfile() {
+  await delay(400);
+  return { ...user };
+}
+
+export async function setPlanet(id) {
+  await delay(300);
+  user.planet = id;
+  return { ...user };
+}
+
+export async function logout() {
+  await delay(300);
 }
 
 export async function getPlansByDate(dateISO) {

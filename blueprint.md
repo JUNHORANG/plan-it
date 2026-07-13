@@ -224,6 +224,7 @@ plan-it/
                 ├── nav-drawer.js / nav-drawer.css
                 ├── bottom-sheet.js / bottom-sheet.css
                 ├── modal.js / modal.css
+                ├── content-drawer.js / content-drawer.css
                 ├── input.js / input.css
                 ├── cta-button.js / cta-button.css
                 ├── toast.js / toast.css
@@ -245,6 +246,7 @@ plan-it/
 | **nav-drawer** | `mountNavDrawer('#nav-drawer')` | 홈/캘린더/스토어/랭킹/프로필/알림 이동 · X로 닫기 |
 | **bottom-sheet** | `openBottomSheet(opts)` | X·외부영역 닫힘 / 아래→위 애니메이션 / 항목 강조 / 기본값 없으면 CTA 비활성 / 요청중 스피너 / 성공→닫고 토스트, 실패→유지+토스트 / 핸들 높이 조절 |
 | **modal** | `openModal(opts)` | X·취소·외부영역 닫힘 / 실패 시 에러 토스트 |
+| **content-drawer** | `openContentDrawer({title, render})` | 앱바 톤 헤더(뒤로가기+제목) + 임의 콘텐츠, 오른쪽에서 슬라이드 (행성변경/약관/개인정보) |
 | **input** | `createInput(opts)` | 안내문구 / 포커스 강조 / blur 유효성 / 검증성공 색상 / 실패 error 테두리+오류문구 |
 | **cta-button** | `createCtaButton(opts)` | 기본 비활성→조건 충족 시 활성 / 요청중 스피너 / 성공·실패 토스트 |
 | **toast** | `showToast(msg, type)` | `#toast-root`에 성공/실패 토스트 |
@@ -283,7 +285,8 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [x] `app-bar` — 뒤로가기(44px 터치영역)+제목, 모바일 60px/타블렛 68px 높이 (`shared/components/app-bar.css`, `.js`)
 - [x] `nav-drawer` — Figma 나브 모바일(4007:333)/타블렛(4146:1022) 기준 1차 구현 (`shared/components/nav-drawer.css`, `.js`)
 - [x] `bottom-sheet` — Figma "일정 - 바텀 시트"(4006:323) 기준. 범용 셸(`openBottomSheet`) + 목록형 헬퍼(`openListBottomSheet`, 고정/수정/삭제 등 재사용) 구현. 배경 블러(6px)+딤, 아래→위 슬라이드, X/배경 클릭 닫힘, CTA 로딩→성공 시 닫힘+토스트/실패 시 유지+토스트 (`shared/components/bottom-sheet.css`, `.js`)
-- [ ] `modal`
+- [x] `modal` — Figma 재사용 컴포넌트(4132:588) "모달"(4132:650) 기준: 흰 카드(radius 10, `box-shadow: 0 0 1px rgba(0,0,0,.25)`) + 제목/본문 + 취소·확인 텍스트 버튼(배경 없음) + 우상단 X. X·취소·외부(배경) 클릭 닫힘, 확인 콜백이 `{ok:false}` 반환 시 에러 토스트 + 유지 (`shared/components/modal.css`, `.js`)
+- [x] `content-drawer` — 행성변경/이용약관/개인정보처리방침처럼 "제목 + 임의 콘텐츠"가 필요한 오버레이 공통 셸. nav-drawer(왼쪽 슬라이드)와 구분되도록 오른쪽에서 슬라이드, 헤더는 앱바 톤(뒤로가기+제목). 전용 Figma 프레임은 API rate limit로 못 받아와 앱바 패턴을 그대로 적용 — §9 참조 (`shared/components/content-drawer.css`, `.js`)
 - [x] `toast` — 재사용 컴포넌트(4132:588) "토스트" 섹션 기준 재구현: 흰 카드 + 상태 점(성공 초록/실패 빨강) + 텍스트 (`shared/components/toast.css`, `.js`)
 - [x] `input` — 로그인 이메일/비밀번호 입력창 기준 구현, 눈 아이콘 토글 포함 (`shared/components/input.css`, `.js`)
 - [x] `cta-button` — 비활성/활성/로딩(점 3개) 상태 구현 (`shared/components/cta-button.css`, `.js`)
@@ -316,8 +319,8 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [ ] `user/profile/orders/index.*` — 내 포인트, 주문 내역(접수중·취소접수중·배송중), 주문 취소 모달
 
 ### 7단계: 프로필 & 드로워
-- [ ] `user/profile/index.*` — 행성 캐릭터(기본:지구)·닉네임·이메일, 포인트, 상점·주문내역 이동, 세팅(로그아웃 모달·행성변경·약관·개인정보·탈퇴·버전)
-- [ ] 행성 변경 / 이용 약관 / 개인 정보 처리 방침 드로워 (오버레이 컴포넌트)
+- [x] `user/profile/index.*` — Figma "/profile"(4007:187) 기준. 행성 캐릭터(기본:지구, `front_titi.png`)·닉네임·이메일(스켈레톤) + 포인트/STORE/주문내역 카드(`store_icon.png`/`truck.png`, `--color-page-bg` 배경) + 세팅 리스트(로그아웃 모달·행성변경/약관/개인정보 드로워·계정탈퇴 이동·버전). "계정 탈퇴" 행은 Figma에서 `visible:false`였지만 spec.md 명시 요구사항이라 포함 — §9 참조
+- [x] 행성 변경 / 이용 약관 / 개인 정보 처리 방침 드로워 — `content-drawer` 공통 컴포넌트로 구현. 행성 컬렉션은 현재 목데이터상 지구(`front_titi.png`)·달(`moon.png`) 2종만 존재 — §9 참조. 약관/개인정보 본문은 정의서에 실제 문구가 없어 플레이스홀더 텍스트로 채움
 
 ### 8단계: 랭킹 & 알림
 - [ ] `user/ranking/index.*` — 1~3등, 내 순위, 전체 순위 목록, 공유하기(오픈그래프 메타)
@@ -346,7 +349,8 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 
 ## 8. 데이터 모델 (목 데이터 초안)
 
-- **User**: `{ nickname, email, points, planet }`
+- **User**: `{ nickname, email, points, planet }` — `shared/js/data.js`의 `user` 목데이터로 구현
+- **Planet**: `{ id, name, image }` — `shared/js/data.js`의 `planets` 목데이터. 현재 지구/달 2종만 존재(§9)
 - **Plan**: `{ id, title, time, startDate, endDate, repeat(당일·매일·매주·격주·매월·매년), done, pinned }`
 - **Product**: `{ id, name, price, category(씨앗·식물·묘목), image }`
 - **Order**: `{ id(8자리), productId, status(주문접수중·취소접수중·배송중·주문취소), address }`
@@ -369,6 +373,7 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 10. ~~**종 아이콘 소스**~~ → 사용자 요청으로 확정: `header.js`에서 lucide `Bell` 대신 Figma 원본 그대로 solar 아이콘셋(`solar:bell-outline`)을 사용. 빌드 스텝 없이 CDN ESM(`iconify-icon@2.1.0/+esm`)으로 Iconify 웹 컴포넌트를 불러와 `<iconify-icon icon="solar:bell-outline">`로 렌더링(CLAUDE.md "아이콘" 섹션에 예외로 명시). 다른 아이콘은 계속 lucide 사용
 11. **로그인 실패 안내 방식** — ~~spec.md는 "실패 토스트를 띄운다"고 적혀 있지만, 로그인 에러 화면(4434:1479) 캡처에는 토스트 없이 인라인 문구만 보여 처음엔 인라인 문구만 구현했었음~~ → 이후 재사용 컴포넌트(4132:588)에 에러 토스트("요청에 실패 했습니다.")가 추가돼 **인라인 문구 + 토스트 둘 다** 띄우는 것으로 확정. 입력값은 지우지 않고 유지, 두 입력창 빨간 테두리, CTA 버튼은 실패 후 다시 비활성(연한 초록) 상태로 돌아가 사용자가 값을 수정해야 재시도 가능. 다른 실패 케이스(회원가입 등)에도 이 패턴(인라인+토스트 동시)을 적용
 12. ~~**일정 완료 화면 디자인 부재**~~ → 전용 Figma "/plans/success"(4006:940) 확보돼 반영 완료. 확정 사항: 제목은 `--font-family-brand`(Gmarket Sans) 36px, 안내 문구는 한 줄("포인트를 지급 했어요!", 16px medium, `--color-primary`) — spec.md의 2번째 문장("포인트를 모아서...")은 Figma에 없어 제외, CTA 라벨은 "포인트 확인 하기"(공백 포함, 기존 임의 문구 대체), 지급 포인트는 "+ N POINT" 형식·`--color-accent`·Gmarket Sans 20px. 이미지 영역: 원본 `good_titi.png`의 피사체(지구본)가 캔버스 중앙보다 오른쪽에 있어 Figma도 컨테이너 폭 기준 좌측 10.1333%(38/375) 오프셋·70.9333%(266/375) 폭으로 배치(정중앙 아님) — `%` 기반으로 구현해 화면 폭이 달라져도 동일 비율 유지
-13. **데스크탑(600px 초과) 뷰** — Figma "데스크탑"(4159:806) 기준으로 확정: `body`는 600px 카드로 고정, 바깥 캔버스는 `--color-page-bg`(#f7f7f7, html에 적용), 카드 그림자는 `#overlay-root`에 `box-shadow: 0 0 4px rgba(0,0,0,.09)`. Figma의 "qr 영역"(4405:1251, 139×128, 흰 배경 + `--color-qr-border` 테두리, radius 5)은 카드 왼쪽 아래 여백에 `#desktop-qr`로 배치했지만 **내용은 비워둠** — 추후 모바일 접속용 QR 이미지를 이 안에 넣을 예정. 카드와 겹치지 않을 최소 폭(`min-width:960px`)에서만 노출
+13. **행성 변경/이용약관/개인정보 드로워 전용 Figma 미확인** — 프로필(4007:187)은 확보했지만 이 3개 드로워는 Figma API rate limit(429)로 프레임을 못 받아옴 → spec.md 텍스트만으로 `content-drawer`(앱바 톤 헤더+콘텐츠) 공통 셸을 만들어 구현. 행성 컬렉션은 `public/images`에 실제로 존재하는 행성류 이미지가 `front_titi.png`(지구)·`moon.png`(달) 2종뿐이라 이 둘로만 구성 — 실제 Figma 프레임/추가 행성 에셋 확보되면 교체·확장 필요. 이용약관/개인정보 처리방침 본문도 정의서에 실제 문구가 없어 플레이스홀더 텍스트로 채움
+14. **데스크탑(600px 초과) 뷰** — Figma "데스크탑"(4159:806) 기준으로 확정: `body`는 600px 카드로 고정, 바깥 캔버스는 `--color-page-bg`(#f7f7f7, html에 적용), 카드 그림자는 `#overlay-root`에 `box-shadow: 0 0 4px rgba(0,0,0,.09)`. Figma의 "qr 영역"(4405:1251, 139×128, 흰 배경 + `--color-qr-border` 테두리, radius 5)은 카드 왼쪽 아래 여백에 `#desktop-qr`로 배치했지만 **내용은 비워둠** — 추후 모바일 접속용 QR 이미지를 이 안에 넣을 예정. 카드와 겹치지 않을 최소 폭(`min-width:960px`)에서만 노출
 
 > 위 항목은 구현 착수 전 확정 권장.

@@ -1,0 +1,170 @@
+/*
+  프로필 (/user/profile/) 전용 스타일
+  참조: Figma "/profile"(4007:187)
+*/
+
+.profile {
+  padding: 16px 0 40px;
+}
+
+.profile__head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 66px;
+}
+
+.profile__avatar {
+  width: 65px;
+  height: 66px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.profile__names {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.profile__nickname {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+  min-height: 17px;
+}
+
+.profile__email {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-assist);
+  min-height: 17px;
+}
+
+.profile__stats {
+  display: flex;
+  align-items: stretch;
+  margin-top: 26px;
+  background: var(--color-page-bg);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.profile__stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 8px;
+  border-left: 1px solid var(--color-card-divider);
+}
+
+.profile__stat:first-child {
+  border-left: none;
+}
+
+.profile__stat-icon {
+  object-fit: contain;
+}
+.profile__stat-icon.point {
+  width: 31px;
+}
+.profile__stat-icon.store {
+  width: 38px;
+}
+.profile__stat-icon.orders {
+  width: 56px;
+}
+
+.profile__stat-label {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+  min-height: 17px;
+}
+
+.profile__setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 56px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--color-row-border);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.profile__setting-chevron {
+  display: inline-flex;
+  color: var(--color-row-chevron);
+}
+
+.profile__setting-value {
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+}
+
+/* 행성 변경 드로워 — 컬렉션 그리드 */
+.planet-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.planet-picker__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 2px solid var(--color-row-border);
+  border-radius: var(--radius-md);
+}
+
+.planet-picker__item.is-selected {
+  border-color: var(--color-primary);
+}
+
+.planet-picker__image {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.planet-picker__name {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.planet-picker__cta {
+  margin-top: 24px;
+}
+
+.legal-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-body);
+  white-space: pre-line;
+}
+
+@media (min-width: 599px) {
+  .profile__avatar {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .profile__nickname {
+    font-size: 16px;
+  }
+  .profile__email {
+    font-size: 16px;
+  }
+}

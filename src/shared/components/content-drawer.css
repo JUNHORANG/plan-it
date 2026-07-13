@@ -1,0 +1,85 @@
+/*
+  콘텐츠 드로워 — 공통 UI 컴포넌트
+  나브 드로워(왼쪽 슬라이드)와 구분되는 "하위 화면 진입" 톤 — 오른쪽에서 슬라이드
+*/
+
+.content-drawer {
+  position: fixed;
+  inset: 0;
+  max-width: var(--breakpoint-tablet);
+  margin: 0 auto;
+  z-index: 250;
+  visibility: hidden;
+}
+
+.content-drawer.is-open {
+  visibility: visible;
+}
+
+.content-drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-white);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.content-drawer.is-open .content-drawer__backdrop {
+  opacity: 1;
+}
+
+.content-drawer__panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+}
+
+.content-drawer.is-open .content-drawer__panel {
+  transform: translateX(0);
+}
+
+.content-drawer__head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--app-bar-height);
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.content-drawer__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--color-header);
+}
+
+.content-drawer__title {
+  font-size: var(--font-size-header-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-header);
+}
+
+.content-drawer__body {
+  padding: 8px 24px 24px;
+  flex: 1;
+}
+
+@media (min-width: 600px) {
+  .content-drawer__head {
+    height: var(--app-bar-height-tablet);
+    padding: 0 16px;
+  }
+
+  .content-drawer__title {
+    font-size: var(--font-size-header-lg);
+  }
+}
