@@ -25,6 +25,8 @@
   display: flex;
   margin-top: 24px;
   padding: 10px 0;
+  margin-left: -16px;
+  margin-right: -16px;
   border-bottom: 1px solid #f1f1f1;
   border-top: 1px solid #f1f1f1;
   box-shadow: 0px 8px 16px -8px rgba(0, 0, 0, 0.12);
@@ -179,4 +181,17 @@
 .home__complete-cta {
   margin: 16px;
   width: calc(100% - 32px);
+}
+
+@media screen and (min-width: 599px) {
+  .home__week {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+}
+@media (min-width: 601px) {
+  .home__week {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
 }

@@ -1,0 +1,101 @@
+/*
+  모달 — 공통 UI 컴포넌트
+  참조: Figma 재사용 컴포넌트(4132:588) "모달"(4132:650) — 흰 카드(radius 10, 그림자 0 0 1px rgba(0,0,0,.25))
+  + 제목/본문 + 취소·확인 텍스트 버튼(배경 없음) + 우상단 X
+*/
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+}
+
+.modal.is-open {
+  visibility: visible;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal.is-open .modal__backdrop {
+  opacity: 1;
+}
+
+.modal__panel {
+  position: relative;
+  width: calc(100% - 48px);
+  max-width: 320px;
+  padding: 20px;
+  background: var(--color-white);
+  border-radius: 10px;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.modal.is-open .modal__panel {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal__title {
+  font-size: 20px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+}
+
+.modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--color-header);
+}
+
+.modal__body {
+  margin-top: 20px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--color-modal-body);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.modal__cancel,
+.modal__confirm {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.modal__cancel {
+  color: var(--color-modal-body);
+}
+
+.modal__confirm {
+  color: var(--color-accent);
+}
