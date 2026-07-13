@@ -231,7 +231,9 @@ plan-it/
                 ├── toast.js / toast.css
                 ├── skeleton.js / skeleton.css
                 ├── stepper.js / stepper.css
-                └── wheel-picker.js / wheel-picker.css
+                ├── wheel-picker.js / wheel-picker.css
+                ├── admin-header.js / admin-header.css   # 관리자 상단 네비(로고+주문/상점관리+로그아웃)
+                └── admin-layout.css                     # 관리자 페이지 전용 데스크탑 레이아웃 오버라이드
 ```
 
 ---
@@ -331,16 +333,21 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 - [x] 행성 변경 / 이용 약관 / 개인 정보 처리 방침 드로워 — `content-drawer` 공통 컴포넌트로 구현. 행성 컬렉션은 현재 목데이터상 지구(`front_titi.png`)·달(`moon.png`) 2종만 존재 — §9 참조. 약관/개인정보 본문은 정의서에 실제 문구가 없어 플레이스홀더 텍스트로 채움
 
 ### 8단계: 랭킹 & 알림
-- [ ] `user/ranking/index.*` — 1~3등, 내 순위, 전체 순위 목록, 공유하기(오픈그래프 메타)
-- [ ] `user/notification/index.*` — 알림 리스트(완료 시 비활성), 클릭 → `/user/plans/`
+- [x] `user/ranking/index.*` — Figma "/ranking"(4259:1235) · 랭킹 리스트 타블렛(4319:1165) 반영. "총 N명 참여 중"(초록)+"M월 랭킹"(24px semibold) → "나의 순위" 풀블리드 카드(위아래 구분선, 아바타+순위+닉네임+포인트+공유하기 필 버튼) → 구분선 → 전체 순위 목록(흰 카드 radius10, 60px 행, 15px 간격). 1~3등은 순위 숫자 대신 왕관 이미지(`crown1/2/3.png`), 포인트는 주조색(초록); 4등 이하는 순위 숫자 검정, 포인트는 회색(`#8c9aae` 실측값 그대로 인라인 — `feat/calendar` 브랜치의 캘린더 미선택 날짜 숫자와 우연히 같은 색이지만 그 브랜치가 아직 `main`에 없어 변수로 공유하지 않고 각자 인라인 처리); 로그인 사용자 본인 행은 목록 안에서도 순위 숫자·포인트가 강조색(주황)으로 다시 하이라이트. 아바타 이미지는 프로필과 동일한 행성(planets, 지구/달) 재사용. 모바일은 닉네임/포인트를 세로로 쌓고 타블렛(≥600px)은 한 행에 좌우로 배치(4319:1165 실측). "나의" 랭킹 데이터는 목데이터 대신 실제 로그인 사용자(user.nickname/points/planet)를 그대로 사용해 프로필 화면과 어긋나지 않게 함. 공유하기: `navigator.share` 지원 시 공유 시트, 미지원이면 클립보드 복사+토스트 — `index.html`에 정적 Open Graph 메타(`og:title`/`og:description`/`og:image`) 추가
+- [x] `user/notification/index.*` — Figma "/notification"(4293:1216) 반영. 앱바(뒤로가기+"알림") + "오늘"/"어제" 섹션별 카드 리스트(흰 배경 radius12). 완료(done) 안 된 항목은 일정 제목만 주조색(초록)으로 강조하고 나머지 문구는 검정 — 실측 결과 리치 텍스트(같은 줄 안에서 색만 다름, 굵기는 동일)라 굵게 처리하지 않음. 완료된 항목은 시간·문구 전체가 `--color-assist`(회색)로 비활성화 표시되고 클릭 불가, 활성 항목만 버튼으로 렌더링해 클릭 시 `/user/plans/` 이동. "오늘" 알림은 `shared/js/data.js`의 `plans`(오늘 날짜) 배열에서 파생해 done 상태가 항상 일치하도록 하고, "어제" 알림은 대응하는 plans 데이터가 없어 별도 목데이터로 채움(§9 참조)
 
 ### 9단계: 에러 페이지
 - [ ] `404/index.*` — 일러스트 + 홈 이동 (서버 미매칭 fallback 설정)
 - [ ] `timeout/index.*` — 일러스트 + 이전 도메인 이동
 
 ### 10단계: 관리자
-- [ ] `admin/orders/index.*` — 주문 개수, 주문 테이블(고객·상품·번호·상태·주소지), 배송/취소 모달
-- [ ] `admin/products/index.*` — 제품 목록, 추가 폼 / 수정 폼(프리필) / 삭제
+관리자 화면은 나머지 앱과 달리 모바일 카드(600px 고정)가 아니라 데스크탑 전용 대시보드
+(Figma 4388:2254 등 1920px 캔버스) — `shared/components/admin-layout.css`가 이 페이지들에서만
+전역 body/#app/#toast-root/#overlay-root의 "600px 카드" 레이아웃을 오버라이드한다. 공통 상단
+네비게이션(로고+주문관리/상점관리/로그아웃)은 `shared/components/admin-header.*`로 분리.
+- [x] `admin/orders/index.*` — Figma "관리자 - 주문 관리 - 주문 확인"(4388:2254 기본 / 4392:2529 모달) 반영. "들어온 주문 N개" + 테이블(주문 고객/상품/번호/상태/주소지), 상태는 점 색상만으로 표시(주문 접수 중=주황 accent, 취소 접수 중=빨강 error, 주문 배송 중=초록 primary — user/profile/orders와 동일한 상태-색상 규칙). 접수 중·취소 접수 중 행만 클릭 가능, 배송 중은 이미 처리된 최종 상태라 클릭 불가. 4392:2529는 배송 모달/취소 모달 두 변형이 같은 좌표에 겹쳐 있는 프레임이었음(둘 다 `visible:true`) — 실제로는 주문 상태에 따라 배송 모달(CTA "배송", 접수중→배송중) 또는 취소 모달(CTA "주문 취소", 성공 시 리스트에서 삭제)만 열리도록 분기 구현. 두 모달 다 CTA 배경은 (취소여도) 초록 — Figma 실측 그대로. 주문 데이터는 사용자 개인 주문 내역(`orders[]`, 소유자 구분 없음)과 분리한 `adminOrders[]`(고객명 포함, Figma 샘플 데이터 그대로)를 신설해 사용 — 안 그러면 다른 고객 목데이터가 로그인한 사용자 "내 주문 내역" 화면에도 섞여 보이는 문제가 생김
+- [x] `admin/products/index.*` — Figma "관리자 - 상점 관리 - 기본"(4392:2654) / "제품 수정"(4404:1119) 반영. 좌측 제품 목록(썸네일+카테고리+이름+가격+수정/삭제) + 우측 추가/수정 폼(사진 추가/제품명/가격/카테고리 — 수정 클릭 시 같은 폼에 프리필, 사진 영역은 "사진 추가"(빈 대시 박스)에서 "사진 변경"(기존 미리보기+대시 박스)으로 전환). 카테고리는 spec.md "씨앗·식물·묘목"이 아니라 상점(6단계)에서 이미 확정한 실제 값 "나무"/"다육식물" 재사용 — Figma 제품 수정 목업(4404:1119)의 드롭다운엔 "묘목"이 선택돼 있었지만 정작 그 제품(사과 나무 묘목)은 목록에서 "나무"로 분류돼 있어 드롭다운 쪽이 갱신 안 된 낡은 값으로 판단, §9 참조. Figma에는 폼 제출 버튼이 없어(프레임 하단에서 잘린 것으로 추정) 공용 `createCtaButton`으로 추가하기/수정하기 버튼을 새로 붙여야 실제로 동작함. 사진은 실제 업로드 서버가 없어 `FileReader`로 data URL 변환 후 그대로 저장(세션 동안만 유지)
+  - [x] **버그 수정**: `shared/js/data.js`의 `products` 배열이 원래 상품 7종을 실수로 3벌 복붙해 21개였음(id가 p1~p7로 겹침) — 그동안 상점(6단계)은 그냥 다 렌더링해서 티가 안 났지만, 관리자 CRUD는 id로 항목을 특정해야 해서 이 상태로는 삭제/수정이 어느 항목을 가리키는지 모호해지는 실제 버그였음 → 7개로 정리
 
 ---
 
@@ -360,10 +367,11 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 - **User**: `{ nickname, email, points, planet }` — `shared/js/data.js`의 `user` 목데이터로 구현
 - **Planet**: `{ id, name, image }` — `shared/js/data.js`의 `planets` 목데이터. 현재 지구/달 2종만 존재(§9)
 - **Plan**: `{ id, title, time, startDate, endDate, repeat(당일·매일·매주·격주·매월·매년), done, pinned }`
-- **Product**: `{ id, name, price, category(씨앗·식물·묘목), image }` — `shared/js/data.js`의 `products` 목데이터(3종)
-- **Order**: `{ id(8자리), productId, status(주문 접수 중·취소 접수 중·주문 배송 중), pointsUsed, remainingAfter, address }` — `shared/js/data.js`의 `orders` 목데이터. `remainingAfter`는 주문 직후 시점의 잔여 포인트 스냅샷(주문 내역 화면 표시용), `createOrder()`가 생성 시점에 기록
-- **Ranking**: `{ rank, nickname, points }`
-- **Notification**: `{ id, planId, message, active }`
+- **Product**: `{ id, name, price, category(나무·다육식물 — spec.md "씨앗·식물·묘목"은 §9 15번대로 실제 미채택), image }` — `shared/js/data.js`의 `products` 목데이터(7종, 한때 21개로 중복돼 있던 버그 수정됨 §9 참조). `shared/js/api.js`의 `addProduct`/`updateProduct`/`deleteProduct`로 CRUD(관리자 상점 관리에서 사용)
+- **Order**: `{ id(8자리), productId, status(주문 접수 중·취소 접수 중·주문 배송 중), pointsUsed, remainingAfter, address }` — `shared/js/data.js`의 `orders` 목데이터("내 주문 내역"용, 소유자 구분 없이 단일 사용자 기준). `remainingAfter`는 주문 직후 시점의 잔여 포인트 스냅샷(주문 내역 화면 표시용), `createOrder()`가 생성 시점에 기록
+- **AdminOrder**: `{ id(주문번호), customer(닉네임), productId, status, address }` — `shared/js/data.js`의 `adminOrders` 목데이터(관리자 주문 관리 전용, §9 19번대로 `orders`와 분리). `shipOrder()`(접수중→배송중), `cancelAdminOrder()`(취소접수중 항목을 리스트에서 삭제)로 상태 전환
+- **Ranking**: `{ rank, nickname, points, planet, isMe? }` — `shared/js/data.js`의 `ranking`/`rankingMeta`
+- **Notification**: `{ id, planId, time, title, done, section(오늘·어제) }` — `shared/js/data.js`의 `notifications`, "오늘" 항목은 `plans[today]`에서 파생
 
 ---
 
@@ -388,5 +396,8 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 16. ~~**구매 전용 Figma 미확인**~~ → Desktop Bridge 플러그인 경로(`figma_execute`, REST 우회)로 기본(4293:1252)/주소지 입력 활성화(4295:1489)/구매 동의 체크(4295:1464) 3개 상태 모두 확보해 반영 완료.
 17. ~~**주문내역 전용 Figma 미확인**~~ → `figma_execute`로 "profile/orders"(4376:1786) 확보해 반영 완료(위 6단계 체크리스트 참조).
 18. **구매완료 전용 Figma 미확인** — 이 화면은 여전히 전용 프레임을 못 받아와 spec.md 텍스트 + 기존 디자인 언어로 구현. 15·16·17번과 같이 Figma Desktop에 파일이 열려 있고 플러그인이 연결된 상태라면 `figma_execute`로 재시도 가능.
+19. **관리자 주문 배송/취소 모달 프레임 중첩** — Figma "관리자 - 주문 관리 - 주문 확인"(4392:2529)은 배송 모달(4392:2586)과 취소 모달(4392:2631) 두 프레임이 같은 좌표에 완전히 겹쳐 있고 둘 다 `visible:true`라, 스크린샷 한 장으론 위에 그려진 취소 모달만 보였음 — `figma_execute`로 두 프레임을 각각 조회해서 확인. 두 프레임 다 샘플 데이터·타이틀("주문 접수 중", 주황)이 동일해 실제로는 CTA 라벨("배송" vs "주문 취소")만 다른 변형이었고, 실제 구현은 주문 상태에 따라 이 중 하나만 열리도록 분기함(위 10단계 참조)
+20. **관리자 상점 관리 카테고리 드롭다운 낡은 값** — 제품 수정 목업(4404:1119)의 "제품 카테고리" 드롭다운엔 "묘목"이 선택돼 있었지만, 정작 그 제품(사과 나무 묘목)은 목록에서 "나무"로 분류돼 있음 → 상점(6단계, §9 15번)에서 이미 확정한 실제 카테고리 "나무"/"다육식물"을 그대로 써서 드롭다운 값이 목록 표기와 어긋나지 않게 구현
+21. **관리자 상점 관리 폼 제출 버튼 없음** — Figma 제품 추가/수정 폼(4392:2654, 4404:1119) 모두 카테고리 드롭다운에서 프레임이 끝나고 제출 버튼이 없음(레이아웃 하단에서 잘린 것으로 추정) → 공용 `createCtaButton`으로 추가하기/수정하기 버튼을 새로 만들어 붙임(위 10단계 참조)
 
 > 위 항목은 구현 착수 전 확정 권장.

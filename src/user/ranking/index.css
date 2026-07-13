@@ -1,0 +1,212 @@
+/*
+  랭킹 (/user/ranking/) 전용 스타일
+  참조: spec.md "랭킹", Figma "/ranking"(4259:1235) · 랭킹 리스트 타블렛(4319:1165)
+*/
+
+/* 이 페이지만 배경이 흰색이 아니라 --color-ranking-bg — 페이지별 stylesheet라 다른 화면엔 영향 없음 */
+body {
+  background-color: var(--color-ranking-bg);
+}
+
+.ranking__meta {
+  padding: 7px 16px 27px;
+  margin-left: -16px;
+  margin-right: -16px;
+  background-color: var(--color-white);
+}
+
+.ranking__participants {
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-primary);
+  min-height: 17px;
+}
+
+.ranking__title {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+/* .ranking-me를 감싸는 마운트 지점([data-ranking-me])이 이 요소 하나만 담고 있어서 높이가
+   자식과 완전히 같다 — position:sticky의 기준이 되는 containing block(직계 부모)이 자식과
+   똑같은 높이면 스크롤 가능한 여유 공간이 없어 고정된 것처럼 안 보이고 그냥 흘러가 버린다.
+   그래서 sticky는 아래 .ranking__list까지 포함해 충분히 긴 [data-ranking-me] 대신, 그 부모인
+   .ranking 안에서 여유 공간을 갖는 [data-ranking-me] 래퍼 쪽에 줘야 한다. */
+[data-ranking-me] {
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+}
+
+/* "나의 순위" — 화면 폭 끝까지 닿는 카드(다른 카드형 리스트와 달리 전용 배경/구분선을 가짐).
+   #app의 좌우 패딩(16px/타블렛 24px)만큼 음수 마진으로 빼서 풀블리드로 만든다
+   (.home__week와 동일한 패턴). */
+.ranking-me {
+  display: flex;
+  align-items: center;
+  margin: 0 -16px;
+  padding: 10px 16px;
+  border-top: 1px solid #f1f1f1;
+  border-bottom: 1px solid #f1f1f1;
+  background-color: #fff;
+  box-shadow: 0px 8px 16px -8px rgba(0, 0, 0, 0.12);
+}
+
+.ranking-me__rank {
+  width: 30px;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+  text-align: center;
+  margin-right: 10px;
+}
+
+.ranking-me__avatar {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  object-fit: contain;
+  margin-right: 12px;
+}
+
+.ranking-me__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ranking-me__name {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-me__points {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: #8c9aae;
+}
+
+.ranking-me__share {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  background: #f2f2f2;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+}
+
+.ranking__list {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ranking-row {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  border-radius: 10px;
+}
+
+.ranking-row__badge {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.ranking-row__crown {
+  width: 28px;
+  height: auto;
+  object-fit: contain;
+}
+
+.ranking-row__rank {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: #000000;
+}
+
+.ranking-row.is-me .ranking-row__rank {
+  color: var(--color-accent);
+}
+
+.ranking-row__avatar {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+.ranking-row__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ranking-row__name {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-row__points {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: #8c9aae; /* 4319:1165 실측 — 4등 이하 순위 포인트 회색 */
+}
+
+.ranking-row__points.is-top {
+  color: var(--color-primary);
+}
+
+.ranking-row__points.is-me {
+  color: var(--color-accent);
+}
+
+@media (min-width: 600px) {
+  .ranking-me,
+  .ranking__meta {
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .ranking-row__info {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ranking-row__name,
+  .ranking-me__name {
+    font-size: 16px;
+  }
+
+  .ranking-row__points,
+  .ranking-me__points {
+    margin-top: 0;
+    font-size: 16px;
+  }
+}

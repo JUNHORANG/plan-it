@@ -21,6 +21,7 @@ export function createInput({
   placeholder = "",
   required = false,
   validate,
+  validateOnBlur = true,
   onInput,
 } = {}) {
   const wrapper = document.createElement("div");
@@ -83,7 +84,9 @@ export function createInput({
     if (onInput) onInput(control.value);
   });
 
-  control.addEventListener("blur", runValidate);
+  if (validateOnBlur) {
+    control.addEventListener("blur", runValidate);
+  }
 
   return {
     el: wrapper,
@@ -94,6 +97,10 @@ export function createInput({
       wrapper.classList.remove("is-valid");
       wrapper.classList.add("is-error");
       error.textContent = message;
+    },
+    setValid: (isValid) => {
+      wrapper.classList.toggle("is-valid", isValid);
+      if (isValid) wrapper.classList.remove("is-error");
     },
     clearState,
   };

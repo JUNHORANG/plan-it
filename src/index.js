@@ -39,6 +39,7 @@ const emailInput = createInput({
   placeholder: "이메일",
   required: true,
   validate: (value) => value.trim().length > 0 || "이메일을 작성해 주세요.",
+  validateOnBlur: false,
   onInput: updateSubmitState,
 });
 
@@ -48,6 +49,7 @@ const passwordInput = createInput({
   placeholder: "비밀번호",
   required: true,
   validate: (value) => value.length > 0 || "비밀번호를 작성해 주세요.",
+  validateOnBlur: false,
   onInput: updateSubmitState,
 });
 
@@ -73,6 +75,7 @@ function updateSubmitState() {
   const filled = emailInput.getValue().trim().length > 0 && passwordInput.getValue().length > 0;
   submit.setDisabled(!filled);
   loginError.classList.remove("is-visible");
+  emailInput.setValid(emailInput.getValue().trim().length > 0);
 }
 
 async function handleLogin() {

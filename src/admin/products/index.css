@@ -1,0 +1,190 @@
+/*
+  관리자 - 상점 관리 (/admin/products/) 전용 스타일
+  참조: Figma "관리자 - 상점 관리 - 기본"(4392:2654) / "제품 수정"(4404:1119)
+  공통 레이아웃(body/#app 오버라이드, .admin-content)은 shared/components/admin-layout.css 참조
+*/
+
+.admin-products {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 46px;
+}
+
+.admin-products__list {
+  flex: 1;
+  background: var(--color-white);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 88px;
+  padding: 0 16px;
+  border-top: 1px solid var(--color-admin-border);
+}
+
+.product-row:first-child {
+  border-top: none;
+}
+
+.product-row__thumb {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-row__thumb img {
+  width: 47px;
+  height: 66px;
+  object-fit: contain;
+}
+
+.product-row__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-row__category {
+  font-size: 12px;
+  color: var(--color-assist);
+}
+
+.product-row__name {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--color-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-row__price {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.product-row__actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 16px;
+}
+
+.product-row__action {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.product-form {
+  width: 586px;
+  flex-shrink: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.product-form__label {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--color-body);
+}
+
+.product-form__label:first-child {
+  margin-top: 0;
+}
+
+.product-form__photo {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+}
+
+.product-form__preview {
+  width: 130px;
+  height: 127px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.product-form__photo-trigger {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 127px;
+  border: 1px dashed #d6dde3;
+  border-radius: 12px;
+  color: var(--color-assist);
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.product-form__photo-trigger--full {
+  width: 100%;
+}
+
+.product-form__input {
+  margin-top: 8px;
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 14px;
+  font-size: var(--font-size-input);
+  color: var(--color-body);
+}
+
+.product-form__input::placeholder {
+  color: var(--color-input-assist);
+}
+
+.product-form__select-wrap {
+  position: relative;
+  margin-top: 8px;
+}
+
+.product-form__select-wrap svg {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: var(--color-row-chevron);
+  pointer-events: none;
+}
+
+.product-form__select {
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 14px;
+  font-size: var(--font-size-input);
+  color: var(--color-body);
+  appearance: none;
+}
+
+.product-form__select:invalid {
+  color: var(--color-input-assist);
+}
+
+.product-form__cta {
+  margin-top: 24px;
+}
