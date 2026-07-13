@@ -47,16 +47,31 @@
 .login__form {
   width: 100%;
   max-width: 330px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+}
+.input-field {
+  margin-bottom: 16px;
+}
+.login__form .input-field:nth-child(2) {
+  margin-bottom: 25px;
+}
+
+.error-container {
+  position: relative;
+}
+
+.error-container p {
+  position: absolute;
+  height: 0;
+  margin: 0;
+  top: -22px;
+  left: 0;
 }
 
 .login__error {
   display: none;
-  margin-top: -8px;
+  position: absolute;
   padding-left: 4px;
-  font-size: 10px; /* Figma 4434:1479 실측 */
+  font-size: 12px;
   color: var(--color-error);
 }
 
@@ -65,7 +80,8 @@
 }
 
 .login__submit {
-  margin-top: 9px; /* 입력창-버튼 간격 20px = gap 16px + 9px = 25px */
+  /* margin-top: 9px;  */
+  /* 입력창-버튼 간격 20px = gap 16px + 9px = 25px */
 }
 
 .login__footer {
@@ -82,4 +98,9 @@
   text-decoration: underline;
   text-decoration-color: var(--color-primary);
   text-underline-offset: 2px;
+}
+.input-field .input-field__error {
+  display: none;
+  min-height: 0px;
+  margin-top: 0px;
 }

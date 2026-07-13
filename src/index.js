@@ -62,7 +62,11 @@ const loginError = document.createElement("p");
 loginError.className = "login__error";
 loginError.textContent = "아이디 또는 비밀번호가 맞지 않습니다! 다시 한번 확인해 주세요.";
 
-form.append(emailInput.el, passwordInput.el, loginError, submit.el);
+const errorContainer = document.createElement("div");
+errorContainer.classList.add("error-container");
+errorContainer.appendChild(loginError);
+
+form.append(emailInput.el, passwordInput.el, errorContainer, submit.el);
 form.addEventListener("submit", (event) => event.preventDefault());
 
 function updateSubmitState() {
