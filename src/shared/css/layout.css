@@ -17,6 +17,8 @@
 #overlay-root {
   position: fixed;
   inset: 0;
+  max-width: var(--breakpoint-tablet);
+  margin: 0 auto;
   z-index: 1000;
   pointer-events: none;
 }

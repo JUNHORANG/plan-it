@@ -100,6 +100,7 @@
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   --font-size-header-lg: 20px; /* 헤더t: 화면 타이틀 / 앱바 제목 */
   --font-size-header-sm: 18px; /* 헤더: 로고 등 기본 헤더 텍스트 */
@@ -134,6 +135,11 @@
   --color-notification-badge: #ff0000;  /* 헤더 종 아이콘 알림 뱃지 */
   --color-skeleton-from: #f2f2f2;       /* 스켈레톤 그라디언트 시작/끝 */
   --color-skeleton-via: #d9d9d9;        /* 스켈레톤 그라디언트 중앙(하이라이트) */
+  --color-weekend: #e05f61;             /* 주간 날짜 선택 토/일 요일 라벨 */
+  --color-date-number: #5f5f5f;         /* 주간 날짜 선택 날짜 숫자 (선택되지 않은 날) */
+  --color-option-muted: #b0b8c1;        /* 바텀시트 목록형 항목 - 선택 안 된 상태 텍스트 */
+  --color-sheet-divider: #f2f2f2;       /* 바텀시트 목록형 항목 구분선 */
+  --color-backdrop: rgba(25, 31, 40, 0.26); /* 바텀시트/모달 뒷배경 (블러 6px 동반) */
 
   /* ── Radius / Shadow ────────────────────────── */
   --radius-sm: 8px;
@@ -169,7 +175,9 @@ body {
 
 body {
   min-width: var(--viewport-mobile-min-width);
+  max-width: var(--breakpoint-tablet);
   min-height: var(--viewport-mobile-min-height);
+  margin: 0 auto;
   font-family: var(--font-family-base);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);

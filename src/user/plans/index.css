@@ -1,0 +1,180 @@
+/*
+  홈 (/user/plans/) 전용 스타일
+  참조: Figma 일정-기본(4066:724) / 일정-리스트(4005:67) / 일정-리스트 고정(4007:209) /
+        일정-리스트 완료(4006:786) / 일정-스켈레톤(4095:444)
+*/
+
+.home__meta {
+  padding: 20px 0 0;
+}
+
+.home__date {
+  font-size: var(--font-size-body);
+  color: var(--color-primary);
+}
+
+.home__next-title {
+  margin-top: 6px;
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+  min-height: 29px;
+}
+
+.home__week {
+  display: flex;
+  margin-top: 24px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f7f7f7;
+}
+
+.home__week-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+
+.home__week-day-label {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-assist);
+}
+
+.home__week-day-label--weekend {
+  color: var(--color-weekend);
+}
+
+.home__week-date {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-date-number);
+}
+
+.home__week-date--selected {
+  color: var(--color-accent);
+}
+
+.home__plans-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 12px;
+}
+
+.home__plans-title {
+  font-size: 18px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.home__plans-count {
+  margin-left: 4px;
+  color: var(--color-primary);
+}
+
+.home__add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-body);
+}
+
+.home__item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 80px;
+  border-bottom: 1px solid #f6f6f6;
+}
+
+.home__item-checkbox {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-assist);
+}
+
+.home__item.is-done .home__item-checkbox {
+  color: var(--color-primary);
+}
+
+.home__item-time {
+  width: 46px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.home__item-title-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.home__item-title {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.home__item-pin-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #eb0000;
+}
+
+.home__item.is-done .home__item-time,
+.home__item.is-done .home__item-title {
+  color: var(--color-assist);
+}
+
+.home__item-more {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-body);
+}
+
+.home__item.is-done .home__item-more {
+  color: var(--color-assist);
+}
+
+.home__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+}
+
+.home__empty-image {
+  width: 196px;
+  height: 184px;
+  object-fit: contain;
+}
+
+.home__complete-cta {
+  margin: 16px;
+  width: calc(100% - 32px);
+}

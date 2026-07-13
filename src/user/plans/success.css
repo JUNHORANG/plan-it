@@ -1,0 +1,104 @@
+/*
+  일정 완료 (/user/plans/success.html)
+  참조: Figma "/plans/success"(4006:940)
+
+  이미지 영역: 원본 소스(good_titi.png)의 피사체(지구본)가 이미지 캔버스 중앙보다
+  오른쪽에 치우쳐 있어, Figma에서도 이미지를 컨테이너 폭(375) 기준 정중앙이 아니라
+  좌측 10.1333%(38/375)에 오프셋을 줘 시각적 피사체가 가운데로 오도록 보정한다.
+  전부 %(비율) 기반이라 화면이 넓어져도 이 오프셋·이미지 폭 비율이 그대로 유지된다.
+*/
+
+.plan-success {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - var(--app-bar-height));
+  padding: 60px 24px 140px;
+  text-align: center;
+}
+
+.plan-success__title {
+  font-family: var(--font-family-brand);
+  font-size: 36px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.plan-success__desc {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.plan-success__image-area {
+  position: relative;
+  align-self: stretch;
+  width: calc(100% + 48px);
+  margin: 28px -24px 0;
+  aspect-ratio: 375 / 195;
+  overflow: hidden;
+}
+
+.plan-success__image {
+  position: absolute;
+  top: 0;
+  left: 10.1333%;
+  width: 70.9333%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.plan-success__spacer {
+  flex: 1 1 auto;
+  min-height: 24px;
+}
+
+@keyframes plan-success-points-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
+.plan-success__points {
+  font-family: var(--font-family-brand);
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  animation: plan-success-points-rise 2.6s ease forwards;
+}
+
+.plan-success__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 600px) {
+  .plan-success {
+    min-height: calc(100vh - var(--app-bar-height-tablet));
+  }
+
+  .plan-success__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+}

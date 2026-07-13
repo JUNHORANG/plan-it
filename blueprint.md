@@ -266,15 +266,16 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [x] 정적 서버 실행 확인 — `npm run dev` (`scripts/dev-server.js`, src/+public/ 병합 서빙, 기본 포트 3000)
 - [x] `shared/css/variables.css` — 전역 변수, 리셋 (Figma 폰트 시스템 4111:853 기준 컬러·타이포 토큰 반영)
 - [x] `shared/css/layout.css` — 헤더/앱바/레이아웃 공통 (mount point 셸 배치만, 컴포넌트별 스타일은 shared/components/*.css)
-- [ ] `shared/js/utils.js` — `requireAuth`, `getQuery`, `navigate`, 날짜·포인트 포맷, storage 래퍼
-- [ ] `shared/js/data.js` — 목 데이터
-- [ ] `shared/js/api.js` — 목 API (지연·실패 시 `/timeout/` 이동)
+- [x] `shared/js/utils.js` — `toISODate`, `getWeekDates`, `formatFullDateLabel`, `storage` 래퍼 구현. `requireAuth`/`getQuery`/`navigate`는 아직 (인증 가드 붙일 때 추가)
+- [x] `shared/js/data.js` — 목 일정 데이터 (오늘/내일 날짜 기준 동적 생성)
+- [x] `shared/js/api.js` — `getPlansByDate`(고정 항목 상단 정렬, 고정 2개 이상이면 그 안에서도 시간 오름차순), `setPlanDone`(id, done — 체크 시 로컬 낙관적 업데이트와 값이 어긋나지 않도록 내부에서 toggle 하지 않고 호출측이 정한 값을 그대로 저장), `pinPlan`(다중 고정 허용), `deletePlan` (지연 시뮬레이션만, 실패·`/timeout/` 이동 케이스는 아직)
 
 ### 2단계: 공통 UI 컴포넌트 (ES 모듈)
 - [x] `header` — 로고·종(알림 뱃지)·햄버거, 재사용 컴포넌트(4132:588) "헤더" 섹션 기준. 햄버거 클릭 시 `nav-drawer.js`의 `openNavDrawer()` 호출로 연동 (`shared/components/header.css`, `.js`)
 - [x] `app-bar` — 뒤로가기(44px 터치영역)+제목, 모바일 60px/타블렛 68px 높이 (`shared/components/app-bar.css`, `.js`)
 - [x] `nav-drawer` — Figma 나브 모바일(4007:333)/타블렛(4146:1022) 기준 1차 구현 (`shared/components/nav-drawer.css`, `.js`)
-- [ ] `bottom-sheet` / `modal`
+- [x] `bottom-sheet` — Figma "일정 - 바텀 시트"(4006:323) 기준. 범용 셸(`openBottomSheet`) + 목록형 헬퍼(`openListBottomSheet`, 고정/수정/삭제 등 재사용) 구현. 배경 블러(6px)+딤, 아래→위 슬라이드, X/배경 클릭 닫힘, CTA 로딩→성공 시 닫힘+토스트/실패 시 유지+토스트 (`shared/components/bottom-sheet.css`, `.js`)
+- [ ] `modal`
 - [x] `toast` — 재사용 컴포넌트(4132:588) "토스트" 섹션 기준 재구현: 흰 카드 + 상태 점(성공 초록/실패 빨강) + 텍스트 (`shared/components/toast.css`, `.js`)
 - [x] `input` — 로그인 이메일/비밀번호 입력창 기준 구현, 눈 아이콘 토글 포함 (`shared/components/input.css`, `.js`)
 - [x] `cta-button` — 비활성/활성/로딩(점 3개) 상태 구현 (`shared/components/cta-button.css`, `.js`)
@@ -288,10 +289,14 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [ ] `user/auth/resign/index.*` — 이메일 인증 후 탈퇴, 시간초과 시 이동
 
 ### 4단계: 홈 & 일정
-- [ ] `user/plans/index.*` — 다음 일정 / 금주 날짜 선택(`?date=`) / 날짜별 목록(시간 오름차순) / 체크박스 완료 / 더보기 바텀시트(고정·수정·삭제) / 전체완료 시 완료 CTA → `success.html` / **최초 진입 온보딩 3-step**
+- [x] `user/plans/index.*` (1차) — Figma 일정-기본(4066:724)/리스트(4005:67)/스켈레톤(4095:444) 기준. 다음 일정 제목(완료 안 된 항목 중 가장 이른 시간, 없으면 "일정을 추가해 주세요!") / 금주 월~일 날짜 선택 클릭 시 해당 날짜 데이터 재조회 / 날짜별 목록(시간 오름차순) / 체크박스로 완료 토글 / 전체완료 시 "일정 완료!" CTA → `success.html`. `empty_list.png`는 선택한 날짜에 일정이 0개일 때만 표시
+  - [x] 더보기(⋮) → 고정·수정·삭제 바텀시트 연동. 고정=상단 정렬(다중 고정 가능, 2개 이상이면 시간 오름차순 재정렬), 삭제=목록에서 제거, 수정=`/user/plans/edit.html?planId=` 이동(페이지는 아직 없음). 고정된 항목은 제목 옆에 빨간 점(Figma 4007:232 실측 `#eb0000`) 표시
+  - [ ] 최초 진입 온보딩 3-step
+  - [ ] `?date=` 쿼리스트링 연동 (현재는 클릭 시 메모리 상태만 갱신, URL 미반영)
+  - [ ] `requireAuth` 가드 (로그인 성공 시 토큰 저장 로직도 아직 없음)
 - [ ] `user/plans/add.*` — 일정 입력, 시간·시작일·종료일·주기(휠피커 바텀시트), 유효성(종료≥시작)
 - [ ] `user/plans/edit.*` — add 로직 재사용 + `?planId=` 프리필
-- [ ] `user/plans/success.*` — 완료 일러스트 + 지급 포인트(`?points=`) 애니메이션 → 프로필 이동
+- [x] `user/plans/success.*` — 완료 일러스트(`good_titi.png`) + 지급 포인트(`?points=`, 완료 개수×10) 카운트업 애니메이션(아래→위 등장 후 위로 사라짐) → CTA로 `/user/profile/` 이동. 전용 Figma "/plans/success"(4006:940) 반영 완료 — §9 참조
 
 ### 5단계: 캘린더
 - [ ] `user/calendar/index.*` — 월 이동, 날짜 선택, 선택일 일정 바텀시트(핸들 높이 조절), 더보기(고정·수정·삭제)
@@ -355,5 +360,6 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 9. **헤더 로고 표기** — 재사용 컴포넌트(4132:588)의 헤더 워드마크가 모바일은 "PLAN !T", 타블렛은 "PLAN T!T"로 다르게 적혀 있음(오타로 추정) → `header.js`는 두 브레이크포인트 모두 "PLAN !T"로 통일해 구현. 실제 의도 확인 필요
 10. **종 아이콘 소스** — Figma 원본 레이어명은 `solar:bell-outline`(solar 아이콘셋)이지만 프로젝트 아이콘 컨벤션(CLAUDE.md, lucide-icons 고정)에 맞춰 `header.js`에서 lucide의 `Bell`로 대체함 → 디자인 의도상 solar 아이콘셋 병행 사용이 필요하면 컨벤션 재논의 필요
 11. **로그인 실패 안내 방식** — ~~spec.md는 "실패 토스트를 띄운다"고 적혀 있지만, 로그인 에러 화면(4434:1479) 캡처에는 토스트 없이 인라인 문구만 보여 처음엔 인라인 문구만 구현했었음~~ → 이후 재사용 컴포넌트(4132:588)에 에러 토스트("요청에 실패 했습니다.")가 추가돼 **인라인 문구 + 토스트 둘 다** 띄우는 것으로 확정. 입력값은 지우지 않고 유지, 두 입력창 빨간 테두리, CTA 버튼은 실패 후 다시 비활성(연한 초록) 상태로 돌아가 사용자가 값을 수정해야 재시도 가능. 다른 실패 케이스(회원가입 등)에도 이 패턴(인라인+토스트 동시)을 적용
+12. ~~**일정 완료 화면 디자인 부재**~~ → 전용 Figma "/plans/success"(4006:940) 확보돼 반영 완료. 확정 사항: 제목은 `--font-family-brand`(Gmarket Sans) 36px, 안내 문구는 한 줄("포인트를 지급 했어요!", 16px medium, `--color-primary`) — spec.md의 2번째 문장("포인트를 모아서...")은 Figma에 없어 제외, CTA 라벨은 "포인트 확인 하기"(공백 포함, 기존 임의 문구 대체), 지급 포인트는 "+ N POINT" 형식·`--color-accent`·Gmarket Sans 20px. 이미지 영역: 원본 `good_titi.png`의 피사체(지구본)가 캔버스 중앙보다 오른쪽에 있어 Figma도 컨테이너 폭 기준 좌측 10.1333%(38/375) 오프셋·70.9333%(266/375) 폭으로 배치(정중앙 아님) — `%` 기반으로 구현해 화면 폭이 달라져도 동일 비율 유지
 
 > 위 항목은 구현 착수 전 확정 권장.
