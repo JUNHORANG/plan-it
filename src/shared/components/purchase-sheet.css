@@ -1,0 +1,99 @@
+/*
+  구매 확인 바텀시트 — Figma "구매창"(4278:893) 실측. 제목/X 헤더 없는 전용 레이아웃이라
+  shared/components/bottom-sheet.css(공용 바텀시트)와 별개로 둔다.
+*/
+.purchase-sheet {
+  position: fixed;
+  inset: 0;
+  max-width: var(--breakpoint-tablet);
+  margin: 0 auto;
+  z-index: 200;
+  visibility: hidden;
+}
+
+.purchase-sheet.is-open {
+  visibility: visible;
+}
+
+.purchase-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.purchase-sheet.is-open .purchase-sheet__backdrop {
+  opacity: 1;
+}
+
+/* 구매 페이지에서 재사용할 때: 외부 클릭으로 닫히는 동작은 유지하되 배경 딤/블러는 뺀다 */
+.purchase-sheet--no-backdrop .purchase-sheet__backdrop {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.purchase-sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 15px 16px max(24px, env(safe-area-inset-bottom));
+  background: var(--color-white);
+  border-radius: 20px 20px 0 0;
+  box-shadow: -2px 0 10px rgba(68, 70, 91, 0.08);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+}
+
+.purchase-sheet.is-open .purchase-sheet__panel {
+  transform: translateY(0);
+}
+
+.purchase-sheet__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.purchase-sheet__name {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.purchase-sheet__remaining {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.purchase-sheet__remaining-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.purchase-sheet__remaining-text {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+}
+
+.purchase-sheet__disclaimer {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-input-assist);
+}

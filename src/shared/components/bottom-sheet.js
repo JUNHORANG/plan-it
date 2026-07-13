@@ -17,6 +17,7 @@
 import { createElement, X } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 import { createCtaButton } from "./cta-button.js";
 import { showToast } from "./toast.js";
+import { lockScroll, unlockScroll } from "../js/utils.js";
 
 let active = null;
 
@@ -25,11 +26,13 @@ export function closeBottomSheet() {
   const { el } = active;
   el.classList.remove("is-open");
   active = null;
+  unlockScroll();
   setTimeout(() => el.remove(), 250);
 }
 
 export function openBottomSheet({ title = "", render, submitLabel = "저장", getValue, onSubmit } = {}) {
   closeBottomSheet();
+  lockScroll();
 
   const root = document.querySelector("#overlay-root");
   const el = document.createElement("div");

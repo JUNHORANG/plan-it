@@ -88,6 +88,9 @@
   left: 16px;
   right: 16px;
   bottom: max(16px, env(safe-area-inset-bottom));
+  /* .cta-button은 width:100%(뷰포트 기준)라 left+right만으론 안 밀리고 오른쪽으로 16px
+     삐져나감 — width:auto로 밀어줘야 left/right 사이 폭으로 다시 계산된다 */
+  width: auto;
 }
 
 @media (min-width: 600px) {

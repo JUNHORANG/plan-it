@@ -1,0 +1,240 @@
+/*
+  구매 (/user/products/order/?id=)
+  참조: Figma "상점 - 구매"(4293:1252 기본) / 주소지 입력 활성화(4295:1489) / 구매 동의 체크(4295:1464)
+  — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
+*/
+
+/* 이 페이지만 배경이 흰색이 아니라 --color-order-bg(4293:1252 실측) — body 자체를 물들이고
+   앱바는 투명하게 둬서 앱바 영역까지 이어지는 하나의 배경색으로 보이게 한다(#app-bar는
+   다른 페이지와 공유하는 sticky 흰 배경이라, 여기서만 오버라이드) */
+body {
+  background-color: var(--color-order-bg);
+}
+
+.app-bar {
+  background-color: transparent;
+}
+
+.order {
+  padding-bottom: 24px;
+  min-height: calc(100vh - var(--app-bar-height));
+}
+
+.order__product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 23px 0 35px 0;
+}
+
+.order__product-image {
+  width: 47px;
+  height: 66px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.order__product-price {
+  font-size: 20px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-price);
+  min-height: 24px;
+}
+
+.order__product-name {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+  min-height: 17px;
+}
+
+.order-card {
+  background: var(--color-white);
+  border: 2px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 23px 18px;
+  transition: border-color 0.15s ease;
+}
+
+.order-card + .order-card {
+  margin-top: 15px;
+}
+
+/* 주소지 입력창(4295:1489 실측): 입력창에 포커스가 들어가면 카드 전체 테두리가 초록으로
+   바뀐다. "값이 있는 상태(4295:1369)"에서는 접힌 카드 테두리가 그대로 회색이라, 값 유무가
+   아니라 순수 포커스 여부로만 반응해야 함 — :focus-within으로 처리(JS 상태 불필요) */
+.order-card--address:focus-within {
+  border-color: var(--color-primary);
+}
+
+/* 구매 동의 카드(4295:1464 실측): 체크하면 카드 전체 테두리도 초록으로 */
+.order-card--agree.is-checked {
+  border-color: var(--color-primary);
+}
+
+.order-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.order-card__label-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.order-card__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--color-body);
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.order-card__label {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+.order-card__value {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+  min-height: 19px;
+}
+
+.order-card__value--muted {
+  color: var(--color-assist);
+}
+
+/* 주소지 카드 */
+.order-card__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.order-card__toggle .order-card__value {
+  flex: 1;
+  text-align: right;
+}
+
+.order-card__chevron {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-row-chevron);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.order-card__toggle.is-open .order-card__chevron {
+  transform: rotate(180deg);
+}
+
+/* 주소지 입력폼을 아코디언처럼 부드럽게 펼치고/접는다(다른 오버레이들의 슬라이드 애니메이션과
+   톤을 맞춤). grid-template-rows: 0fr → 1fr 기법 — 내용 높이를 몰라도 자연스럽게 늘어난다 */
+.order-card__expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  transition:
+    grid-template-rows 0.25s ease,
+    margin-top 0.25s ease;
+}
+
+.order-card__expand.is-open {
+  grid-template-rows: 1fr;
+  margin-top: 20px;
+}
+
+.order-card__expand-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.order-card__save {
+  align-self: flex-end;
+  font-size: 12px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-assist);
+  padding: 4px 2px;
+}
+
+/* 구매 동의 카드 */
+.order-card__agree-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.order-card__checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--color-card-border);
+  color: transparent;
+  flex-shrink: 0;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.order-card__checkbox.is-checked {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.order-card__agree-title {
+  font-size: 18px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.order-card__row--sub {
+  margin-top: 25px;
+}
+
+.order-card__divider {
+  margin-top: 16px;
+  height: 1px;
+  background: var(--color-card-border);
+}
+
+.order-card__use-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  height: 47px;
+  padding: 0 15px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 5px;
+}
+
+.order-card__use-label,
+.order-card__use-value {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-assist);
+}
+
+.order-card__use-value.is-checked {
+  color: var(--color-primary);
+}
