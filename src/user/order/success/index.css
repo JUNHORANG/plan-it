@@ -1,0 +1,57 @@
+/*
+  구매 완료 (/user/order/success/?orderId=)
+  참조: spec.md "구매 완료" — 일정 완료(success) 화면과 같은 "완료" 템플릿 톤 재사용
+  (전용 Figma 프레임은 API rate limit로 확인 못함 — blueprint.md §9 참조)
+*/
+
+.order-success {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - var(--app-bar-height));
+  padding: 100px 0 0px;
+  text-align: center;
+}
+
+.order-success__title {
+  font-family: var(--font-family-brand);
+  font-size: 36px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.order-success__image {
+  width: 357px;
+  object-fit: contain;
+  margin-top: 24px;
+}
+
+.order-success__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  /* .cta-button은 width:100%(뷰포트 기준)라 left+right만으론 안 밀리고 오른쪽으로 16px
+     삐져나감(4295:1520에서도 좌우 16px 여백) — width:auto로 밀어줘야 left/right 사이 폭으로
+     다시 계산된다 */
+  width: auto;
+}
+
+@media (min-width: 600px) {
+  .order-success {
+    min-height: calc(100vh - var(--app-bar-height-tablet));
+  }
+
+  .order-success__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+
+  .order-success__image {
+    width: 520px;
+  }
+}

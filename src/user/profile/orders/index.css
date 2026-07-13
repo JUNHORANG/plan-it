@@ -1,0 +1,178 @@
+/*
+  주문 내역 (/user/profile/orders/) 전용 스타일
+  참조: Figma "profile/orders"(4376:1786) — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
+*/
+
+/* 이 페이지도 구매 페이지와 같은 --color-order-bg 배경(실측 동일 값) — 페이지별 stylesheet라
+   다른 화면엔 영향 없음 */
+body {
+  background-color: var(--color-order-bg);
+}
+
+.orders__points {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-top: 1px solid var(--color-sheet-divider);
+  border-bottom: 1px solid var(--color-sheet-divider);
+  background-color: #fff;
+  margin-right: -16px;
+  margin-left: -16px;
+}
+
+.orders__points-label {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+.orders__points-pill {
+  padding: 2px 10px;
+  border-radius: 5px;
+  background: var(--color-surface);
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  min-height: 19px;
+}
+
+.orders__count {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+  min-height: 21px;
+}
+
+.orders__count strong {
+  color: var(--color-primary);
+}
+
+.orders__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.orders__item {
+  background: var(--color-white);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 14px 18px 18px;
+}
+
+.orders__item-status-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.orders__item-status {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+}
+
+.orders__item-status-icon {
+  display: inline-flex;
+  color: var(--color-assist);
+}
+
+.orders__item.is-cancelling .orders__item-status {
+  color: var(--color-error);
+}
+
+.orders__item.is-shipping .orders__item-status {
+  color: var(--color-primary);
+}
+
+.orders__item-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.orders__item-image {
+  width: 47px;
+  height: 66px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.orders__item-price {
+  font-size: 20px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-price);
+}
+
+.orders__item-name {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+}
+
+.orders__item-divider {
+  margin-top: 17px;
+  height: 1px;
+  background: var(--color-card-border);
+}
+
+.orders__item-remaining {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  height: 47px;
+  padding: 0 15px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 5px;
+}
+
+.orders__item-remaining-label,
+.orders__item-remaining-value {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.orders__item-remaining-label {
+  color: var(--color-assist);
+}
+
+.orders__item-remaining-value {
+  color: var(--color-body);
+}
+
+.orders__item-cancel {
+  margin-top: 15px;
+  width: 100%;
+  height: 47px;
+  border-radius: 5px;
+  background: var(--color-primary);
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary);
+}
+
+.orders__item-cancel:disabled {
+  background: var(--color-primary-disabled-bg);
+  cursor: not-allowed;
+}
+
+.orders__empty {
+  padding: 60px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-input-assist);
+}
+@media (min-width: 600px) {
+  .orders__points {
+    margin-right: -24px;
+    margin-left: -24px;
+    padding: 20px 24px;
+  }
+}

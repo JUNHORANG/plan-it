@@ -223,6 +223,7 @@ plan-it/
                 ├── app-bar.js / app-bar.css
                 ├── nav-drawer.js / nav-drawer.css
                 ├── bottom-sheet.js / bottom-sheet.css
+                ├── purchase-sheet.js / purchase-sheet.css
                 ├── modal.js / modal.css
                 ├── content-drawer.js / content-drawer.css
                 ├── input.js / input.css
@@ -244,7 +245,8 @@ plan-it/
 | **header** | `mountHeader('#header')` | 로고→`/user/plans/` · 종→`/user/notification/`(새 알림 시 빨간 뱃지) · 햄버거→나브 열기 |
 | **app-bar** | `mountAppBar('#header', {title})` | 뒤로가기 → `history.back()` 또는 지정 도메인 |
 | **nav-drawer** | `mountNavDrawer('#nav-drawer')` | 홈/캘린더/스토어/랭킹/프로필/알림 이동 · X로 닫기 |
-| **bottom-sheet** | `openBottomSheet(opts)` | X·외부영역 닫힘 / 아래→위 애니메이션 / 항목 강조 / 기본값 없으면 CTA 비활성 / 요청중 스피너 / 성공→닫고 토스트, 실패→유지+토스트 / 핸들 높이 조절 |
+| **bottom-sheet** | `openBottomSheet(opts)` | X·외부영역 닫힘 / 아래→위 애니메이션 / 항목 강조 / 기본값 없으면 CTA 비활성 / 요청중 스피너 / 성공→닫고 토스트, 실패→유지+토스트 / 핸들 높이 조절 / 열려있는 동안 배경 스크롤 잠금(`shared/js/utils.js`의 `lockScroll`/`unlockScroll`) |
+| **purchase-sheet** | `openPurchaseSheet({name, remaining, submitLabel, onConfirm, backdrop, onClose})` | 제목/X 없는 전용 구매 확인 시트(4278:893). `backdrop:false`로 배경 딤 제거 가능(구매 페이지), `onClose`로 트리거 상태 복원, 열려있는 동안 배경 스크롤 잠금(bottom-sheet와 동일한 `lockScroll`/`unlockScroll`) |
 | **modal** | `openModal(opts)` | X·취소·외부영역 닫힘 / 실패 시 에러 토스트 |
 | **content-drawer** | `openContentDrawer({title, render})` | 앱바 톤 헤더(뒤로가기+제목) + 임의 콘텐츠, 오른쪽에서 슬라이드 (행성변경/약관/개인정보) |
 | **input** | `createInput(opts)` | 안내문구 / 포커스 강조 / blur 유효성 / 검증성공 색상 / 실패 error 테두리+오류문구 |
@@ -313,10 +315,16 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [ ] `user/calendar/index.*` — 월 이동, 날짜 선택, 선택일 일정 바텀시트(핸들 높이 조절), 더보기(고정·수정·삭제)
 
 ### 6단계: 상점 · 구매 · 주문 내역
-- [ ] `user/store/products/index.*` — 내 포인트, 제품 목록(씨앗·식물·묘목), 구매 확인 바텀시트 → `order/?id=`
-- [ ] `user/products/order/index.*` — 제품 정보(`?id=`), 주소지 입력·저장, 구매 동의 체크 → 구매 바텀시트 → `success/?orderId=`
-- [ ] `user/order/success/index.*` — 구매 완료 → 주문 내역 이동
-- [ ] `user/profile/orders/index.*` — 내 포인트, 주문 내역(접수중·취소접수중·배송중), 주문 취소 모달
+구매완료/주문내역 2개 화면은 전용 Figma 프레임을 API rate limit(429)로 끝내 못 받아와
+spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §9 참조. 스토어(4278:843)·구매
+(4293:1252 등)는 이후 Desktop Bridge 플러그인 경로(로컬, REST API 우회)로 실측 확보해 반영.
+- [x] `user/store/products/index.*` — Figma "/store"(4278:843) 반영: 아이콘(`store_icon.png`)+"스토어" 타이틀(24px) → "나의 포인트" 라벨+회색 필(pill) 배경의 포인트 값 → 단일 열 상품 리스트(썸네일 80×80 + 카테고리/이름/가격, 가격은 초록 원형 "P" 배지+검정 숫자). 카테고리는 spec.md의 "씨앗·식물·묘목"이 아니라 Figma 실측 "나무"/"다육식물" 2종을 그대로 사용(§9), 상품 7종·가격·이미지 매핑(나무=`tree3.png`/`tree2.png`, 다육식물=`tree1.png`)도 Figma 그대로. 행 클릭 시 구매 확인 바텀시트 → `order/index.html?id=`
+  - [x] 타블렛(≥600px) 리스트 항목(4324:1295 실측) — 카테고리/이름 묶음(`.store__item-info`)과 가격을 세로로 쌓지 않고 한 행에서 좌우 끝으로 배치(`justify-content:space-between`), 가격도 모바일보다 크게(배지 15→17px, 숫자 12→16px medium)
+  - [x] 구매 확인 바텀시트(4278:893 "구매창" 실측) — 실측 결과 제목/X 헤더가 아예 없는 레이아웃(이름+잔여포인트 줄 / CTA / 안내문구만 존재)이라 공용 `shared/components/bottom-sheet.js`를 쓰지 않고 전용 컴포넌트 `shared/components/purchase-sheet.js`(+`.css`)로 구현 — 상점 목록과 구매 페이지 양쪽에서 재사용(아래 참조). 배경 블러+딤/외부 클릭·Esc 닫힘/아래→위 슬라이드는 공용 바텀시트와 동일하게 유지. "결제 후 포인트 N"은 주황 원형 "P" 배지(`--color-accent`), CTA 버튼은 `createCtaButton` 재사용, 버튼 아래 "주문 내용을 확인 하였으며, 정보 제공 등에 동의 합니다." 안내 문구. `onConfirm`이 `{ok:false}` 반환 시 에러 토스트+유지(bottom-sheet.js와 동일 규약), `onClose` 콜백으로 호출측이 트리거 상태(체크박스 등)를 되돌릴 수 있음
+- [x] `user/products/order/index.*` — Figma "상점 - 구매"(4293:1252 기본) / 주소지 입력 활성화(4295:1489) / 구매 동의 체크(4295:1464) 반영. 앱바 타이틀은 제품명이 아니라 고정 문구 "결제", 제품 정보는 가격(20px semibold 검정)이 이름(14px regular) 위에 옴(다른 화면과 반대 순서). 카드 3개(흰 배경, `--color-card-border` 테두리, radius12): ①MY 포인트(다크그레이 원형 "P" 배지) ②주소지(기본 없음 4295:1338/값 있음 4295:1369 모두 접힌 카드 테두리는 회색 유지, 꺽쇠로 입력폼 토글 — 펼쳐도 카드 테두리는 회색이다가 입력창에 포커스가 들어갈 때만(4295:1489) 카드 전체 테두리가 초록으로 바뀜(`:focus-within`, JS 상태 불필요). 공용 `input-field`가 그대로 focus/valid 색상과 일치해 입력창 자체는 별도 스타일 불필요. "주소지 저장" 클릭 시 `planit.address`(localStorage)에 저장 — 페이지를 새로고침해도 유지되고 다음 방문 시 프리필) ③구매 동의(원형 체크박스+굵은 제목이 곧 토글 버튼, 체크 시 원 배경 회색→초록/사용 포인트 값 회색→초록, **체크하는 순간** 구매 바텀시트가 배경 딤 없이 열림 — `purchase-sheet`를 `backdrop:false`로 재사용, 사용자 요청). 페이지 배경은 다른 화면과 달리 흰색이 아니라 `--color-order-bg`(#f8f9fb) — 이 페이지 CSS에서 `body` 배경 자체를 오버라이드(페이지별 stylesheet라 다른 화면엔 영향 없음)하고 `.app-bar`는 투명 처리해 앱바 영역까지 같은 배경색 하나로 이어지게 함. `createOrder()` 성공 시 `../../order/success/index.html?orderId=`
+- [x] `user/order/success/index.*` — Figma "구매 완료"(4295:1520) 반영: 안내 문구 "구매 완료!" + 일러스트(`smile_titi.png`, 피사체가 중앙이라 오프셋 보정 불필요) → CTA "주문 내역 확인하기"로 `/user/profile/orders/` 이동(§9 "구매 완료 이동" 항목과 동일한 해석). 라벨은 실제로는 "구매 내역 확인"이지만 주문내역 페이지 이동 흐름과 맞춰 기존 문구 유지
+  - [x] **버그 수정**: 모바일에서 CTA가 화면 오른쪽으로 16px 밀려나가던 문제 — `.cta-button`(공용, `width:100%`)과 `position:fixed;left:16px;right:16px`를 같이 쓰면 `width:100%`가 뷰포트 기준으로 먼저 계산되면서 `right`가 무시돼 버림. `width:auto`를 추가로 얹어야 left/right 사이 폭으로 재계산됨 — `plan-success__cta`(일정 완료)에도 동일한 버그가 있어 같이 수정. 이 "고정 CTA + left/right 16px" 패턴을 새로 쓸 때는 항상 `width:auto`를 같이 넣을 것
+- [x] `user/profile/orders/index.*` — Figma "profile/orders"(4376:1786) 반영. "나의 포인트" 바는 상점과 동일한 라벨+초록 필(pill), "주문 내역 N건" 타이틀(18px semibold + 초록 건수). 카드(흰 배경, `--color-card-border`): 상태 행(`lucide/Info` 아이콘 + 상태 텍스트 — 주문 접수 중은 `--color-accent`, 취소 접수 중은 `--color-error`, 주문 배송 중은 `--color-primary`, 배송중 색상은 실측 예시가 없어 팔레트 흐름상 추정) → 제품(가격 20px semibold이 이름 위, 구매 페이지와 동일 순서) → 구분선 → "사용 후 포인트" 박스 → "주문 취소" 버튼. **주문 취소 버튼은 "주문 접수 중"일 때만 활성화**(진한 초록), 취소 접수 중·주문 배송 중이면 비활성화(`--color-primary-disabled-bg` — 연한 초록, 실측 색상 값과 정확히 일치, 사용자 지정 규칙) → 주문 취소 모달(`openModal`) 확인 시 `cancelOrder()`로 상태 전환
 
 ### 7단계: 프로필 & 드로워
 - [x] `user/profile/index.*` — Figma "/profile"(4007:187) 기준. 행성 캐릭터(기본:지구, `front_titi.png`)·닉네임·이메일(스켈레톤) + 포인트/STORE/주문내역 카드(`store_icon.png`/`truck.png`, `--color-page-bg` 배경) + 세팅 리스트(로그아웃 모달·행성변경/약관/개인정보 드로워·계정탈퇴 이동·버전). "계정 탈퇴" 행은 Figma에서 `visible:false`였지만 spec.md 명시 요구사항이라 포함 — §9 참조
@@ -352,8 +360,8 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - **User**: `{ nickname, email, points, planet }` — `shared/js/data.js`의 `user` 목데이터로 구현
 - **Planet**: `{ id, name, image }` — `shared/js/data.js`의 `planets` 목데이터. 현재 지구/달 2종만 존재(§9)
 - **Plan**: `{ id, title, time, startDate, endDate, repeat(당일·매일·매주·격주·매월·매년), done, pinned }`
-- **Product**: `{ id, name, price, category(씨앗·식물·묘목), image }`
-- **Order**: `{ id(8자리), productId, status(주문접수중·취소접수중·배송중·주문취소), address }`
+- **Product**: `{ id, name, price, category(씨앗·식물·묘목), image }` — `shared/js/data.js`의 `products` 목데이터(3종)
+- **Order**: `{ id(8자리), productId, status(주문 접수 중·취소 접수 중·주문 배송 중), pointsUsed, remainingAfter, address }` — `shared/js/data.js`의 `orders` 목데이터. `remainingAfter`는 주문 직후 시점의 잔여 포인트 스냅샷(주문 내역 화면 표시용), `createOrder()`가 생성 시점에 기록
 - **Ranking**: `{ rank, nickname, points }`
 - **Notification**: `{ id, planId, message, active }`
 
@@ -375,5 +383,10 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 12. ~~**일정 완료 화면 디자인 부재**~~ → 전용 Figma "/plans/success"(4006:940) 확보돼 반영 완료. 확정 사항: 제목은 `--font-family-brand`(Gmarket Sans) 36px, 안내 문구는 한 줄("포인트를 지급 했어요!", 16px medium, `--color-primary`) — spec.md의 2번째 문장("포인트를 모아서...")은 Figma에 없어 제외, CTA 라벨은 "포인트 확인 하기"(공백 포함, 기존 임의 문구 대체), 지급 포인트는 "+ N POINT" 형식·`--color-accent`·Gmarket Sans 20px. 이미지 영역: 원본 `good_titi.png`의 피사체(지구본)가 캔버스 중앙보다 오른쪽에 있어 Figma도 컨테이너 폭 기준 좌측 10.1333%(38/375) 오프셋·70.9333%(266/375) 폭으로 배치(정중앙 아님) — `%` 기반으로 구현해 화면 폭이 달라져도 동일 비율 유지
 13. **행성 변경/이용약관/개인정보 드로워 전용 Figma 미확인** — 프로필(4007:187)은 확보했지만 이 3개 드로워는 Figma API rate limit(429)로 프레임을 못 받아옴 → spec.md 텍스트만으로 `content-drawer`(앱바 톤 헤더+콘텐츠) 공통 셸을 만들어 구현. 행성 컬렉션은 `public/images`에 실제로 존재하는 행성류 이미지가 `front_titi.png`(지구)·`moon.png`(달) 2종뿐이라 이 둘로만 구성 — 실제 Figma 프레임/추가 행성 에셋 확보되면 교체·확장 필요. 이용약관/개인정보 처리방침 본문도 정의서에 실제 문구가 없어 플레이스홀더 텍스트로 채움
 14. **데스크탑(600px 초과) 뷰** — Figma "데스크탑"(4159:806) 기준으로 확정: `body`는 600px 카드로 고정, 바깥 캔버스는 `--color-page-bg`(#f7f7f7, html에 적용), 카드 그림자는 `#overlay-root`에 `box-shadow: 0 0 4px rgba(0,0,0,.09)`. Figma의 "qr 영역"(4405:1251, 139×128, 흰 배경 + `--color-qr-border` 테두리, radius 5)은 카드 왼쪽 아래 여백에 `#desktop-qr`로 배치했지만 **내용은 비워둠** — 추후 모바일 접속용 QR 이미지를 이 안에 넣을 예정. 카드와 겹치지 않을 최소 폭(`min-width:960px`)에서만 노출
+
+15. ~~**상점 전용 Figma 미확인**~~ → REST API가 계속 rate limit(429)이었지만, Figma Desktop에 Desktop Bridge 플러그인이 연결돼 있어 `figma_capture_screenshot`/`figma_execute`(플러그인 로컬 실행, REST 안 거침)로 "/store"(4278:843) 실측 확보해 반영 완료. 카테고리는 spec.md "씨앗·식물·묘목"이 아니라 실측 "나무"/"다육식물" 2종, 상품 7종(사철 나무 묘목·구슬 얽이·고스티×2·사과 나무 묘목·오육 나무 묘목·달랑 나무 묘목)·가격·이미지 매핑 모두 실측 그대로.
+16. ~~**구매 전용 Figma 미확인**~~ → Desktop Bridge 플러그인 경로(`figma_execute`, REST 우회)로 기본(4293:1252)/주소지 입력 활성화(4295:1489)/구매 동의 체크(4295:1464) 3개 상태 모두 확보해 반영 완료.
+17. ~~**주문내역 전용 Figma 미확인**~~ → `figma_execute`로 "profile/orders"(4376:1786) 확보해 반영 완료(위 6단계 체크리스트 참조).
+18. **구매완료 전용 Figma 미확인** — 이 화면은 여전히 전용 프레임을 못 받아와 spec.md 텍스트 + 기존 디자인 언어로 구현. 15·16·17번과 같이 Figma Desktop에 파일이 열려 있고 플러그인이 연결된 상태라면 `figma_execute`로 재시도 가능.
 
 > 위 항목은 구현 착수 전 확정 권장.

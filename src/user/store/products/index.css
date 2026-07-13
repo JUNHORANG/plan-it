@@ -1,0 +1,192 @@
+/*
+  상점 (/user/store/products/) 전용 스타일
+  참조: Figma "/store"(4278:843) — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
+*/
+
+.store__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 27px;
+}
+
+.store__title-icon {
+  width: 24px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.store__title-text {
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+.store__points {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding: 20px 16px;
+  border-top: 1px solid #f1f1f1;
+  border-bottom: 1px solid #f1f1f1;
+  box-shadow: 0px 8px 16px -8px rgba(0, 0, 0, 0.12);
+  /* 요소의 위쪽, 왼쪽, 오른쪽 바깥 영역을 잘라내어 그림자가 안 보이게 만듭니다 */
+  clip-path: inset(0px -30px -30px -30px);
+  position: sticky;
+  top: var(--header-height);
+  left: 0;
+  background-color: #fff;
+}
+
+.store__points-label {
+  font-size: 16px;
+  color: var(--color-body);
+  min-height: 19px;
+  font-weight: 600;
+}
+
+.store__points-pill {
+  padding: 2px 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  min-height: 19px;
+}
+.store_line {
+  margin-left: -16px;
+  margin-right: -16px;
+  height: 10px;
+  background-color: #f7f7f7;
+}
+.store__list {
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.store__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 88px;
+  border-bottom: 1px solid var(--color-sheet-divider);
+  text-align: left;
+  background-color: #f9f9f9;
+  padding-right: 16px;
+}
+
+.store__item-image-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.store__item-image {
+  width: 58%;
+  height: 82%;
+  object-fit: contain;
+}
+
+.store__item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.store__item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.store__item-category {
+  font-size: 12px;
+  color: #a4a9b4;
+}
+
+.store__item-name {
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+}
+
+.store__item-price {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.store__item-price-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.store__item-price-value {
+  font-size: 12px;
+  color: var(--color-price);
+}
+
+/* 구매 확인 바텀시트는 shared/components/purchase-sheet.js·css(공용 컴포넌트)로 이동 */
+@media (min-width: 599px) {
+  .store__points {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+  .store__list {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+  .store__points {
+    padding: 20px 24px;
+  }
+  .store_line {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+}
+
+/* 타블렛 리스트 항목(4324:1295 실측) — 카테고리/이름 묶음과 가격을 한 줄에 좌우로 벌려 배치,
+   가격 표기도 모바일보다 크게(배지 15→17px, 숫자 12→16px) */
+@media (min-width: 600px) {
+  .store__item-body {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .store__item-price {
+    gap: 6px;
+  }
+
+  .store__item-price-badge {
+    width: 17px;
+    height: 17px;
+  }
+
+  .store__item-price-value {
+    font-size: 16px;
+    font-weight: var(--font-weight-medium);
+  }
+  .store__item {
+    padding-right: 24px;
+  }
+}
