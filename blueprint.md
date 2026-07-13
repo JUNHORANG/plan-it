@@ -15,10 +15,10 @@
   - 구매: `/user/products/order/?id=123`
   - 구매 완료: `/user/order/success/?orderId=abc12345`
   - 일정 수정: `/user/plans/edit.html?planId=45`
-- **공통 자원은 루트 절대경로(`/shared/...`, `/fonts/...`, `/images/...`)로 참조**한다. 폴더가 3단계까지 깊어져 상대경로(`../../../`)가 지저분해지므로, **`public/` 폴더를 정적 서버 루트로 서빙**하는 것을 전제로 한다.
-  - 즉 `index.html`, `signup/`, `user/`, `admin/`, `shared/`, `404/`, `timeout/` 등 사이트에 필요한 모든 파일은 **`public/` 안**에 위치해야 한다. (`public/fonts`, `public/images`는 이미 존재)
-- **정적 서버 필수.** ES module `import`와 `fetch`는 `file://`에서 동작하지 않는다.
-  - VS Code **Live Server**(`public/`을 루트로 지정), 또는 `python3 -m http.server`(작업 디렉터리를 `public/`으로), 또는 `npx serve public` 중 택1.
+- **`src/` vs `public/` 분리.** `src/`는 소스(html·css·js — `index.*`, `signup/`, `user/`, `admin/`, `shared/`, `404/`, `timeout/` 등), `public/`는 순수 정적 자산(`fonts/`, `images/`)만 둔다. 둘은 프로젝트 루트에서 형제 폴더다.
+- **공통 자원은 루트 절대경로(`/shared/...`, `/fonts/...`, `/images/...`)로 참조**한다. 폴더가 3단계까지 깊어져 상대경로(`../../../`)가 지저분해지므로, `src/`와 `public/`를 **하나의 서버 루트로 합쳐서 서빙**하는 것을 전제로 한다 (요청 경로를 `src/`에서 먼저 찾고 없으면 `public/`로 폴백).
+- **정적 서버 필수.** ES module `import`와 `fetch`는 `file://`에서 동작하지 않는다. 단, 위 병합 서빙이 필요해 범용 정적 서버(Live Server 등 단일 루트 지정 도구)로는 부족하다.
+  - **`npm run dev`** — `scripts/dev-server.js`(빌드 없는 순수 Node, 의존성 0개)가 `src/`+`public/`를 병합해 `http://localhost:3000`으로 서빙한다. `PORT` 환경변수로 포트 변경 가능.
 - **컴포넌트 로딩** = ES 모듈. 각 페이지 `.js`를 `<script type="module">`로 불러오고, 그 안에서 필요한 공통 컴포넌트만 `import` 후 mount 한다.
 - **인증 가드**: `/user/**`, `/admin/**` 페이지는 로드 시 `localStorage` 토큰을 확인하고, 없으면 `/`(로그인)로 리다이렉트하는 가드 유틸을 호출한다.
 - **에러 페이지**: `404`는 정적 서버가 미매칭 경로에 `404/index.html`을 응답하도록 설정한다. `timeout`은 요청 타임아웃/실패 시 JS에서 `/timeout/`으로 이동시킨다.
@@ -120,19 +120,20 @@ mountNavDrawer('#nav-drawer'); // 공통 GNB 렌더
 
 ```
 plan-it/
-└── public/                             # 정적 서버 루트 (Live Server / serve 를 이 폴더로 지정)
+├── scripts/
+│   └── dev-server.js                   # src/+public/ 병합 서빙 (npm run dev)
+│
+├── public/                             # 순수 정적 자산만 (소스 코드 없음)
+│   ├── 🔤 fonts/                        # 루트 절대경로 /fonts/... 로 참조
+│   │   ├── Pretendard-*.woff2           # Thin~Black 9종 (본문 기본 폰트)
+│   │   └── GmarketSans*.otf             # Light/Medium/Bold (로고·브랜드 텍스트 전용)
+│   └── 🖼️ images/                       # 루트 절대경로 /images/... 로 참조
+│
+└── src/                                 # 소스 코드 (html · css · js)
     │
     ├── index.html                        # 로그인 (/)
     ├── index.css
     ├── index.js
-    │
-    ├── 🔤 폰트 (루트 절대경로 /fonts/... 로 참조)
-    │   └── fonts/
-    │       ├── Pretendard-*.woff2         # Thin~Black 9종 (본문 기본 폰트)
-    │       └── GmarketSans*.otf            # Light/Medium/Bold (로고·브랜드 텍스트 전용)
-    │
-    ├── 🖼️ 이미지 (루트 절대경로 /images/... 로 참조)
-    │   └── images/
     │
     ├── 👤 회원가입
     │   └── signup/
@@ -262,7 +263,7 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 ## 6. 작업 TODO (빌드 순서)
 
 ### 1단계: 공유 자원 · 환경
-- [ ] 정적 서버 실행 확인 (Live Server / `python3 -m http.server`)
+- [x] 정적 서버 실행 확인 — `npm run dev` (`scripts/dev-server.js`, src/+public/ 병합 서빙, 기본 포트 3000)
 - [x] `shared/css/variables.css` — 전역 변수, 리셋 (Figma 폰트 시스템 4111:853 기준 컬러·타이포 토큰 반영)
 - [x] `shared/css/layout.css` — 헤더/앱바/레이아웃 공통 (mount point 셸 배치만, 컴포넌트별 스타일은 shared/components/*.css)
 - [ ] `shared/js/utils.js` — `requireAuth`, `getQuery`, `navigate`, 날짜·포인트 포맷, storage 래퍼
@@ -270,13 +271,15 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [ ] `shared/js/api.js` — 목 API (지연·실패 시 `/timeout/` 이동)
 
 ### 2단계: 공통 UI 컴포넌트 (ES 모듈)
-- [ ] `header` / `app-bar`
-- [x] `nav-drawer` — Figma 나브 모바일(4007:333)/타블렛(4146:1022) 기준 1차 구현 (`shared/components/nav-drawer.css`, `.js`). header.js에서 `openNavDrawer()` 호출로 연동 예정
+- [x] `header` — 로고·종(알림 뱃지)·햄버거, 재사용 컴포넌트(4132:588) "헤더" 섹션 기준. 햄버거 클릭 시 `nav-drawer.js`의 `openNavDrawer()` 호출로 연동 (`shared/components/header.css`, `.js`)
+- [x] `app-bar` — 뒤로가기(44px 터치영역)+제목, 모바일 60px/타블렛 68px 높이 (`shared/components/app-bar.css`, `.js`)
+- [x] `nav-drawer` — Figma 나브 모바일(4007:333)/타블렛(4146:1022) 기준 1차 구현 (`shared/components/nav-drawer.css`, `.js`)
 - [ ] `bottom-sheet` / `modal`
-- [x] `toast` — 로그인 실패 토스트 등에서 사용 (`shared/components/toast.css`, `.js`)
+- [x] `toast` — 재사용 컴포넌트(4132:588) "토스트" 섹션 기준 재구현: 흰 카드 + 상태 점(성공 초록/실패 빨강) + 텍스트 (`shared/components/toast.css`, `.js`)
 - [x] `input` — 로그인 이메일/비밀번호 입력창 기준 구현, 눈 아이콘 토글 포함 (`shared/components/input.css`, `.js`)
 - [x] `cta-button` — 비활성/활성/로딩(점 3개) 상태 구현 (`shared/components/cta-button.css`, `.js`)
-- [ ] `skeleton` / `stepper` / `wheel-picker`
+- [x] `skeleton` — 재사용 컴포넌트(4132:588) "스켈레톤" 섹션 그라디언트 실측 반영 (`shared/components/skeleton.css`, `.js`)
+- [ ] `stepper` / `wheel-picker`
 - [ ] **보일러플레이트 HTML 템플릿** 확정 (mount 지점 `#header`/`#nav-drawer`/`#app`/`#toast-root`/`#overlay-root`)
 
 ### 3단계: 인증
@@ -349,5 +352,7 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 6. **상점 사용자 흐름** — MVP 정의서 "상점" 흐름이 "랭킹" 흐름과 동일하게 복붙된 오류 → 재정의 필요
 7. **타블렛 브레이크포인트 폭** — 정의서·Figma 모두 타블렛은 "최소 높이 600px"만 명시, 폭 기준 없음. Figma "나브" 타블렛 프레임(4146:1022) 실측 폭이 600px라 `--breakpoint-tablet: 600px`로 가정해 `nav-drawer.css`에 반영함 → 실제 타블렛 폭 기준(예: 768px 등) 확정 필요
 8. **입력창 텍스트 크기** — "폰트 시스템"(4111:853) 프레임의 콘텐츠/어시스트 텍스트는 14px로 정의됐지만, 로그인 화면(4001:44 등) 실제 입력창의 placeholder·입력값은 12px로 그려져 있음 → `--font-size-input: 12px`로 별도 토큰을 두고 실측값을 따름. 의도적 축소인지 확인 필요
+9. **헤더 로고 표기** — 재사용 컴포넌트(4132:588)의 헤더 워드마크가 모바일은 "PLAN !T", 타블렛은 "PLAN T!T"로 다르게 적혀 있음(오타로 추정) → `header.js`는 두 브레이크포인트 모두 "PLAN !T"로 통일해 구현. 실제 의도 확인 필요
+10. **종 아이콘 소스** — Figma 원본 레이어명은 `solar:bell-outline`(solar 아이콘셋)이지만 프로젝트 아이콘 컨벤션(CLAUDE.md, lucide-icons 고정)에 맞춰 `header.js`에서 lucide의 `Bell`로 대체함 → 디자인 의도상 solar 아이콘셋 병행 사용이 필요하면 컨벤션 재논의 필요
 
 > 위 항목은 구현 착수 전 확정 권장.

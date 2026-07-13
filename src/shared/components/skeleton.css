@@ -1,0 +1,26 @@
+/*
+  스켈레톤 — 공통 UI 컴포넌트
+  참조: Figma 재사용 컴포넌트(4132:588) "스켈레톤" 섹션 (그라디언트 실측: #f2f2f2 → #d9d9d9 → #f2f2f2)
+*/
+
+.skeleton {
+  display: block;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from) 0%,
+    var(--color-skeleton-via) 50%,
+    var(--color-skeleton-from) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

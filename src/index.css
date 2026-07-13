@@ -27,13 +27,14 @@
   margin-top: 6px;
   font-family: var(--font-family-brand);
   font-size: 36px;
+  font-weight: bold;
   line-height: 1;
   color: var(--color-header);
 }
 
 .login__logo em {
   font-style: normal;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .login__tagline {
@@ -65,7 +66,7 @@
 }
 
 .login__signup-link {
-  color: var(--color-header);
+  color: var(--color-primary);
   text-decoration: underline;
   text-decoration-color: var(--color-primary);
   text-underline-offset: 2px;

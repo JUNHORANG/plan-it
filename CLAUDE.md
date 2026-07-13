@@ -9,6 +9,12 @@ Todo 기반 일정 관리 + 게이미피케이션(포인트·수집·랭킹) 웹
 
 새 화면/기능을 구현하거나 수정할 때는 blueprint.md의 아키텍처 규칙(파일 배치, 컴포넌트 규약 등)을 따르고, 세부 동작이 불명확하면 spec.md에서 해당 화면 섹션을 확인한다.
 
+## 폴더 구조 · 실행
+
+- `src/` — 소스 코드 (html·css·js, `index.*`/`user/`/`admin/`/`shared/` 등)
+- `public/` — 순수 정적 자산만 (`fonts/`, `images/`). 소스 코드를 여기 두지 않는다.
+- 실행: `npm run dev` → `scripts/dev-server.js`가 `src/`와 `public/`를 하나의 루트(`http://localhost:3000`)로 합쳐서 서빙한다(요청을 `src/`에서 먼저 찾고 없으면 `public/`로 폴백). 빌드 스텝 없음.
+
 ## 아이콘
 
 아이콘은 [lucide-icons](https://lucide.dev)를 사용한다. 빌드 스텝이 없는 정적 MPA이므로 npm 설치 없이 CDN ESM import로 가져온다.

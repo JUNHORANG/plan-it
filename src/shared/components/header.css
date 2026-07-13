@@ -1,0 +1,57 @@
+/*
+  헤더 — 공통 UI 컴포넌트
+  참조: Figma 재사용 컴포넌트(4132:588) "헤더" 섹션 (모바일 4132:809 / 타블렛 4417:1298)
+*/
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding: 0 16px;
+}
+
+.header__logo {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-logo);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+}
+
+.header__logo .header__logo-accent {
+  color: var(--color-accent);
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header__icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-header);
+}
+
+.header__badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-notification-badge);
+}
+
+@media (min-width: 600px) {
+  .header {
+    padding: 0 24px;
+  }
+}

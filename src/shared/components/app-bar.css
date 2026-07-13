@@ -1,0 +1,38 @@
+/*
+  앱바 — 공통 UI 컴포넌트
+  참조: Figma 재사용 컴포넌트(4132:588) "앱바" 섹션 (모바일 4134:843 / 타블렛 4146:991)
+*/
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  height: var(--app-bar-height);
+  padding: 0 16px;
+}
+
+.app-bar__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--color-header);
+}
+
+.app-bar__title {
+  font-size: var(--font-size-header-sm); /* 18px */
+  font-weight: var(--font-weight-medium);
+  color: var(--color-header);
+}
+
+@media (min-width: 600px) {
+  .app-bar {
+    height: var(--app-bar-height-tablet);
+    padding: 0 24px;
+  }
+
+  .app-bar__title {
+    font-size: var(--font-size-header-lg); /* 20px */
+  }
+}
