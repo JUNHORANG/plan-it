@@ -108,6 +108,8 @@
   --font-size-error: 12px;     /* 에러색: 에러 문구 */
   --font-size-input: 12px;     /* 입력창 placeholder/입력값 (로그인 화면 실측, 확인 필요 — CLAUDE.md 참조) */
   --font-size-button: 18px;    /* CTA 버튼 라벨 */
+  --font-size-logo: 15px;      /* 헤더 바 안의 "PLAN !T" 워드마크 (재사용 컴포넌트 4132:588 실측) */
+  --font-size-toast: 14px;     /* 토스트 문구 */
 
   /* ── Color: 폰트/텍스트 ─────────────────────── */
   --color-primary: #179c00;       /* 주조색 — CTA, 활성 상태, 브랜드 그린 */
@@ -129,6 +131,9 @@
   --color-input-border: #f6f7f8;        /* 입력창 기본 테두리 */
   --color-input-valid-bg: #f7fdf2;      /* 입력창 검증 완료 배경 */
   --color-input-valid-border: #f2f7f2;  /* 입력창 검증 완료 테두리 */
+  --color-notification-badge: #ff0000;  /* 헤더 종 아이콘 알림 뱃지 */
+  --color-skeleton-from: #f2f2f2;       /* 스켈레톤 그라디언트 시작/끝 */
+  --color-skeleton-via: #d9d9d9;        /* 스켈레톤 그라디언트 중앙(하이라이트) */
 
   /* ── Radius / Shadow ────────────────────────── */
   --radius-sm: 8px;
@@ -138,8 +143,9 @@
   --shadow-elevated: 0 3px 20px rgba(0, 0, 0, 0.08);
 
   /* ── Layout ─────────────────────────────────── */
-  --header-height: 56px;
-  --app-bar-height: 56px;
+  --header-height: 56px;          /* 헤더 (모바일·타블렛 공통) */
+  --app-bar-height: 60px;         /* 앱바 모바일 */
+  --app-bar-height-tablet: 68px;  /* 앱바 타블렛 */
 
   /* ── Breakpoints (참고값 — 미디어쿼리는 아래 숫자를 직접 사용) ── */
   --viewport-mobile-min-width: 360px;
