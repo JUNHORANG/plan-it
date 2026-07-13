@@ -312,7 +312,7 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 - [x] `user/plans/success.*` — 완료 일러스트(`good_titi.png`) + 지급 포인트(`?points=`, 완료 개수×10) 카운트업 애니메이션(아래→위 등장 후 위로 사라짐) → CTA로 `/user/profile/` 이동. 전용 Figma "/plans/success"(4006:940) 반영 완료 — §9 참조
 
 ### 5단계: 캘린더
-- [ ] `user/calendar/index.*` — 월 이동, 날짜 선택, 선택일 일정 바텀시트(핸들 높이 조절), 더보기(고정·수정·삭제)
+- [x] `user/calendar/index.*` — Figma 캘린더-기본(4107:736)/캘린더-리스트(4006:1076)/캘린더-바텀시트(4008:405) 반영. 화살표로 월 이동, 날짜 클릭 시 선택 표시(주조색 원)+하단 패널 갱신. 하단 "선택일 일정" 패널은 모달이 아니라 화면 하단에 항상 고정(fixed)돼 있는 독(dock)형 패널(전용 컴포넌트 없이 이 페이지 CSS/JS에 직접 구현, `#overlay-root`/`.bottom-sheet`와 동일하게 `left/right:0 + max-width + margin:auto`로 데스크탑 600px 중앙 정렬 유지) — 핸들(초록 반투명 pill)을 포인터 드래그하면 높이를 조절할 수 있다(spec.md "바텀 시트 - 공통 UI" 9번), 최대 높이는 `100vh - 헤더 높이`로 캡을 둬서 늘려도 헤더 영역은 절대 침범하지 않는다. 더보기(⋮)는 홈과 동일하게 `shared/components/bottom-sheet.js`의 `openListBottomSheet`(고정/수정/삭제)를 그대로 재사용 — Figma 4008:405가 홈의 "일정 - 바텀 시트"와 동일 레이아웃이라 별도 컴포넌트 불필요. 페이지 배경은 다른 화면과 달리 흰색이 아니라 `--color-calendar-bg`(#f9f9f9, 4107:736 실측) — `user/products/order`와 동일한 패턴으로 이 페이지 CSS에서 `body` 배경을 오버라이드하고, 헤더도 이 페이지에서만 투명 처리(`.header{background:transparent}`)해 캘린더/바텀시트와 하나로 이어지는 배경처럼 보이게 함
 
 ### 6단계: 상점 · 구매 · 주문 내역
 구매완료/주문내역 2개 화면은 전용 Figma 프레임을 API rate limit(429)로 끝내 못 받아와
