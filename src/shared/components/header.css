@@ -21,13 +21,12 @@
 }
 
 .header__logo .header__logo-accent {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .header__actions {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .header__icon-btn {

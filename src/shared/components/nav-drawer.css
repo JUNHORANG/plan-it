@@ -3,11 +3,15 @@
   출처: Figma "나브" 모바일(4007:333) / 타블렛(4146:1022)
   - 두 프레임 모두 전체 화면(100%)을 덮는 흰색 패널이며, 콘텐츠 좌우 여백만
     모바일 16px → 타블렛 24px 로 달라진다(사이드바형 아님).
+  - 웹에서는 body와 동일하게 max-width(--breakpoint-tablet) 안에서만 덮는다
+    (body 폭 제한을 넘어서까지 펼쳐지지 않도록).
 */
 
 .nav-drawer {
   position: fixed;
   inset: 0;
+  max-width: var(--breakpoint-tablet);
+  margin: 0 auto;
   z-index: 100;
   visibility: hidden;
 }
@@ -60,10 +64,6 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-header);
   letter-spacing: -0.02em;
-}
-
-.nav-drawer__logo .nav-drawer__logo-accent {
-  color: var(--color-accent);
 }
 
 .nav-drawer__logo .nav-drawer__logo-primary {
