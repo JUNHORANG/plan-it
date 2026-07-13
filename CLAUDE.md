@@ -26,6 +26,13 @@ el.appendChild(createElement(X, { size: 24 }));
 
 손으로 그린 인라인 SVG(`<svg>...</svg>`)는 사용하지 않는다. `nav-drawer.js`의 닫기(X) 아이콘 참조.
 
+예외: 헤더 종 아이콘은 Figma 원본이 solar 아이콘셋(`solar:bell-outline`)이라 lucide 대신 그대로 사용한다(`header.js` 참조, blueprint.md §9 10번). 빌드 스텝 없이 CDN ESM으로 Iconify 웹 컴포넌트를 불러와 렌더링한다.
+
+```js
+import "https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/+esm";
+// <iconify-icon icon="solar:bell-outline" width="22" height="22"></iconify-icon>
+```
+
 ## 주의: spec.md ↔ blueprint.md 충돌 시 우선순위
 
 spec.md는 원본 기능 정의서를 그대로 보존한 문서라 도메인 표기 오타·불일치가 일부 남아 있다 (예: `/user/plants/success` vs `/user/plans/success`, `/index` vs `/user/plans/`). 이런 라우팅/도메인 표기가 두 문서 간 다르게 보이면 **spec.md가 아니라 blueprint.md §9(확인 필요 항목)에서 채택한 표기를 따른다.** §9에 없는 새로운 불일치를 발견하면 §9에 추가하고 여기서도 알린다.

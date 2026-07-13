@@ -25,7 +25,9 @@
   display: flex;
   margin-top: 24px;
   padding: 10px 0;
-  border-bottom: 1px solid #f7f7f7;
+  border-bottom: 1px solid #f1f1f1;
+  border-top: 1px solid #f1f1f1;
+  box-shadow: 0px 8px 16px -8px rgba(0, 0, 0, 0.12);
 }
 
 .home__week-day {
@@ -61,7 +63,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 0 12px;
+  padding: 40px 0 12px;
 }
 
 .home__plans-title {
@@ -89,7 +91,7 @@
   align-items: center;
   gap: 15px;
   height: 80px;
-  border-bottom: 1px solid #f6f6f6;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .home__item-checkbox {

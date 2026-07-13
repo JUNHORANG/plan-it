@@ -66,10 +66,6 @@
   letter-spacing: -0.02em;
 }
 
-.nav-drawer__logo .nav-drawer__logo-accent {
-  color: var(--color-accent);
-}
-
 .nav-drawer__logo .nav-drawer__logo-primary {
   color: var(--color-primary);
 }

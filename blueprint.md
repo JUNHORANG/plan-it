@@ -42,10 +42,18 @@
   <main id="app"><!-- 페이지 콘텐츠 --></main>
   <div id="toast-root"></div>      <!-- 토스트 mount 지점 -->
   <div id="overlay-root"></div>    <!-- 바텀시트/모달/드로워 mount 지점 -->
+  <div id="desktop-qr" aria-hidden="true"></div> <!-- 데스크탑(4159:806) QR 자리, 비워둠 -->
   <script type="module" src="/user/plans/index.js"></script>  <!-- 페이지 전용 JS -->
 </body>
 </html>
 ```
+
+> **좌우 여백은 `#app`(layout.css)이 전역으로 준다.** 페이지별 CSS에서 콘텐츠 컨테이너에 또
+> `padding: 0 16px` 같은 걸 넣지 않는다(2중 패딩 방지). 페이지 전용 CSS는 세로 여백만 잡는다.
+
+> **데스크탑(600px 초과) 배경/그림자**: `body`는 항상 600px 카드로 고정되고, 그 바깥 캔버스는
+> `html { background-color: var(--color-page-bg) }`(변수는 variables.css), 카드 그림자는
+> `#overlay-root`의 `box-shadow`(레이아웃 전역, layout.css)로 표현한다 — 페이지별로 반복 구현하지 않는다.
 
 ### 페이지 JS 진입 패턴 (예: 홈)
 
@@ -358,8 +366,9 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 7. **타블렛 브레이크포인트 폭** — 정의서·Figma 모두 타블렛은 "최소 높이 600px"만 명시, 폭 기준 없음. Figma "나브" 타블렛 프레임(4146:1022) 실측 폭이 600px라 `--breakpoint-tablet: 600px`로 가정해 `nav-drawer.css`에 반영함 → 실제 타블렛 폭 기준(예: 768px 등) 확정 필요
 8. **입력창 텍스트 크기** — "폰트 시스템"(4111:853) 프레임의 콘텐츠/어시스트 텍스트는 14px로 정의됐지만, 로그인 화면(4001:44 등) 실제 입력창의 placeholder·입력값은 12px로 그려져 있음 → `--font-size-input: 12px`로 별도 토큰을 두고 실측값을 따름. 의도적 축소인지 확인 필요
 9. **헤더 로고 표기** — 재사용 컴포넌트(4132:588)의 헤더 워드마크가 모바일은 "PLAN !T", 타블렛은 "PLAN T!T"로 다르게 적혀 있음(오타로 추정) → `header.js`는 두 브레이크포인트 모두 "PLAN !T"로 통일해 구현. 실제 의도 확인 필요
-10. **종 아이콘 소스** — Figma 원본 레이어명은 `solar:bell-outline`(solar 아이콘셋)이지만 프로젝트 아이콘 컨벤션(CLAUDE.md, lucide-icons 고정)에 맞춰 `header.js`에서 lucide의 `Bell`로 대체함 → 디자인 의도상 solar 아이콘셋 병행 사용이 필요하면 컨벤션 재논의 필요
+10. ~~**종 아이콘 소스**~~ → 사용자 요청으로 확정: `header.js`에서 lucide `Bell` 대신 Figma 원본 그대로 solar 아이콘셋(`solar:bell-outline`)을 사용. 빌드 스텝 없이 CDN ESM(`iconify-icon@2.1.0/+esm`)으로 Iconify 웹 컴포넌트를 불러와 `<iconify-icon icon="solar:bell-outline">`로 렌더링(CLAUDE.md "아이콘" 섹션에 예외로 명시). 다른 아이콘은 계속 lucide 사용
 11. **로그인 실패 안내 방식** — ~~spec.md는 "실패 토스트를 띄운다"고 적혀 있지만, 로그인 에러 화면(4434:1479) 캡처에는 토스트 없이 인라인 문구만 보여 처음엔 인라인 문구만 구현했었음~~ → 이후 재사용 컴포넌트(4132:588)에 에러 토스트("요청에 실패 했습니다.")가 추가돼 **인라인 문구 + 토스트 둘 다** 띄우는 것으로 확정. 입력값은 지우지 않고 유지, 두 입력창 빨간 테두리, CTA 버튼은 실패 후 다시 비활성(연한 초록) 상태로 돌아가 사용자가 값을 수정해야 재시도 가능. 다른 실패 케이스(회원가입 등)에도 이 패턴(인라인+토스트 동시)을 적용
 12. ~~**일정 완료 화면 디자인 부재**~~ → 전용 Figma "/plans/success"(4006:940) 확보돼 반영 완료. 확정 사항: 제목은 `--font-family-brand`(Gmarket Sans) 36px, 안내 문구는 한 줄("포인트를 지급 했어요!", 16px medium, `--color-primary`) — spec.md의 2번째 문장("포인트를 모아서...")은 Figma에 없어 제외, CTA 라벨은 "포인트 확인 하기"(공백 포함, 기존 임의 문구 대체), 지급 포인트는 "+ N POINT" 형식·`--color-accent`·Gmarket Sans 20px. 이미지 영역: 원본 `good_titi.png`의 피사체(지구본)가 캔버스 중앙보다 오른쪽에 있어 Figma도 컨테이너 폭 기준 좌측 10.1333%(38/375) 오프셋·70.9333%(266/375) 폭으로 배치(정중앙 아님) — `%` 기반으로 구현해 화면 폭이 달라져도 동일 비율 유지
+13. **데스크탑(600px 초과) 뷰** — Figma "데스크탑"(4159:806) 기준으로 확정: `body`는 600px 카드로 고정, 바깥 캔버스는 `--color-page-bg`(#f7f7f7, html에 적용), 카드 그림자는 `#overlay-root`에 `box-shadow: 0 0 4px rgba(0,0,0,.09)`. Figma의 "qr 영역"(4405:1251, 139×128, 흰 배경 + `--color-qr-border` 테두리, radius 5)은 카드 왼쪽 아래 여백에 `#desktop-qr`로 배치했지만 **내용은 비워둠** — 추후 모바일 접속용 QR 이미지를 이 안에 넣을 예정. 카드와 겹치지 않을 최소 폭(`min-width:960px`)에서만 노출
 
 > 위 항목은 구현 착수 전 확정 권장.

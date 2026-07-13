@@ -11,7 +11,10 @@
   TODO: shared/js/utils.js의 navigate() 헬퍼가 만들어지면 location.href 직접 대입을 교체할 것.
 */
 
-import { createElement, X } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import {
+  createElement,
+  X,
+} from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 const MENU_ITEMS = [
   { label: "홈", path: "/user/plans/" },
@@ -36,7 +39,7 @@ function renderMenu() {
           data-nav-path="${item.path}"
         >${item.label}</a>
       </li>
-    `
+    `,
   ).join("");
 }
 
@@ -46,7 +49,7 @@ function render() {
     <div class="nav-drawer__panel" role="dialog" aria-label="내비게이션">
       <div class="nav-drawer__header">
         <a class="nav-drawer__logo" href="/user/plans/" data-nav-logo>
-          PLAN <span class="nav-drawer__logo-accent">!</span><span class="nav-drawer__logo-primary">T</span>
+          PLAN <span class="nav-drawer__logo-primary">!</span>T
         </a>
         <button class="nav-drawer__close" type="button" aria-label="닫기" data-nav-close></button>
       </div>
@@ -63,7 +66,9 @@ export function mountNavDrawer(selector) {
 
   root.classList.add("nav-drawer");
   root.innerHTML = render();
-  root.querySelector(".nav-drawer__close").appendChild(createElement(X, { size: 24 }));
+  root
+    .querySelector(".nav-drawer__close")
+    .appendChild(createElement(X, { size: 24 }));
 
   const open = () => root.classList.add("is-open");
   const close = () => root.classList.remove("is-open");

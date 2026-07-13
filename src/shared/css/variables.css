@@ -94,8 +94,10 @@
 
 :root {
   /* ── Typography ─────────────────────────────── */
-  --font-family-base: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-family-brand: "GmarketSans", var(--font-family-base); /* 로고/브랜드 텍스트 전용 */
+  --font-family-base:
+    "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-brand:
+    "GmarketSans", var(--font-family-base); /* 로고/브랜드 텍스트 전용 */
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
@@ -103,43 +105,55 @@
   --font-weight-bold: 700;
 
   --font-size-header-lg: 20px; /* 헤더t: 화면 타이틀 / 앱바 제목 */
-  --font-size-header-sm: 18px; /* 헤더: 로고 등 기본 헤더 텍스트 */
-  --font-size-body: 14px;      /* 콘텐츠: 본문 텍스트 */
-  --font-size-assist: 14px;    /* 어시스트: 보조 텍스트 */
-  --font-size-error: 12px;     /* 에러색: 에러 문구 */
-  --font-size-input: 12px;     /* 입력창 placeholder/입력값 (로그인 화면 실측, 확인 필요 — CLAUDE.md 참조) */
-  --font-size-button: 18px;    /* CTA 버튼 라벨 */
-  --font-size-logo: 15px;      /* 헤더 바 안의 "PLAN !T" 워드마크 (재사용 컴포넌트 4132:588 실측) */
-  --font-size-toast: 14px;     /* 토스트 문구 */
+  --font-size-header-sm: 15px; /* 헤더: 로고 등 기본 헤더 텍스트 */
+  --font-size-body: 14px; /* 콘텐츠: 본문 텍스트 */
+  --font-size-assist: 14px; /* 어시스트: 보조 텍스트 */
+  --font-size-error: 12px; /* 에러색: 에러 문구 */
+  --font-size-input: 12px; /* 입력창 placeholder/입력값 (로그인 화면 실측, 확인 필요 — CLAUDE.md 참조) */
+  --font-size-button: 18px; /* CTA 버튼 라벨 */
+  --font-size-logo: 15px; /* 헤더 바 안의 "PLAN !T" 워드마크 (재사용 컴포넌트 4132:588 실측) */
+  --font-size-toast: 14px; /* 토스트 문구 */
 
   /* ── Color: 폰트/텍스트 ─────────────────────── */
-  --color-primary: #179c00;       /* 주조색 — CTA, 활성 상태, 브랜드 그린 */
-  --color-accent: #fc5603;        /* 보색 — 강조 텍스트(타이머, 바텀시트 라벨 등) */
-  --color-header: #111827;        /* 헤더 텍스트 */
-  --color-body: #333333;          /* 콘텐츠(본문) 텍스트 */
-  --color-assist: #c2c8d3;        /* 어시스트 / 본문 보조 텍스트 */
-  --color-input-assist: #858d9a;  /* 플레이스홀더 / 인풋 보조 텍스트 */
-  --color-muted: #98a3b4;         /* 하단 안내문구 등 저강조 텍스트 (로그인 "이메일로 간단하게") */
-  --color-error: #ef4444;         /* 에러 */
-  --color-disabled: #c2c8d3;      /* 비활성화 (assist와 동일 값) */
+  --color-primary: #179c00; /* 주조색 — CTA, 활성 상태, 브랜드 그린 */
+  --color-accent: #fc5603; /* 보색 — 강조 텍스트(타이머, 바텀시트 라벨 등) */
+  --color-header: #111827; /* 헤더 텍스트 */
+  --color-body: #333333; /* 콘텐츠(본문) 텍스트 */
+  --color-assist: #c2c8d3; /* 어시스트 / 본문 보조 텍스트 */
+  --color-input-assist: #858d9a; /* 플레이스홀더 / 인풋 보조 텍스트 */
+  --color-muted: #98a3b4; /* 하단 안내문구 등 저강조 텍스트 (로그인 "이메일로 간단하게") */
+  --color-error: #ef4444; /* 에러 */
+  --color-disabled: #c2c8d3; /* 비활성화 (assist와 동일 값) */
 
   /* ── Color: 서피스 ──────────────────────────── */
   --color-white: #ffffff;
-  --color-surface: #f5f6f8;             /* 범용 서피스 배경 */
-  --color-on-primary: #f8f9f6;          /* 주조색 위에 올라가는 텍스트 (버튼 라벨) */
-  --color-primary-disabled-bg: rgba(23, 156, 0, 0.2); /* CTA 버튼 비활성 배경 = 주조색 20% */
-  --color-input-bg: #f8f9fa;            /* 입력창 기본 배경 */
-  --color-input-border: #f6f7f8;        /* 입력창 기본 테두리 */
-  --color-input-valid-bg: #f7fdf2;      /* 입력창 검증 완료 배경 */
-  --color-input-valid-border: #f2f7f2;  /* 입력창 검증 완료 테두리 */
-  --color-notification-badge: #ff0000;  /* 헤더 종 아이콘 알림 뱃지 */
-  --color-skeleton-from: #f2f2f2;       /* 스켈레톤 그라디언트 시작/끝 */
-  --color-skeleton-via: #d9d9d9;        /* 스켈레톤 그라디언트 중앙(하이라이트) */
-  --color-weekend: #e05f61;             /* 주간 날짜 선택 토/일 요일 라벨 */
-  --color-date-number: #5f5f5f;         /* 주간 날짜 선택 날짜 숫자 (선택되지 않은 날) */
-  --color-option-muted: #b0b8c1;        /* 바텀시트 목록형 항목 - 선택 안 된 상태 텍스트 */
-  --color-sheet-divider: #f2f2f2;       /* 바텀시트 목록형 항목 구분선 */
-  --color-backdrop: rgba(25, 31, 40, 0.26); /* 바텀시트/모달 뒷배경 (블러 6px 동반) */
+  --color-surface: #f5f6f8; /* 범용 서피스 배경 */
+  --color-page-bg: #f7f7f7; /* 데스크탑(4159:806) 배경 — body(카드) 바깥 여백 색 */
+  --color-qr-border: #ececec; /* 데스크탑(4159:806) QR 영역 테두리 */
+  --color-on-primary: #f8f9f6; /* 주조색 위에 올라가는 텍스트 (버튼 라벨) */
+  --color-primary-disabled-bg: rgba(
+    23,
+    156,
+    0,
+    0.2
+  ); /* CTA 버튼 비활성 배경 = 주조색 20% */
+  --color-input-bg: #f8f9fa; /* 입력창 기본 배경 */
+  --color-input-border: #f6f7f8; /* 입력창 기본 테두리 */
+  --color-input-valid-bg: #f7fdf2; /* 입력창 검증 완료 배경 */
+  --color-input-valid-border: #f2f7f2; /* 입력창 검증 완료 테두리 */
+  --color-notification-badge: #ff0000; /* 헤더 종 아이콘 알림 뱃지 */
+  --color-skeleton-from: #f2f2f2; /* 스켈레톤 그라디언트 시작/끝 */
+  --color-skeleton-via: #d9d9d9; /* 스켈레톤 그라디언트 중앙(하이라이트) */
+  --color-weekend: #e05f61; /* 주간 날짜 선택 토/일 요일 라벨 */
+  --color-date-number: #5f5f5f; /* 주간 날짜 선택 날짜 숫자 (선택되지 않은 날) */
+  --color-option-muted: #b0b8c1; /* 바텀시트 목록형 항목 - 선택 안 된 상태 텍스트 */
+  --color-sheet-divider: #f2f2f2; /* 바텀시트 목록형 항목 구분선 */
+  --color-backdrop: rgba(
+    25,
+    31,
+    40,
+    0.26
+  ); /* 바텀시트/모달 뒷배경 (블러 6px 동반) */
 
   /* ── Radius / Shadow ────────────────────────── */
   --radius-sm: 8px;
@@ -149,9 +163,9 @@
   --shadow-elevated: 0 3px 20px rgba(0, 0, 0, 0.08);
 
   /* ── Layout ─────────────────────────────────── */
-  --header-height: 56px;          /* 헤더 (모바일·타블렛 공통) */
-  --app-bar-height: 60px;         /* 앱바 모바일 */
-  --app-bar-height-tablet: 68px;  /* 앱바 타블렛 */
+  --header-height: 56px; /* 헤더 (모바일·타블렛 공통) */
+  --app-bar-height: 60px; /* 앱바 모바일 */
+  --app-bar-height-tablet: 68px; /* 앱바 타블렛 */
 
   /* ── Breakpoints (참고값 — 미디어쿼리는 아래 숫자를 직접 사용) ── */
   --viewport-mobile-min-width: 360px;
@@ -171,6 +185,11 @@ html,
 body {
   margin: 0;
   padding: 0;
+}
+
+html {
+  /* 데스크탑(4159:806): body(600px 카드) 바깥으로 보이는 캔버스 배경 */
+  background-color: var(--color-page-bg);
 }
 
 body {
