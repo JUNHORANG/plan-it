@@ -52,8 +52,20 @@
   gap: 16px;
 }
 
+.login__error {
+  display: none;
+  margin-top: -8px;
+  padding-left: 4px;
+  font-size: 10px; /* Figma 4434:1479 실측 */
+  color: var(--color-error);
+}
+
+.login__error.is-visible {
+  display: block;
+}
+
 .login__submit {
-  margin-top: 4px; /* 입력창-버튼 간격 20px = gap 16px + 4px */
+  margin-top: 9px; /* 입력창-버튼 간격 20px = gap 16px + 9px = 25px */
 }
 
 .login__footer {
