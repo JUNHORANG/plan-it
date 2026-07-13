@@ -1,0 +1,72 @@
+/*
+  로그인 (/) 전용 스타일
+  참조: Figma 로그인 기본(4001:44) / 입력창 활성화(4006:955) / 검증(4006:989) / 타블렛(4146:1040)
+*/
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 156px;
+}
+
+.login__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 34px;
+}
+
+.login__mascot {
+  width: 129px;
+  height: 66px;
+  object-fit: contain;
+}
+
+.login__logo {
+  margin-top: 6px;
+  font-family: var(--font-family-brand);
+  font-size: 36px;
+  line-height: 1;
+  color: var(--color-header);
+}
+
+.login__logo em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+
+.login__tagline {
+  margin-top: 7px;
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.login__form {
+  width: 100%;
+  max-width: 330px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login__submit {
+  margin-top: 4px; /* 입력창-버튼 간격 20px = gap 16px + 4px */
+}
+
+.login__footer {
+  width: 100%;
+  max-width: 330px;
+  margin-top: 24px;
+  text-align: center;
+  font-size: var(--font-size-error); /* 12px, 하단 안내문구 실측값 */
+  color: var(--color-muted);
+}
+
+.login__signup-link {
+  color: var(--color-header);
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 2px;
+}

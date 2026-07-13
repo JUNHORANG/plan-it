@@ -272,13 +272,15 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 ### 2단계: 공통 UI 컴포넌트 (ES 모듈)
 - [ ] `header` / `app-bar`
 - [x] `nav-drawer` — Figma 나브 모바일(4007:333)/타블렛(4146:1022) 기준 1차 구현 (`shared/components/nav-drawer.css`, `.js`). header.js에서 `openNavDrawer()` 호출로 연동 예정
-- [ ] `bottom-sheet` / `modal` / `toast`
-- [ ] `input` / `cta-button`
+- [ ] `bottom-sheet` / `modal`
+- [x] `toast` — 로그인 실패 토스트 등에서 사용 (`shared/components/toast.css`, `.js`)
+- [x] `input` — 로그인 이메일/비밀번호 입력창 기준 구현, 눈 아이콘 토글 포함 (`shared/components/input.css`, `.js`)
+- [x] `cta-button` — 비활성/활성/로딩(점 3개) 상태 구현 (`shared/components/cta-button.css`, `.js`)
 - [ ] `skeleton` / `stepper` / `wheel-picker`
 - [ ] **보일러플레이트 HTML 템플릿** 확정 (mount 지점 `#header`/`#nav-drawer`/`#app`/`#toast-root`/`#overlay-root`)
 
 ### 3단계: 인증
-- [ ] `index.*` (로그인) — 이메일·비번 입력, 눈 아이콘, 유효성, 성공→`/user/plans/` / 회원가입 이동
+- [x] `index.*` (로그인) — 이메일·비번 입력, 눈 아이콘, 유효성, 성공→`/user/plans/` / 회원가입 이동. Figma 기본(4001:44)·입력창 활성화(4006:955)·검증(4006:989)·타블렛(4146:1040) 기준. 선행 작업으로 `shared/components/input.*`, `cta-button.*`, `toast.*` 공통 컴포넌트 구현. 목 로그인(`mockLogin`)은 `shared/js/api.js` 생기면 교체 필요
 - [ ] `signup/index.*` — 스텝퍼 3-step(①닉네임+중복확인 ②이메일 인증+5분 타이머+연장 ③비번+확인) + 완료 화면
 - [ ] `user/auth/resign/index.*` — 이메일 인증 후 탈퇴, 시간초과 시 이동
 
@@ -346,5 +348,6 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 5. **일정 완료 이동** — CTA가 `/profile`로 기재 → `/user/profile/`로 해석
 6. **상점 사용자 흐름** — MVP 정의서 "상점" 흐름이 "랭킹" 흐름과 동일하게 복붙된 오류 → 재정의 필요
 7. **타블렛 브레이크포인트 폭** — 정의서·Figma 모두 타블렛은 "최소 높이 600px"만 명시, 폭 기준 없음. Figma "나브" 타블렛 프레임(4146:1022) 실측 폭이 600px라 `--breakpoint-tablet: 600px`로 가정해 `nav-drawer.css`에 반영함 → 실제 타블렛 폭 기준(예: 768px 등) 확정 필요
+8. **입력창 텍스트 크기** — "폰트 시스템"(4111:853) 프레임의 콘텐츠/어시스트 텍스트는 14px로 정의됐지만, 로그인 화면(4001:44 등) 실제 입력창의 placeholder·입력값은 12px로 그려져 있음 → `--font-size-input: 12px`로 별도 토큰을 두고 실측값을 따름. 의도적 축소인지 확인 필요
 
 > 위 항목은 구현 착수 전 확정 권장.

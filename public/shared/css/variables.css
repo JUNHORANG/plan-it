@@ -98,6 +98,7 @@
   --font-family-brand: "GmarketSans", var(--font-family-base); /* 로고/브랜드 텍스트 전용 */
 
   --font-weight-regular: 400;
+  --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
   --font-size-header-lg: 20px; /* 헤더t: 화면 타이틀 / 앱바 제목 */
@@ -105,6 +106,8 @@
   --font-size-body: 14px;      /* 콘텐츠: 본문 텍스트 */
   --font-size-assist: 14px;    /* 어시스트: 보조 텍스트 */
   --font-size-error: 12px;     /* 에러색: 에러 문구 */
+  --font-size-input: 12px;     /* 입력창 placeholder/입력값 (로그인 화면 실측, 확인 필요 — CLAUDE.md 참조) */
+  --font-size-button: 18px;    /* CTA 버튼 라벨 */
 
   /* ── Color: 폰트/텍스트 ─────────────────────── */
   --color-primary: #179c00;       /* 주조색 — CTA, 활성 상태, 브랜드 그린 */
@@ -113,18 +116,25 @@
   --color-body: #333333;          /* 콘텐츠(본문) 텍스트 */
   --color-assist: #c2c8d3;        /* 어시스트 / 본문 보조 텍스트 */
   --color-input-assist: #858d9a;  /* 플레이스홀더 / 인풋 보조 텍스트 */
+  --color-muted: #98a3b4;         /* 하단 안내문구 등 저강조 텍스트 (로그인 "이메일로 간단하게") */
   --color-error: #ef4444;         /* 에러 */
   --color-disabled: #c2c8d3;      /* 비활성화 (assist와 동일 값) */
 
   /* ── Color: 서피스 ──────────────────────────── */
   --color-white: #ffffff;
-  --color-surface: #f5f6f8;           /* 입력창 기본 배경 등 */
-  --color-primary-disabled-bg: #d7ecd2; /* CTA 버튼 비활성 배경 (연한 그린) */
+  --color-surface: #f5f6f8;             /* 범용 서피스 배경 */
+  --color-on-primary: #f8f9f6;          /* 주조색 위에 올라가는 텍스트 (버튼 라벨) */
+  --color-primary-disabled-bg: rgba(23, 156, 0, 0.2); /* CTA 버튼 비활성 배경 = 주조색 20% */
+  --color-input-bg: #f8f9fa;            /* 입력창 기본 배경 */
+  --color-input-border: #f6f7f8;        /* 입력창 기본 테두리 */
+  --color-input-valid-bg: #f7fdf2;      /* 입력창 검증 완료 배경 */
+  --color-input-valid-border: #f2f7f2;  /* 입력창 검증 완료 테두리 */
 
   /* ── Radius / Shadow ────────────────────────── */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
+  --radius-control: 14px; /* 입력창 · CTA 버튼 공통 라운드 */
   --shadow-elevated: 0 3px 20px rgba(0, 0, 0, 0.08);
 
   /* ── Layout ─────────────────────────────────── */
