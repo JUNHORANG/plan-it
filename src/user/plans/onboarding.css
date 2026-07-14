@@ -136,15 +136,6 @@
   flex-shrink: 0;
 }
 
-.onboarding__home-indicator {
-  width: 120px;
-  height: 4px;
-  margin-top: 16px;
-  border-radius: 10px;
-  background: #aaaaaa; /* Figma "Rectangle 665" 실측 */
-  flex-shrink: 0;
-}
-
 @media (min-width: 600px) {
   .onboarding {
     padding: 24px 24px max(16px, env(safe-area-inset-bottom));

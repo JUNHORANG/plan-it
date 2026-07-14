@@ -86,7 +86,6 @@ function openOnboarding() {
         </div>
         <div class="onboarding__cta-slot"></div>
       </div>
-      <div class="onboarding__home-indicator"></div>
     `;
 
     // 이 lucide CDN 빌드는 createElement의 {size} 옵션을 매핑하지 않고 항상 기본 24x24로
