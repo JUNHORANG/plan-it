@@ -84,13 +84,22 @@
   justify-content: center;
 }
 
-/* step별 원본 에셋의 가로세로 비율이 조금씩 달라(step3만 유독 좁음) 폭을 고정하면 step3만
-   유독 길쭉해 보인다 — Figma도 스텝마다 높이(500)는 고정하고 폭(277 vs 247)만 다르게 둬서
-   시각적 크기를 맞췄다. 그래서 폭 대신 높이 기준(max-height) + max-width로 비율을 유지한 채
-   맞추고, 남는 세로 공간(step3는 CTA 버튼만큼 더 좁음)에도 자연스럽게 줄어들게 한다. */
+/* step별 원본 에셋의 가로세로 비율이 조금씩 달라(step3만 유독 좁음) — Figma도 스텝마다
+   높이(500)는 고정하고 폭(277 vs 247)만 다르게 둬서 시각적 크기를 맞췄다. width/height 둘 다
+   auto + max-width/max-height로 비율을 유지한 채 맞추되, step1/2와 step3은 원본 가로세로
+   비율이 달라 max-width를 동일하게 두면(예전 구현) step3만 유독 커 보인다("step3만 이미지가
+   큰거야?" 리포트로 발견) — width가 아니라 height 기준으로 맞춰야 세 스텝 다 실제 렌더 크기가
+   같아지므로, step3 전용으로 max-width를 새 에셋 비율(995x2000)에 맞게 좁혀서(233/280px)
+   같은 높이가 나오도록 보정한다. 새 이미지로 재교체 시 이 값도 다시 계산해야 함. */
 .onboarding__image {
+  width: auto;
+  height: auto;
   max-width: min(277px, 100%);
   max-height: 100%;
+}
+
+.onboarding__image--step3 {
+  max-width: min(233px, 100%);
 }
 
 /* Figma "컨트롤러"(4202:845) 실측: 터치 영역 49x59, 화면 좌우 여백 없이 가장자리에 딱 붙음.
@@ -152,6 +161,10 @@
 
   .onboarding__image {
     max-width: min(333px, 100%);
+  }
+
+  .onboarding__image--step3 {
+    max-width: min(280px, 100%);
   }
 
   .onboarding__nav:first-of-type {
