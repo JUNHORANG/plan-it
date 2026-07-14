@@ -3,6 +3,17 @@
   참조: Figma 로그인 기본(4001:44) / 입력창 활성화(4006:955) / 검증(4006:989) / 타블렛(4146:1040)
 */
 
+/* 모바일 기기 다크 모드에서 브라우저가 강제로 색을 반전시키는 문제 방지용 안전장치.
+   variables.css의 html{color-scheme:light}만으로 충분해야 하지만, 실기기(QR 접속)에서
+   그래도 검게 나오는 경우가 있어 !important로 한 번 더 못박는다. 다른 화면(캘린더/랭킹/
+   구매/관리자)은 의도적으로 body 배경을 흰색이 아닌 값으로 바꿔 쓰므로 이 !important를
+   shared/css/variables.css에 전역으로 넣으면 그 화면들이 깨진다 — 그래서 로그인 페이지
+   에만 한정한다. */
+body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
 .login {
   display: flex;
   flex-direction: column;
@@ -55,30 +66,6 @@
   margin-bottom: 25px;
 }
 
-.error-container {
-  position: relative;
-}
-
-.error-container p {
-  position: absolute;
-  height: 0;
-  margin: 0;
-  top: -22px;
-  left: 0;
-}
-
-.login__error {
-  display: none;
-  position: absolute;
-  padding-left: 4px;
-  font-size: 12px;
-  color: var(--color-error);
-}
-
-.login__error.is-visible {
-  display: block;
-}
-
 .login__submit {
   /* margin-top: 9px;  */
   /* 입력창-버튼 간격 20px = gap 16px + 9px = 25px */
@@ -98,9 +85,4 @@
   text-decoration: underline;
   text-decoration-color: var(--color-primary);
   text-underline-offset: 2px;
-}
-.input-field .input-field__error {
-  display: none;
-  min-height: 0px;
-  margin-top: 0px;
 }

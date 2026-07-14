@@ -13,8 +13,7 @@
 
 import { mountAdminHeader } from "/shared/components/admin-header.js";
 import { showToast } from "/shared/components/toast.js";
-import { getAdminOrders, shipOrder, cancelAdminOrder } from "/shared/js/api.js";
-import { products } from "/shared/js/data.js";
+import { getAdminOrders, shipOrder, cancelAdminOrder, getProducts } from "/shared/js/api.js";
 import { createElement, X } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 mountAdminHeader("#admin-header");
@@ -33,10 +32,13 @@ const STATUS_DOT_CLASS = {
   "주문 배송 중": "is-primary",
 };
 
+let products = [];
+
 loadOrders();
 
 async function loadOrders() {
-  const orders = await getAdminOrders();
+  const [orders, productList] = await Promise.all([getAdminOrders(), getProducts()]);
+  products = productList;
   renderOrders(orders);
 }
 

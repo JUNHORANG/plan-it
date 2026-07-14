@@ -10,12 +10,28 @@
 }
 
 .stepper__bar {
+  position: relative;
   flex: 1;
   height: 4px;
   border-radius: 2px;
   background: #eff6ec; /* Figma 미채움 바 실측 */
+  overflow: hidden;
 }
 
-.stepper__bar.is-active {
+.stepper__fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  border-radius: 2px;
   background: var(--color-primary);
+  transition: width 0.6s ease;
+}
+
+.stepper__bar.is-active .stepper__fill {
+  width: 100%;
+}
+
+/* 이미 지나온 step — 다시 그릴 때 애니메이션 없이 바로 채워진 상태로 표시 */
+.stepper__bar--instant .stepper__fill {
+  transition: none;
 }

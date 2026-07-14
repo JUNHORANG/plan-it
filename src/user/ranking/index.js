@@ -15,7 +15,8 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton } from "/shared/components/skeleton.js";
 import { showToast } from "/shared/components/toast.js";
 import { getRanking } from "/shared/js/api.js";
-import { planets, user } from "/shared/js/data.js";
+import { getState } from "/shared/js/state.js";
+import { planets } from "/shared/js/data.js";
 
 mountHeader("#header", { hasNotification: true });
 mountNavDrawer("#nav-drawer");
@@ -51,7 +52,7 @@ function renderMeSkeleton() {
   el.innerHTML = `
     <div class="ranking-me">
       <span class="ranking-me__rank"></span>
-      <img class="ranking-me__avatar" src="${planetImage(user.planet)}" alt="" />
+      <img class="ranking-me__avatar" src="${planetImage(getState().user.planet)}" alt="" />
       <span class="ranking-me__info">
         <span class="ranking-me__name"></span>
         <span class="ranking-me__points"></span>

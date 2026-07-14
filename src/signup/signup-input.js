@@ -1,51 +1,64 @@
 /*
-  입력창 — 공통 UI 컴포넌트
-  참조: spec.md "입력창 - 공통 UI", Figma 로그인 입력창 상태(4001:44, 4006:955, 4006:989)
+  회원가입 전용 입력창 — shared/components/input.js와 별도로 둔다.
+  참조: Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)
 
-  동작
-  1. 기본 상태 placeholder 노출 (네이티브 <input placeholder>)
-  2. 포커스 시 테두리 강조 (CSS :focus)
-  3. 입력 시작 시 placeholder 자동 숨김 (네이티브 동작)
-  4. blur 시 validate() 실행
-  5. 유효하면 is-valid 클래스로 배경 변경
-  6. 유효하지 않으면 is-error 클래스 + 하단 오류 문구 표시
-
-  아이콘: lucide-icons (CLAUDE.md 컨벤션 참조)
+  회원가입 입력창은 위에 라벨("닉네임"/"이메일" 등)이 있어 눈 아이콘·체크 아이콘 위치가
+  라벨 없는 로그인/구매 등 다른 화면과 달라야 하는데, 처음에 shared/components/input.js를
+  그대로 재사용하다 보니 그 아이콘 위치를 회원가입에 맞춰 고칠 때마다 로그인·구매 입력창
+  레이아웃이 같이 깨졌다 — 그래서 클래스명(signup-field*)부터 완전히 분리해 이 파일과
+  signup-input.css만 건드리면 되게 한다.
 */
+import { createElement, Eye, EyeOff, Check } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
-import { createElement, Eye, EyeOff } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
-
-export function createInput({
+export function createSignupInput({
   type = "text",
   name = "",
+  label = "",
   placeholder = "",
   required = false,
-  autocomplete,
+  autocomplete = "off",
   validate,
-  validateOnBlur = true,
+  validateOnBlur = false,
+  showValidIcon = false,
   onInput,
 } = {}) {
   const wrapper = document.createElement("div");
-  wrapper.className = "input-field";
+  wrapper.className = "signup-field";
+
+  if (label) {
+    const labelEl = document.createElement("label");
+    labelEl.className = "signup-field__label";
+    labelEl.textContent = label;
+    wrapper.appendChild(labelEl);
+  }
 
   const isPassword = type === "password";
   const control = document.createElement("input");
-  control.className = "input-field__control";
+  control.className = "signup-field__control";
   control.type = isPassword ? "password" : type;
   control.name = name;
   control.placeholder = placeholder;
   control.required = required;
-  control.autocomplete = autocomplete ?? (isPassword ? "current-password" : type === "email" ? "email" : "off");
+  control.autocomplete = autocomplete;
 
   const error = document.createElement("p");
-  error.className = "input-field__error";
+  error.className = "signup-field__error";
 
   wrapper.appendChild(control);
+
+  // 닉네임 중복확인/이메일 인증처럼 검증 결과를 입력창 안 체크 아이콘으로도 보여주는 화면용
+  // (Figma 4008:358/680 실측 — 기본 회색, is-valid 시 주조색 초록)
+  if (showValidIcon) {
+    const checkIcon = document.createElement("span");
+    checkIcon.className = "signup-field__check";
+    checkIcon.appendChild(createElement(Check, { size: 18 }));
+    wrapper.appendChild(checkIcon);
+  }
 
   if (isPassword) {
     const toggleBtn = document.createElement("button");
     toggleBtn.type = "button";
-    toggleBtn.className = "input-field__toggle";
+    toggleBtn.className = "signup-field__toggle";
     toggleBtn.setAttribute("aria-label", "비밀번호 표시");
     toggleBtn.appendChild(createElement(Eye, { size: 18 }));
 

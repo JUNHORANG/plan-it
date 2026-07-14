@@ -29,6 +29,7 @@ import { mountAppBar } from "/shared/components/app-bar.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { createInput } from "/shared/components/input.js";
 import { openPurchaseSheet } from "/shared/components/purchase-sheet.js";
+import { showToast } from "/shared/components/toast.js";
 import {
   getProduct,
   getProfile,
@@ -56,8 +57,9 @@ const app = document.querySelector("#app");
 app.innerHTML = `
   <div class="order">
     <div class="order__product">
+      <div class="order__product-skeleton" data-product-skeleton></div>
       <img class="order__product-image" data-product-image style="display: none" />
-      <div>
+      <div data-product-info style="display: none">
         <p class="order__product-price" data-product-price></p>
         <p class="order__product-name" data-product-name></p>
       </div>
@@ -197,10 +199,20 @@ async function load() {
   const useValueEl = document.querySelector("[data-use-value]");
   const addressValueEl = document.querySelector("[data-address-value]");
 
-  renderSkeleton(priceEl, { width: 100, height: 24 });
-  renderSkeleton(nameEl, { width: 140, height: 17 });
-  renderSkeleton(myPointsEl, { width: 80, height: 19 });
-  renderSkeleton(addressValueEl, { width: 60, height: 19 });
+  // Figma "상점 - 구매 - 스켈레톤"(4555:1723) 실측: 이미지+가격+이름을 각각 스켈레톤하지 않고
+  // 그 영역 전체를 하나의 블록(168x77)으로 가린다. MY 포인트(89x20)·주소지(146x20)·구매 후
+  // 포인트(86x20)는 각자 실측 크기로 스켈레톤 — 예전엔 주소지가 60px로 너무 좁았고 구매 후
+  // 포인트는 스켈레톤 자체가 빠져 있었음(spec.md "구매 후 잔여 포인트... 스켈레톤 필요").
+  const productSkeletonEl = document.querySelector("[data-product-skeleton]");
+  const productInfoEl = document.querySelector("[data-product-info]");
+  renderSkeleton(productSkeletonEl, { width: 168, height: 77 });
+  renderSkeleton(myPointsEl, { width: 89, height: 20 });
+  // 주소지 값은 마크업에 "미설정"이 정적으로 박혀 있어(초기 표시 문구), 스켈레톤을 씌워도
+  // 텍스트 색은 그대로라 그라디언트 위로 비쳐 보인다 — Figma도 스켈레톤 상태에선 이 텍스트
+  // 자체를 숨겨서(visible:false) 보여준다. 비워서 완전히 가려지게 한다.
+  addressValueEl.textContent = "";
+  renderSkeleton(addressValueEl, { width: 146, height: 20 });
+  renderSkeleton(remainingEl, { width: 86, height: 20 });
 
   const [fetchedProduct, profile, address] = await Promise.all([
     getProduct(productId),
@@ -213,10 +225,11 @@ async function load() {
   savedAddress = address;
   addressSaveEnabled = Boolean(address?.address);
 
-  clearSkeleton(priceEl);
-  clearSkeleton(nameEl);
   clearSkeleton(myPointsEl);
   clearSkeleton(addressValueEl);
+  clearSkeleton(remainingEl);
+
+  productSkeletonEl.style.display = "none";
 
   const image = document.querySelector("[data-product-image]");
   image.src = product.image;
@@ -225,6 +238,7 @@ async function load() {
   // 스타일시트의 display 선언이 선택자 우선순위와 무관하게 UA 기본 [hidden] 규칙을 이긴다) —
   // 인라인 style.display로 직접 제어한다. (user/profile/index.js와 동일한 버그/수정)
   image.style.display = "";
+  productInfoEl.style.display = "";
 
   priceEl.textContent = `${product.price.toLocaleString()} 포인트`;
   nameEl.textContent = product.name;
@@ -238,6 +252,9 @@ async function load() {
   const checkbox = document.querySelector("[data-checkbox]");
   checkbox.classList.toggle("is-disabled", !canAfford);
   document.querySelector("[data-agree-toggle]").disabled = !canAfford;
+  // "구매 동의" 버튼이 네이티브 disabled라 클릭 이벤트 자체가 발생하지 않는다 — 그래서
+  // 포인트 부족 안내는 클릭 시점이 아니라 여기서(포인트 부족이 확인되는 시점) 기존 토스트로 띄운다.
+  if (!canAfford) showToast("포인트가 부족합니다.", "error");
 
   renderAddressValue();
 }

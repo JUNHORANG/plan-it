@@ -20,7 +20,7 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
 import { maybeShowOnboarding } from "/user/plans/onboarding.js";
-import { getPlansByDate, setPlanDone, pinPlan, deletePlan } from "/shared/js/api.js";
+import { getPlansByDate, setPlanDone, pinPlan, deletePlan, awardPoints } from "/shared/js/api.js";
 import { getWeekDates, formatFullDateLabel, toISODate } from "/shared/js/utils.js";
 import { createElement, Check, EllipsisVertical, Plus } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
@@ -171,7 +171,11 @@ function renderList(plans) {
     cta.type = "button";
     cta.className = "cta-button home__complete-cta";
     cta.textContent = "일정 완료!";
-    cta.addEventListener("click", () => {
+    cta.addEventListener("click", async () => {
+      // success.html의 "+N POINT" 애니메이션은 그동안 보여주기만 하고 실제 잔액엔
+      // 반영되지 않던 드리프트 버그가 있었다 — 이동하기 전 여기서 딱 한 번만 적립한다
+      // (success.html 자체에서 하면 새로고침마다 중복 적립될 수 있음).
+      await awardPoints(points);
       location.href = `/user/plans/success.html?points=${points}`;
     });
     bodyEl.appendChild(cta);
