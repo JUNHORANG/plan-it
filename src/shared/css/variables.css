@@ -149,6 +149,7 @@
   --color-date-number: #5f5f5f; /* 주간 날짜 선택 날짜 숫자 (선택되지 않은 날) */
   --color-option-muted: #b0b8c1; /* 바텀시트 목록형 항목 - 선택 안 된 상태 텍스트 */
   --color-sheet-divider: #f2f2f2; /* 바텀시트 목록형 항목 구분선 */
+  --color-sheet-close: #374151; /* 바텀시트 닫기(X) 아이콘 (4008:405 실측, 헤더 텍스트색과 다름) */
   --color-row-border: #e8e8e8; /* 프로필 설정 리스트 항목 테두리 (4007:187 실측) */
   --color-row-chevron: #727272; /* 프로필 설정 리스트 화살표 아이콘 (4007:187 실측) */
   --color-card-divider: #dedede; /* 프로필 포인트/상점/주문내역 카드 구분선 (4007:187 실측) */
@@ -158,6 +159,9 @@
   --color-ranking-bg: #f9f9f9; /* 랭킹 페이지 배경 (다른 화면과 달리 흰색 아님) */
   --color-admin-bg: #f4f8fb; /* 관리자 페이지 배경 (4388:2254 실측) */
   --color-admin-border: #e7ebee; /* 관리자 테이블/카드/입력창 테두리 (4388:2254 실측) */
+  --color-calendar-bg: #f9f9f9; /* 캘린더 페이지 배경 (4107:736 실측, 다른 화면과 달리 흰색 아님) */
+  --color-calendar-weekday: #a8a8a8; /* 캘린더 요일(월~금) 라벨 (4107:736 실측) */
+  --color-calendar-date: #8c9aae; /* 캘린더 선택 안 된 날짜 숫자 (4107:736 실측) */
   --color-backdrop: rgba(
     25,
     31,
@@ -214,7 +218,11 @@ html {
 body {
   /* height:100vh(고정)였으면 body 박스가 뷰포트 한 칸으로 잘려서, 그 부모를 기준으로
      stick 하는 위치:sticky 요소(#header 등)가 그 지점을 넘어서면 붙지 못하고 그냥
-     스크롤되어 사라진다 — min-height로 바꿔 콘텐츠가 길면 body도 같이 늘어나게 한다 */
+     스크롤되어 사라진다 — min-height로 바꿔 콘텐츠가 길면 body도 같이 늘어나게 한다.
+     html을 감싸는 최상위 카드(body) 자체가 반응형 최소 높이(모바일 640 / 타블렛 600,
+     spec.md 반응형 기준) 아래로 줄어들지 않게 하는 바닥값이라, 뷰포트를 그보다 짧게
+     줄여도 내부 sticky/fixed 레이어(헤더, 오버레이 등)의 기준점이 always 이 바닥 위에서
+     안정적으로 유지된다. */
   min-height: max(100vh, var(--viewport-mobile-min-height));
   min-width: var(--viewport-mobile-min-width);
   max-width: var(--breakpoint-tablet);
@@ -226,6 +234,12 @@ body {
   background-color: var(--color-white);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 600px) {
+  body {
+    min-height: max(100vh, var(--viewport-tablet-min-height));
+  }
 }
 
 ul,

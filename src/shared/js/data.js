@@ -23,7 +23,7 @@ export const user = {
 
 export const planets = [
   { id: "earth", name: "지구", image: "/images/front_titi.png" },
-  { id: "moon", name: "달", image: "/images/moon.png" },
+  { id: "moon", name: "달", image: "/images/ranking_moon.png" },
 ];
 
 // Figma "/store"(4278:843) 실측 그대로 반영 — 이름/카테고리/가격/이미지 매핑.
@@ -156,10 +156,38 @@ export const plans = [
 export const notifications = [
   ...plans
     .filter((p) => p.date === today)
-    .map((p) => ({ id: `notif-${p.id}`, planId: p.id, time: p.time, title: p.title, done: p.done, section: "오늘" })),
-  { id: "notif-y1", planId: null, time: "20:12", title: "무심천 러닝 뛰기", done: true, section: "어제" },
-  { id: "notif-y2", planId: null, time: "18:00", title: "퇴근", done: true, section: "어제" },
-  { id: "notif-y3", planId: null, time: "12:00", title: "점심 시간", done: true, section: "어제" },
+    .map((p) => ({
+      id: `notif-${p.id}`,
+      planId: p.id,
+      time: p.time,
+      title: p.title,
+      done: p.done,
+      section: "오늘",
+    })),
+  {
+    id: "notif-y1",
+    planId: null,
+    time: "20:12",
+    title: "무심천 러닝 뛰기",
+    done: true,
+    section: "어제",
+  },
+  {
+    id: "notif-y2",
+    planId: null,
+    time: "18:00",
+    title: "퇴근",
+    done: true,
+    section: "어제",
+  },
+  {
+    id: "notif-y3",
+    planId: null,
+    time: "12:00",
+    title: "점심 시간",
+    done: true,
+    section: "어제",
+  },
 ];
 
 // 랭킹 — Figma "/ranking"(4259:1235) 실측 그대로(닉네임·포인트·순위), "나의 순위"(6등) 항목만
@@ -170,7 +198,13 @@ export const ranking = [
   { rank: 3, nickname: "키키", points: 810, planet: "earth" },
   { rank: 4, nickname: "캐치캐치", points: 620, planet: "earth" },
   { rank: 5, nickname: "스티키", points: 540, planet: "moon" },
-  { rank: 6, nickname: user.nickname, points: user.points, planet: user.planet, isMe: true },
+  {
+    rank: 6,
+    nickname: user.nickname,
+    points: user.points,
+    planet: user.planet,
+    isMe: true,
+  },
   { rank: 7, nickname: "ADP", points: 420, planet: "moon" },
   { rank: 8, nickname: "레몬에이드", points: 380, planet: "moon" },
 ];

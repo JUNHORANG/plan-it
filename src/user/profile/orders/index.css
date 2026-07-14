@@ -46,6 +46,11 @@ body {
   min-height: 21px;
 }
 
+.orders__count-skeleton {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .orders__count strong {
   color: var(--color-primary);
 }

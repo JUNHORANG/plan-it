@@ -162,6 +162,8 @@ function renderList(plans) {
   bodyEl.appendChild(list);
 
   if (plans.every((p) => p.done)) {
+    list.classList.add("home__list--complete");
+
     const points = plans.length * 10;
     const cta = document.createElement("button");
     cta.type = "button";
@@ -171,6 +173,7 @@ function renderList(plans) {
       location.href = `/user/plans/success.html?points=${points}`;
     });
     bodyEl.appendChild(cta);
+    requestAnimationFrame(() => cta.classList.add("is-visible"));
   }
 }
 

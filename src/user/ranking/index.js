@@ -15,7 +15,7 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton } from "/shared/components/skeleton.js";
 import { showToast } from "/shared/components/toast.js";
 import { getRanking } from "/shared/js/api.js";
-import { planets } from "/shared/js/data.js";
+import { planets, user } from "/shared/js/data.js";
 
 mountHeader("#header", { hasNotification: true });
 mountNavDrawer("#nav-drawer");
@@ -42,33 +42,36 @@ function planetImage(planetId) {
   return (planets.find((p) => p.id === planetId) || planets[0]).image;
 }
 
+/* Figma "랭킹 - 스켈레톤"(4259:1342): 순위/닉네임/포인트는 서버 응답(등수 계산)을 기다려야
+   해서 스켈레톤이지만, 아바타는 로그인한 내 행성(user.planet, 로컬에 이미 있는 값)이라
+   기다릴 필요 없이 바로 실제 이미지로 보여준다. 공유하기 칩도 자리만 미리 잡아두고(비활성
+   텍스트), 데이터가 오면 renderMe()가 전체를 실제 버튼으로 교체한다. */
 function renderMeSkeleton() {
   const el = document.querySelector("[data-ranking-me]");
   el.innerHTML = `
     <div class="ranking-me">
       <span class="ranking-me__rank"></span>
-      <span class="ranking-me__avatar"></span>
+      <img class="ranking-me__avatar" src="${planetImage(user.planet)}" alt="" />
       <span class="ranking-me__info">
         <span class="ranking-me__name"></span>
         <span class="ranking-me__points"></span>
       </span>
+      <span class="ranking-me__share">공유하기</span>
     </div>
   `;
-  renderSkeleton(el.querySelector(".ranking-me__rank"), { width: 16, height: 19 });
-  renderSkeleton(el.querySelector(".ranking-me__avatar"), { width: 60, height: 60, radius: "50%" });
-  renderSkeleton(el.querySelector(".ranking-me__name"), { width: 80, height: 19 });
-  renderSkeleton(el.querySelector(".ranking-me__points"), { width: 60, height: 17 });
+  renderSkeleton(el.querySelector(".ranking-me__rank"), { width: 14, height: 16 });
+  renderSkeleton(el.querySelector(".ranking-me__name"), { width: 80, height: 20 });
+  renderSkeleton(el.querySelector(".ranking-me__points"), { width: 80, height: 16 });
 }
 
+/* 랭킹 리스트도 캘린더 바텀시트 스켈레톤과 동일하게, 항목 개수만큼 반복하지 않고
+   한 줄짜리 자리표시자 하나만 보여준다(Figma 4259:1342 실측). */
 function renderListSkeleton() {
   const list = document.querySelector("[data-ranking-list]");
   list.innerHTML = "";
-  for (let i = 0; i < 6; i++) {
-    const row = document.createElement("div");
-    row.className = "ranking-row";
-    renderSkeleton(row, { width: "100%", height: 60, radius: "10px" });
-    list.appendChild(row);
-  }
+  const row = document.createElement("div");
+  list.appendChild(row);
+  renderSkeleton(row, { width: "100%", height: 60, radius: "10px" });
 }
 
 async function loadRanking() {

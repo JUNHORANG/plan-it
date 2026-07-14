@@ -20,31 +20,21 @@ app.innerHTML = `<div class="notification" data-notification-body></div>`;
 renderSkeletonList();
 loadNotifications();
 
+/* Figma "알림 - 스켈레톤"(4255:1696): "오늘" 섹션 제목은 고정 문구라 실제 텍스트 그대로
+   보여주고("어제" 섹션은 아예 없음), 카드도 여러 장이 아니라 한 장짜리 자리표시자만 둔다. */
 function renderSkeletonList() {
   const body = document.querySelector("[data-notification-body]");
-  body.innerHTML = "";
+  body.innerHTML = `
+    <div class="notification__section">
+      <p class="notification__section-title">오늘</p>
+      <div class="notification__list"></div>
+    </div>
+  `;
 
-  ["오늘", "어제"].forEach((label) => {
-    const section = document.createElement("div");
-    section.className = "notification__section";
-
-    const heading = document.createElement("p");
-    heading.className = "notification__section-title";
-    renderSkeleton(heading, { width: 60, height: 19 });
-    section.appendChild(heading);
-
-    const list = document.createElement("div");
-    list.className = "notification__list";
-    for (let i = 0; i < 3; i++) {
-      const card = document.createElement("div");
-      card.className = "notification__skeleton-card";
-      renderSkeleton(card, { width: "100%", height: 58, radius: "12px" });
-      list.appendChild(card);
-    }
-    section.appendChild(list);
-
-    body.appendChild(section);
-  });
+  const card = document.createElement("div");
+  card.className = "notification__skeleton-card";
+  renderSkeleton(card, { width: "100%", height: 58, radius: "12px" });
+  body.querySelector(".notification__list").appendChild(card);
 }
 
 async function loadNotifications() {

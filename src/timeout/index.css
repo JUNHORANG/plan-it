@@ -1,0 +1,76 @@
+/*
+  네트워크 지연 (/timeout/) 전용 스타일
+  참조: Figma 모바일(4087:773) / 타블렛·데스크탑(4146:1003) — 실측: 앱바 하단→제목 74px,
+  제목→안내문구 12px, 안내문구→일러스트 35px. CTA는 404(not-found)/일정 완료(plan-success)
+  화면과 동일한 하단 고정(fixed) + 좌우 16px(타블렛 24px, 최대 552px) 패턴 재사용.
+*/
+
+.timeout-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - var(--app-bar-height));
+  /* 좌우 여백은 #app(layout.css)이 이미 주고 있어 여기서 또 넣지 않는다(2중 패딩 방지) */
+  padding: 74px 0 140px;
+  text-align: center;
+}
+
+.timeout-page__title {
+  font-family: var(--font-family-brand);
+  font-size: 36px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.timeout-page__desc {
+  margin-top: 12px;
+  max-width: 223px;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-assist);
+}
+
+.timeout-page__image-area {
+  margin-top: 35px;
+}
+
+.timeout-page__image {
+  width: 260px;
+  height: 257px;
+  object-fit: contain;
+}
+
+.timeout-page__spacer {
+  flex: 1 1 auto;
+  min-height: 24px;
+}
+
+.timeout-page__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  /* .cta-button은 width:100%(뷰포트 기준)라 left+right만으론 안 밀리고 오른쪽으로 16px
+     삐져나감 — width:auto로 밀어줘야 left/right 사이 폭으로 다시 계산된다 */
+  width: auto;
+}
+
+@media (min-width: 600px) {
+  .timeout-page {
+    min-height: calc(100vh - var(--app-bar-height-tablet));
+  }
+
+  .timeout-page__image {
+    width: 300px;
+    height: 296px;
+  }
+
+  .timeout-page__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+}
