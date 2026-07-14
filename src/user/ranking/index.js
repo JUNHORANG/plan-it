@@ -14,11 +14,15 @@ import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton } from "/shared/components/skeleton.js";
 import { showToast } from "/shared/components/toast.js";
-import { getRanking } from "/shared/js/api.js";
-import { getState } from "/shared/js/state.js";
+import { getRanking, getProfile, hasUnreadNotifications } from "/shared/js/api.js";
 import { planets } from "/shared/js/data.js";
+import { requireAuth } from "/shared/js/utils.js";
 
-mountHeader("#header", { hasNotification: true });
+await requireAuth();
+
+const myProfile = await getProfile();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");
@@ -52,7 +56,7 @@ function renderMeSkeleton() {
   el.innerHTML = `
     <div class="ranking-me">
       <span class="ranking-me__rank"></span>
-      <img class="ranking-me__avatar" src="${planetImage(getState().user.planet)}" alt="" />
+      <img class="ranking-me__avatar" src="${planetImage(myProfile?.planet)}" alt="" />
       <span class="ranking-me__info">
         <span class="ranking-me__name"></span>
         <span class="ranking-me__points"></span>

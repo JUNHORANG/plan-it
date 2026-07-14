@@ -71,6 +71,16 @@ function resolveFile(urlPath) {
   return null;
 }
 
+// MPA라 라우트마다 index.html이 물리적으로 따로 존재해서, 파비콘 <link>를 파일마다
+// 심으면 페이지 추가할 때마다 빠뜨리기 쉽다. 서버가 서빙 시점에 한 번만 주입해서
+// 소스에서는 신경 쓸 필요가 없게 한다.
+const FAVICON_TAG = '<link rel="icon" type="image/png" href="/favicon.png" />';
+
+function injectFavicon(html) {
+  if (html.includes(FAVICON_TAG)) return html;
+  return html.replace("</head>", `    ${FAVICON_TAG}\n  </head>`);
+}
+
 function sendFile(req, res, filePath, statusCode = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const stat = fs.statSync(filePath);
@@ -86,6 +96,13 @@ function sendFile(req, res, filePath, statusCode = 200) {
   if (req.headers["if-none-match"] === etag) {
     res.writeHead(304, headers);
     res.end();
+    return;
+  }
+
+  if (ext === ".html") {
+    const html = injectFavicon(fs.readFileSync(filePath, "utf8"));
+    res.writeHead(statusCode, headers);
+    res.end(html);
     return;
   }
 

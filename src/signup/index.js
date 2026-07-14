@@ -184,8 +184,13 @@ function renderEmailStep() {
   async function handleCtaClick() {
     if (phase === "email") {
       cta.setLoading(true);
-      await sendVerificationCode(state.email);
+      const sendResult = await sendVerificationCode(state.email, state.nickname);
       cta.setLoading(false);
+
+      if (!sendResult.ok) {
+        showToast(sendResult.message || "인증번호 전송에 실패했습니다.", "error");
+        return;
+      }
 
       phase = "code";
       state.codeSent = true;
@@ -198,7 +203,7 @@ function renderEmailStep() {
     }
 
     cta.setLoading(true);
-    const result = await verifyEmailCode(code);
+    const result = await verifyEmailCode(state.email, code);
     cta.setLoading(false);
 
     if (result.ok) {
@@ -235,11 +240,22 @@ function renderEmailStep() {
     fields.appendChild(timerWrap);
     timerEl = timerWrap.querySelector("[data-timer]");
 
-    timerWrap.querySelector("[data-extend]").addEventListener("click", () => {
+    const extendBtn = timerWrap.querySelector("[data-extend]");
+    extendBtn.addEventListener("click", async () => {
+      extendBtn.disabled = true;
+      const result = await sendVerificationCode(state.email, state.nickname);
+      extendBtn.disabled = false;
+
+      if (!result.ok) {
+        showToast(result.message || "인증번호 재전송에 실패했습니다.", "error");
+        return;
+      }
+
       timeLeft = TIMER_SECONDS;
       expired = false;
       cta.setDisabled(code.length !== 6);
       startTimer();
+      showToast("인증번호를 다시 보냈어요.", "success");
     });
 
     startTimer();
@@ -293,8 +309,14 @@ function renderPasswordStep() {
     onClick: async () => {
       cta.setLoading(true);
       state.password = passwordInput.getValue();
-      await signup({ nickname: state.nickname, email: state.email, password: state.password });
+      const result = await signup({ password: state.password });
       cta.setLoading(false);
+
+      if (!result.ok) {
+        showToast(result.message || "회원가입에 실패했습니다.", "error");
+        return;
+      }
+
       state.step = "done";
       renderStep();
     },
@@ -328,7 +350,8 @@ function renderComplete() {
     label: "로그인 하기",
     disabled: false,
     onClick: () => {
-      location.href = "/";
+      // 2단계(verifyEmailCode)에서 이미 Supabase 세션이 발급된 상태라 재로그인 없이 홈으로 이동
+      location.href = "/user/plans/";
     },
   });
   cta.el.classList.add("signup__cta");

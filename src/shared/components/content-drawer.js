@@ -7,7 +7,15 @@
   나브 드로워(왼쪽에서 슬라이드)와 달리, "하위 화면으로 들어간다"는 느낌을 주기 위해
   오른쪽에서 슬라이드해 들어오는 전체화면 오버레이. 뒤로가기 버튼/Escape로 닫힌다.
 
-  openContentDrawer({ title, render(bodyEl) })
+  openContentDrawer({ title, render(bodyEl), renderFooter(footerEl) })
+
+  renderFooter는 선택 사항 — 하단 고정 CTA가 필요한 화면(예: 행성 변경)만 쓴다.
+  body는 스크롤되는 영역(.content-drawer__panel의 overflow-y:auto)이라 그 안에
+  position:fixed 요소를 넣으면 안 된다 — panel이 will-change:transform도 같이 갖고 있어서
+  fixed의 containing block이 진짜 뷰포트가 아니라 panel이 돼 버리고, 결과적으로 panel이
+  스크롤될 때 "고정"이어야 할 요소가 스크롤한 만큼 같이 움직이는 버그가 생긴다(실측 확인:
+  109px 스크롤 시 버튼도 109px 이동). 대신 footer를 body와 형제 관계의 별도 flex 자식으로
+  두면 애초에 스크롤 영역 밖이라 이 문제 자체가 생기지 않는다.
 */
 
 import { createElement, ArrowLeft } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
@@ -22,7 +30,7 @@ export function closeContentDrawer() {
   setTimeout(() => el.remove(), 380);
 }
 
-export function openContentDrawer({ title = "", render } = {}) {
+export function openContentDrawer({ title = "", render, renderFooter } = {}) {
   closeContentDrawer();
 
   const root = document.querySelector("#overlay-root");
@@ -45,6 +53,14 @@ export function openContentDrawer({ title = "", render } = {}) {
 
   const body = el.querySelector(".content-drawer__body");
   if (render) render(body);
+
+  if (renderFooter) {
+    const panel = el.querySelector(".content-drawer__panel");
+    const footer = document.createElement("div");
+    footer.className = "content-drawer__footer";
+    panel.appendChild(footer);
+    renderFooter(footer);
+  }
 
   const escHandler = (event) => {
     if (event.key === "Escape") closeContentDrawer();

@@ -14,7 +14,10 @@
 import { mountAdminHeader } from "/shared/components/admin-header.js";
 import { showToast } from "/shared/components/toast.js";
 import { getAdminOrders, shipOrder, cancelAdminOrder, getProducts } from "/shared/js/api.js";
+import { requireAdmin } from "/shared/js/utils.js";
 import { createElement, X } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+
+await requireAdmin();
 
 mountAdminHeader("#admin-header");
 

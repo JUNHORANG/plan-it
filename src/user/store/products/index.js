@@ -13,9 +13,12 @@ import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openPurchaseSheet } from "/shared/components/purchase-sheet.js";
-import { getProfile, getProducts } from "/shared/js/api.js";
+import { getProfile, getProducts, hasUnreadNotifications } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
 
-mountHeader("#header");
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");

@@ -12,7 +12,6 @@
     깜빡여 UX가 나쁘다. 체크 시엔 로컬 상태만 낙관적으로 바꿔 리스트를 즉시 다시 그리고,
     저장 요청(setPlanDone)은 백그라운드로 보낸다(loadPlans의 500ms 지연·스켈레톤 없음).
     모든 일정이 완료되면 renderList 내부에서 "일정 완료" CTA가 나타나 success.html로 이동한다.
-  TODO: 회원가입/로그인 흐름과 연결되는 requireAuth 가드는 shared/js/utils.js 확장 후 적용.
 */
 
 import { mountHeader } from "/shared/components/header.js";
@@ -20,11 +19,13 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
 import { maybeShowOnboarding } from "/user/plans/onboarding.js";
-import { getPlansByDate, setPlanDone, pinPlan, deletePlan, awardPoints } from "/shared/js/api.js";
-import { getWeekDates, formatFullDateLabel, toISODate } from "/shared/js/utils.js";
+import { getPlansByDate, setPlanDone, pinPlan, deletePlan, awardPoints, hasUnreadNotifications } from "/shared/js/api.js";
+import { getWeekDates, formatFullDateLabel, toISODate, requireAuth } from "/shared/js/utils.js";
 import { createElement, Check, EllipsisVertical, Plus } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
-mountHeader("#header", { hasNotification: true });
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 maybeShowOnboarding();
 

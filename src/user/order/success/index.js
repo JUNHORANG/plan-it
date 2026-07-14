@@ -6,6 +6,9 @@
 
 import { mountAppBar } from "/shared/components/app-bar.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 mountAppBar("#app-bar", {
   title: "",

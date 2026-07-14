@@ -10,6 +10,9 @@
 
 import { initPlanForm } from "./plan-form.js";
 import { getPlan, updatePlan } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 const planId = new URLSearchParams(location.search).get("planId");
 const plan = await getPlan(planId);
