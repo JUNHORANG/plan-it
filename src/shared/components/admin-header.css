@@ -1,0 +1,41 @@
+/*
+  관리자 헤더 — 공통 UI
+  참조: Figma "관리자 - 주문 관리"(4388:2254) 헤더 실측(100px 높이, 흰 배경, 하단 테두리)
+*/
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding: 0 40px;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-admin-border);
+}
+
+.admin-header__logo {
+  font-family: var(--font-family-brand);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-header);
+}
+
+.admin-header__logo-accent {
+  color: var(--color-primary);
+}
+
+.admin-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.admin-header__link {
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.admin-header__link.is-active {
+  color: var(--color-primary);
+}

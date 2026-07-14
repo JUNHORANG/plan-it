@@ -1,0 +1,77 @@
+/*
+  휠 피커 — 공통 UI 컴포넌트 (일정 추가/수정 전용)
+  참조: Figma "일정 추가 - 휠 피커 바텀 시트 - 시간/시작 날짜/종료 날짜"
+  (4079:1055, 4079:1096, 4208:872) — 3행(37/39/37) 구조를 39px 균일 행으로 단순화(js 주석 참조).
+*/
+
+.wheel-picker__head {
+  display: flex;
+  padding-bottom: 8px;
+}
+
+.wheel-picker__head-label {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-assist);
+}
+
+.wheel-picker__body {
+  position: relative;
+  display: flex;
+  height: 117px;
+}
+
+.wheel-picker__highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 39px;
+  height: 39px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wheel-picker__column {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  height: 117px;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.wheel-picker__column::-webkit-scrollbar {
+  display: none;
+}
+
+.wheel-picker__column + .wheel-picker__column {
+  border-left: 1px solid var(--color-sheet-divider);
+}
+
+.wheel-picker__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wheel-picker__item {
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: 17px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-assist);
+}
+
+.wheel-picker__item.is-selected {
+  color: var(--color-body);
+  font-weight: var(--font-weight-semibold);
+}

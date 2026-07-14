@@ -15,6 +15,7 @@
 import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
+import { renderSkeleton } from "/shared/components/skeleton.js";
 import { getPlansByDate, pinPlan, deletePlan } from "/shared/js/api.js";
 import { toISODate } from "/shared/js/utils.js";
 import {
@@ -127,15 +128,30 @@ function renderMonth() {
 }
 
 async function loadDayPlans() {
-  const titleEl = document.querySelector("[data-calendar-title]");
-  const bodyEl = document.querySelector("[data-calendar-body]");
-
-  titleEl.innerHTML = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 일정`;
-  bodyEl.innerHTML = "";
+  renderSheetSkeleton();
 
   const iso = toISODate(selectedDate);
   const plans = await getPlansByDate(iso);
   renderSheet(plans);
+}
+
+/** Figma "캘린더 - 스켈레톤"(4095:557) — 날짜/월 그리드는 즉시 계산되는 로컬 값이라 스켈레톤이
+    필요 없고, 서버 응답을 기다리는 시트 쪽만 표시한다: 제목 옆 개수 배지(27x21) + 목록 자리에
+    한 줄짜리 자리표시자(리스트 항목 1개와 동일한 343x60 비율) 하나. */
+function renderSheetSkeleton() {
+  const titleEl = document.querySelector("[data-calendar-title]");
+  const bodyEl = document.querySelector("[data-calendar-body]");
+
+  titleEl.innerHTML = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 일정 `;
+  const countSkeleton = document.createElement("span");
+  countSkeleton.className = "calendar-sheet__count-skeleton";
+  titleEl.appendChild(countSkeleton);
+  renderSkeleton(countSkeleton, { width: 27, height: 21 });
+
+  bodyEl.innerHTML = "";
+  const itemSkeleton = document.createElement("div");
+  bodyEl.appendChild(itemSkeleton);
+  renderSkeleton(itemSkeleton, { width: "100%", height: 60 });
 }
 
 function renderSheet(plans) {

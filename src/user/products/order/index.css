@@ -16,7 +16,6 @@ body {
 }
 
 .order {
-  padding-bottom: 24px;
   min-height: calc(100vh - var(--app-bar-height));
 }
 
@@ -172,6 +171,13 @@ body {
   font-weight: var(--font-weight-regular);
   color: var(--color-assist);
   padding: 4px 2px;
+  transition: color 0.15s ease;
+}
+
+/* 토글 켜짐 — 이 주소를 다음 구매에도 쓰겠다는 뜻으로 계속 유지되는 색 */
+.order-card__save.is-active {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 구매 동의 카드 */

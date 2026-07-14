@@ -1,0 +1,21 @@
+/*
+  스텝퍼 — 공통 UI 컴포넌트
+  참조: Figma 회원가입 "stepper" 컴포넌트(4008:547, 3개 Line 4px 두께 실측)
+*/
+
+.stepper {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.stepper__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #eff6ec; /* Figma 미채움 바 실측 */
+}
+
+.stepper__bar.is-active {
+  background: var(--color-primary);
+}

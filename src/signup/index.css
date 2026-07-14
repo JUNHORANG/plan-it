@@ -1,0 +1,123 @@
+/*
+  회원가입 (/signup/) 전용 스타일
+  참조: Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)/
+        완료(4008:340) — 좌우 여백은 #app(layout.css)이 이미 주고 있어 여기서 또 넣지 않는다.
+*/
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0 120px;
+}
+
+.signup__stepper {
+  margin-bottom: 30px;
+}
+
+.signup__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.signup__timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.signup__timer-time {
+  font-size: 14px;
+  color: var(--color-error);
+}
+
+.signup__timer-extend {
+  font-size: 14px;
+  color: var(--color-modal-body);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.signup__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: auto;
+}
+
+@media (min-width: 600px) {
+  .signup__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+}
+
+/* 완료 화면 (4008:340) */
+.signup-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 0 140px;
+}
+
+.signup-complete__title {
+  font-family: var(--font-family-brand);
+  font-size: 36px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.signup-complete__desc {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.signup-complete__illustration {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-top: 48px;
+  animation: signup-complete-in 0.5s ease;
+}
+
+@keyframes signup-complete-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.signup-complete__globe {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.signup-complete__sparkle {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.signup-complete__sparkle--tl {
+  top: -6px;
+  left: -18px;
+}
+
+.signup-complete__sparkle--br {
+  bottom: 10px;
+  right: -18px;
+}

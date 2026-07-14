@@ -41,7 +41,8 @@ const app = document.querySelector("#app");
 app.innerHTML = `
   <div class="profile">
     <div class="profile__head">
-      <img class="profile__avatar" data-avatar alt="내 행성 캐릭터" hidden />
+      <span class="profile__avatar-skeleton" data-avatar-skeleton></span>
+      <img class="profile__avatar" data-avatar alt="내 행성 캐릭터" style="display: none" />
       <div class="profile__names">
         <p class="profile__nickname" data-nickname></p>
         <p class="profile__email" data-email></p>
@@ -69,13 +70,20 @@ renderSettings();
 loadProfile();
 
 async function loadProfile() {
+  const avatarSkeleton = document.querySelector("[data-avatar-skeleton]");
   const nickname = document.querySelector("[data-nickname]");
   const email = document.querySelector("[data-email]");
   const points = document.querySelector("[data-points]");
 
-  renderSkeleton(nickname, { width: 100, height: 17 });
-  renderSkeleton(email, { width: 140, height: 17 });
-  renderSkeleton(points, { width: 60, height: 17 });
+  // Figma "프로필 - 스켈레톤"(4095:782, 아바타/닉네임/이메일 4095:784): 어느 행성인지는 서버
+  // 응답(profile.planet) 전엔 알 수 없어서(랭킹 "나의 순위"의 user.planet과 달리 여긴 로컬에
+  // 없음) <img>에 곧바로 스켈레톤 클래스를 입히지 않는다 — src 없는 <img>는 깨진 이미지 아이콘
+  // (엑스박스)으로 보이므로, 별도 자리표시자 span(원형 66x66)을 놓고 실제 <img>는 로드 전까지
+  // hidden으로 감춰서 그 문제를 피한다.
+  renderSkeleton(avatarSkeleton, { width: 66, height: 66, radius: "50%" });
+  renderSkeleton(nickname, { width: 69, height: 17 });
+  renderSkeleton(email, { width: 112, height: 17 });
+  renderSkeleton(points, { width: 53, height: 17 });
 
   const profile = await getProfile();
 
@@ -91,9 +99,15 @@ async function loadProfile() {
 
 function applyAvatar(planetId) {
   const avatar = document.querySelector("[data-avatar]");
+  const avatarSkeleton = document.querySelector("[data-avatar-skeleton]");
   const planet = planets.find((p) => p.id === planetId) || planets[0];
   avatar.src = planet.image;
-  avatar.hidden = false;
+  // hidden 속성/프로퍼티는 여기선 안 먹힌다 — variables.css의 전역 img,svg{display:block}
+  // 리셋과 .skeleton{display:block}처럼 author 스타일시트가 display를 선언해두면, 그게
+  // (선택자 우선순위와 무관하게) UA 기본값인 [hidden]{display:none}보다 항상 이긴다.
+  // 그래서 인라인 style.display로 직접 제어해야 확실히 반영된다.
+  avatar.style.display = "";
+  avatarSkeleton.style.display = "none";
 }
 
 function renderSettings() {

@@ -42,14 +42,14 @@ async function load() {
   const pointsEl = document.querySelector("[data-points]");
   const listEl = document.querySelector("[data-list]");
 
-  renderSkeleton(pointsEl, { width: 70, height: 19 });
+  // Figma "스토어 - 스켈레톤"(4534:1055) 실측: 포인트 값 89x19, 리스트는 여러 줄이 아니라
+  // 한 줄짜리 자리표시자(343x77) 하나.
+  renderSkeleton(pointsEl, { width: 89, height: 19 });
   listEl.innerHTML = "";
-  for (let i = 0; i < 1; i++) {
-    const row = document.createElement("div");
-    row.className = "store__item";
-    renderSkeleton(row, { width: "100%", height: 64 });
-    listEl.appendChild(row);
-  }
+  const row = document.createElement("div");
+  row.className = "store__item-skeleton";
+  renderSkeleton(row, { width: "calc(100% - 32px)", height: 77 });
+  listEl.appendChild(row);
 
   const [profile, products] = await Promise.all([getProfile(), getProducts()]);
   currentPoints = profile.points;

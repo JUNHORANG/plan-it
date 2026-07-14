@@ -42,19 +42,24 @@ async function load() {
   const countEl = document.querySelector("[data-count]");
   const listEl = document.querySelector("[data-list]");
 
-  renderSkeleton(pointsEl, { width: 70, height: 19 });
-  renderSkeleton(countEl, { width: 90, height: 21 });
+  // Figma "주문 내역 - 스켈레톤"(4376:1962): 포인트 값만 자리표시자고 "나의 포인트"/"주문 내역"
+  // 라벨은 고정 문구라 실제 텍스트 그대로 두고, 건수(N건) 자리에만 작은 배지를 붙인다.
+  // 카드도 여러 장이 아니라 실제 카드 한 장 높이(265px)만큼 한 장만 보여준다.
+  renderSkeleton(pointsEl, { width: 109, height: 19 });
+  countEl.innerHTML = "주문 내역 ";
+  const countSkeleton = document.createElement("span");
+  countSkeleton.className = "orders__count-skeleton";
+  countEl.appendChild(countSkeleton);
+  renderSkeleton(countSkeleton, { width: 25, height: 21 });
+
   listEl.innerHTML = "";
-  for (let i = 0; i < 2; i++) {
-    const item = document.createElement("div");
-    renderSkeleton(item, { width: "100%", height: 220, radius: "12px" });
-    listEl.appendChild(item);
-  }
+  const item = document.createElement("div");
+  renderSkeleton(item, { width: "100%", height: 265, radius: "12px" });
+  listEl.appendChild(item);
 
   const [profile, orders] = await Promise.all([getProfile(), getOrders()]);
 
   clearSkeleton(pointsEl);
-  clearSkeleton(countEl);
   pointsEl.textContent = `${profile.points.toLocaleString()} 포인트`;
   countEl.innerHTML = `주문 내역 <strong>${orders.length}건</strong>`;
 

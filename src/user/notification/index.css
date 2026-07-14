@@ -1,0 +1,70 @@
+/*
+  알림 (/user/notification/) 전용 스타일
+  참조: spec.md "알림", Figma "/notification"(4293:1216)
+*/
+
+.notification {
+  padding: 20px 0 40px;
+}
+
+.notification__section + .notification__section {
+  margin-top: 30px;
+}
+
+.notification__section-title {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+.notification__list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notification__card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--color-white);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.notification__time {
+  flex-shrink: 0;
+  width: 60px;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+  white-space: nowrap;
+}
+
+.notification__message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: #000000;
+  line-height: 1.4;
+}
+
+.notification__message-title {
+  color: var(--color-primary);
+}
+
+.notification__card.is-done {
+  cursor: default;
+}
+
+.notification__card.is-done .notification__time,
+.notification__card.is-done .notification__message {
+  color: var(--color-assist);
+}
+
+.notification__skeleton-card {
+  width: 100%;
+}

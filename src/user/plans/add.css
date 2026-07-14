@@ -1,0 +1,147 @@
+/*
+  일정 추가 (/user/plans/add.html) 전용 스타일
+  참조: spec.md "일정 추가", Figma "일정 추가/수정"(4355:1141)
+
+  좌우 여백은 #app(layout.css)이 이미 주고 있어 여기서 또 넣지 않는다(2중 패딩 방지).
+*/
+
+.plan-add {
+  display: flex;
+  padding-bottom: 100px;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-add__textarea-wrap {
+  position: relative;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-control);
+  background: var(--color-input-valid-bg);
+  height: 70px;
+}
+
+.plan-add__textarea-icon {
+  position: absolute;
+  top: 16px;
+  left: 15px;
+  display: none;
+  color: var(--color-input-assist);
+  pointer-events: none;
+}
+
+.plan-add__textarea {
+  width: 100%;
+  height: 100%;
+  padding: 15px 16px 20px 16px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--color-body);
+}
+
+.plan-add__textarea::placeholder {
+  color: var(--color-input-assist);
+}
+
+.plan-add__textarea:focus {
+  outline: none;
+}
+
+.plan-add__counter {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 12px;
+  color: var(--color-input-assist);
+  pointer-events: none;
+}
+
+.plan-add__card {
+  border-radius: 12px;
+  background: #f7f7f7;
+  overflow: hidden;
+}
+
+.plan-add__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 50px;
+  padding: 0 5px 0 12px;
+  background: #f7f7f7;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.plan-add__card .plan-add__row {
+  border-radius: 0;
+}
+
+.plan-add__row + .plan-add__row {
+  margin-top: 14px;
+}
+
+.plan-add__card .plan-add__row + .plan-add__row {
+  margin-top: 0;
+}
+
+.plan-add__row.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.plan-add__label {
+  font-size: 14px;
+  color: var(--color-body);
+}
+
+.plan-add__required {
+  margin-left: 2px;
+  color: #eb0000;
+}
+
+.plan-add__value-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.plan-add__value {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-body);
+}
+
+.plan-add__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-row-chevron);
+}
+
+.plan-add__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: auto;
+}
+
+[data-row="start"] {
+  border-bottom: 2px solid #fff;
+}
+
+@media (min-width: 600px) {
+  .plan-add__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+}

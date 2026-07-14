@@ -1,0 +1,38 @@
+/*
+  관리자 페이지 공통 레이아웃 — admin/orders, admin/products 둘 다 사용
+  참조: Figma "관리자 - 주문 관리"(4388:2254) / "관리자 - 상점 관리"(4392:2654)
+
+  관리자 화면은 나머지 앱과 달리 모바일 카드(600px 고정)가 아니라 데스크탑 전용 대시보드라,
+  전역 body/#app/#toast-root/#overlay-root의 "600px 카드" 레이아웃을 여기서 오버라이드한다.
+*/
+
+body {
+  max-width: none;
+  min-width: 1024px;
+  background: var(--color-admin-bg);
+}
+
+#app {
+  padding: 0;
+}
+
+#toast-root,
+#overlay-root {
+  max-width: none;
+}
+
+.admin-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 40px 80px;
+}
+
+.admin-content__title {
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-body);
+}
+
+.admin-content__count {
+  color: var(--color-primary);
+}

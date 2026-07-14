@@ -1,0 +1,177 @@
+/*
+  관리자 - 주문 관리 (/admin/orders/) 전용 스타일
+  참조: Figma "관리자 - 주문 관리 - 주문 확인"(4388:2254 기본 / 4392:2529 모달)
+  공통 레이아웃(body/#app 오버라이드, .admin-content)은 shared/components/admin-layout.css 참조
+*/
+
+.admin-table {
+  margin-top: 46px;
+  background: var(--color-white);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-table__head,
+.admin-table__row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 80px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-body);
+}
+
+.admin-table__head {
+  font-weight: var(--font-weight-medium);
+  color: #212121;
+}
+
+.admin-table__row {
+  font-weight: var(--font-weight-regular);
+  border-top: 1px solid var(--color-admin-border);
+}
+
+.admin-table__row.is-clickable {
+  cursor: pointer;
+}
+
+.admin-table__row.is-clickable:hover {
+  background: var(--color-admin-bg);
+}
+
+.admin-table__status {
+  display: flex;
+  justify-content: center;
+}
+
+.admin-table__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.admin-table__dot.is-primary {
+  background: var(--color-primary);
+}
+
+.admin-table__dot.is-accent {
+  background: var(--color-accent);
+}
+
+.admin-table__dot.is-error {
+  background: var(--color-error);
+}
+
+/* 주문 상세 모달 (4392:2529 — 배송 모달 / 취소 모달 공용 셸) */
+.order-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(6px);
+}
+
+.order-modal__panel {
+  position: relative;
+  width: 343px;
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated);
+  padding: 14px 18px 18px;
+}
+
+.order-modal__status {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+}
+
+.order-modal__status.is-primary {
+  color: var(--color-primary);
+}
+
+.order-modal__status.is-accent {
+  color: var(--color-accent);
+}
+
+.order-modal__status.is-error {
+  color: var(--color-error);
+}
+
+.order-modal__close {
+  position: absolute;
+  top: 9px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-header);
+}
+
+.order-modal__body {
+  display: flex;
+  gap: 12px;
+  margin-top: 29px;
+}
+
+.order-modal__image {
+  width: 47px;
+  height: 66px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.order-modal__info {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+}
+
+.order-modal__labels,
+.order-modal__values {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-body);
+}
+
+.order-modal__divider {
+  height: 1px;
+  background: var(--color-admin-border);
+  margin-top: 15px;
+}
+
+.order-modal__address {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 14px;
+  color: var(--color-body);
+}
+
+.order-modal__cta {
+  width: 100%;
+  height: 44px;
+  margin-top: 18px;
+  background: var(--color-primary);
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+}

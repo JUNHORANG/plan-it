@@ -13,18 +13,28 @@
   아이콘: lucide-icons (CLAUDE.md 컨벤션 참조)
 */
 
-import { createElement, Eye, EyeOff } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { createElement, Eye, EyeOff, Check } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 export function createInput({
   type = "text",
   name = "",
+  label = "",
   placeholder = "",
   required = false,
   validate,
+  validateOnBlur = true,
+  showValidIcon = false,
   onInput,
 } = {}) {
   const wrapper = document.createElement("div");
   wrapper.className = "input-field";
+
+  if (label) {
+    const labelEl = document.createElement("label");
+    labelEl.className = "input-field__label";
+    labelEl.textContent = label;
+    wrapper.appendChild(labelEl);
+  }
 
   const isPassword = type === "password";
   const control = document.createElement("input");
@@ -39,6 +49,15 @@ export function createInput({
   error.className = "input-field__error";
 
   wrapper.appendChild(control);
+
+  // 닉네임 중복확인/이메일 인증처럼 검증 결과를 입력창 안 체크 아이콘으로도 보여주는 화면용
+  // (회원가입, Figma 4008:358/680 실측 — 기본 회색, is-valid 시 주조색 초록)
+  if (showValidIcon) {
+    const checkIcon = document.createElement("span");
+    checkIcon.className = "input-field__check";
+    checkIcon.appendChild(createElement(Check, { size: 18 }));
+    wrapper.appendChild(checkIcon);
+  }
 
   if (isPassword) {
     const toggleBtn = document.createElement("button");
@@ -83,7 +102,9 @@ export function createInput({
     if (onInput) onInput(control.value);
   });
 
-  control.addEventListener("blur", runValidate);
+  if (validateOnBlur) {
+    control.addEventListener("blur", runValidate);
+  }
 
   return {
     el: wrapper,
@@ -94,6 +115,10 @@ export function createInput({
       wrapper.classList.remove("is-valid");
       wrapper.classList.add("is-error");
       error.textContent = message;
+    },
+    setValid: (isValid) => {
+      wrapper.classList.toggle("is-valid", isValid);
+      if (isValid) wrapper.classList.remove("is-error");
     },
     clearState,
   };
