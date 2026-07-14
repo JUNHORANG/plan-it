@@ -16,10 +16,13 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openModal } from "/shared/components/modal.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProfile, getOrders, cancelOrder, getProducts } from "/shared/js/api.js";
+import { getProfile, getOrders, cancelOrder, getProducts, hasUnreadNotifications } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
 import { createElement, Info } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
-mountHeader("#header");
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");

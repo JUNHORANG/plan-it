@@ -16,8 +16,8 @@ import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
 import { renderSkeleton } from "/shared/components/skeleton.js";
-import { getPlansByDate, pinPlan, deletePlan } from "/shared/js/api.js";
-import { toISODate } from "/shared/js/utils.js";
+import { getPlansByDate, pinPlan, deletePlan, hasUnreadNotifications } from "/shared/js/api.js";
+import { toISODate, requireAuth } from "/shared/js/utils.js";
 import {
   createElement,
   ChevronLeft,
@@ -26,7 +26,9 @@ import {
   Plus,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
-mountHeader("#header", { hasNotification: true });
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");

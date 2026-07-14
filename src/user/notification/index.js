@@ -11,6 +11,9 @@
 import { mountAppBar } from "/shared/components/app-bar.js";
 import { renderSkeleton } from "/shared/components/skeleton.js";
 import { getNotifications } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 mountAppBar("#app-bar", { title: "알림" });
 
@@ -71,8 +74,8 @@ function renderNotifications(items) {
         <span class="notification__time">${formatTime(item.time)}</span>
         <span class="notification__message">${
           item.done
-            ? `${item.title} 일정이 있습니다. 일정을 확인해 주세요.`
-            : `<span class="notification__message-title">${item.title}</span> 일정이 있습니다. 일정을 확인해 주세요.`
+            ? `${item.title} 일정이 있었습니다.`
+            : `<span class="notification__message-title">${item.title}</span> 일정이 10분 후에 시작해요!`
         }</span>
       `;
       if (!item.done) {

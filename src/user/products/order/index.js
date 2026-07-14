@@ -43,6 +43,9 @@ import {
   ChevronDown,
   Check,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 const productId = new URLSearchParams(location.search).get("id");
 

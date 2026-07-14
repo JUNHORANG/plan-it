@@ -16,7 +16,10 @@ import { mountAdminHeader } from "/shared/components/admin-header.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { showToast } from "/shared/components/toast.js";
 import { getProducts, addProduct, updateProduct, deleteProduct } from "/shared/js/api.js";
+import { requireAdmin } from "/shared/js/utils.js";
 import { createElement, ImageUp, ChevronDown } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+
+await requireAdmin();
 
 mountAdminHeader("#admin-header");
 

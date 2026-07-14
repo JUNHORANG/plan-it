@@ -38,7 +38,9 @@
   opacity: 0;
   will-change: transform, opacity;
   transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out;
-  overflow-y: auto;
+  /* 스크롤은 body(flex:1)가 전담한다 — panel 자체에도 overflow를 주면 스크롤 컨테이너가
+     두 겹이 되고, footer 없는 화면(약관 등)은 top/privacy 텍스트가 body 대신 panel
+     기준으로 스크롤돼 버려서 항상 body가 유일한 스크롤 영역이 되게 통일한다 */
 }
 
 .content-drawer.is-open .content-drawer__panel {
@@ -74,6 +76,15 @@
 .content-drawer__body {
   padding: 8px 24px 24px;
   flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* flex 자식이 내용 높이만큼 커져서 body가 넘치는 걸 막고, 이 요소 자체가 스크롤되게 함 */
+}
+
+/* renderFooter를 쓴 드로워에서만 JS가 붙인다 — body와 형제 관계라 body가 스크롤돼도
+   같이 움직이지 않고 항상 하단에 고정된다(내부 사정은 content-drawer.js 상단 주석 참조) */
+.content-drawer__footer {
+  flex-shrink: 0;
+  padding: 16px 24px max(16px, env(safe-area-inset-bottom));
 }
 
 @media (min-width: 600px) {

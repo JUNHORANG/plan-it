@@ -5,6 +5,9 @@
 
 import { initPlanForm } from "./plan-form.js";
 import { addPlan } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 const now = new Date();
 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
