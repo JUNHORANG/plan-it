@@ -16,7 +16,7 @@ const tomorrow = addDays(1);
 
 export const user = {
   nickname: "행성지킴이",
-  email: "planit.user@example.com",
+  email: "test@email.com",
   points: 8000,
   planet: "earth",
 };
@@ -26,79 +26,10 @@ export const planets = [
   { id: "moon", name: "달", image: "/images/ranking_moon.png" },
 ];
 
-// Figma "/store"(4278:843) 실측 그대로 반영 — 이름/카테고리/가격/이미지 매핑.
-// (예전엔 이 7종이 실수로 3벌 복붙돼 21개였다 — id가 겹쳐서 admin 상점 관리의 수정/삭제가
-// 어느 항목을 가리키는지 모호해지는 실제 버그였어서 정리함)
-export const products = [
-  {
-    id: "p1",
-    name: "사철 나무 묘목",
-    category: "나무",
-    price: 7000,
-    image: "/images/tree3.png",
-  },
-  {
-    id: "p2",
-    name: "구슬 얽이",
-    category: "다육식물",
-    price: 5000,
-    image: "/images/tree1.png",
-  },
-  {
-    id: "p3",
-    name: "고스티",
-    category: "다육식물",
-    price: 6000,
-    image: "/images/tree1.png",
-  },
-  {
-    id: "p4",
-    name: "사과 나무 묘목",
-    category: "나무",
-    price: 9000,
-    image: "/images/tree2.png",
-  },
-  {
-    id: "p5",
-    name: "고스티",
-    category: "다육식물",
-    price: 6000,
-    image: "/images/tree1.png",
-  },
-  {
-    id: "p6",
-    name: "오육 나무 묘목",
-    category: "나무",
-    price: 9000,
-    image: "/images/tree2.png",
-  },
-  {
-    id: "p7",
-    name: "달랑 나무 묘목",
-    category: "나무",
-    price: 7000,
-    image: "/images/tree3.png",
-  },
-];
-
-export const orders = [
-  {
-    id: "48213076",
-    productId: "p2",
-    status: "주문 접수 중",
-    pointsUsed: 5000,
-    remainingAfter: 13000,
-    address: "서울특별시 강남구 테헤란로 123",
-  },
-  {
-    id: "20948117",
-    productId: "p1",
-    status: "주문 배송 중",
-    pointsUsed: 7000,
-    remainingAfter: 8000,
-    address: "서울특별시 강남구 테헤란로 123",
-  },
-];
+// 식물 카탈로그(products)는 shared/js/plants.js(20종)로 대체되고 state.js의 시드로만
+// 쓰인다 — data.js엔 더 이상 두지 않음(blueprint.md §9 25번 참조).
+// orders(주문 내역)도 이제 항상 빈 배열로 시작해 state.js가 관리한다 — 여기 있던 2건의
+// 시드 주문은 products가 사라지며 참조할 productId가 없어져 함께 정리함.
 
 export const plans = [
   {
@@ -215,25 +146,26 @@ export const rankingMeta = { participants: 274 };
 // 사용자(user)의 orders[]는 "내 주문 내역"(단일 사용자 기준)이라 소유자 구분이 없는데,
 // admin은 "전체 고객 주문"을 봐야 해서 별도 배열로 분리했다(같은 orders[]를 썼다면 다른
 // 고객 이름의 목데이터가 로그인한 사용자 자신의 주문 내역 화면에도 섞여 보이는 문제가 생김).
+// productId는 shared/js/plants.js(pl1~pl20) 기준으로 맞춤(예전 p1~p7 카탈로그 폐기에 맞춰 갱신).
 export const adminOrders = [
   {
     id: "202607011297",
     customer: "레몬에이드",
-    productId: "p7",
+    productId: "pl3",
     status: "주문 배송 중",
     address: "어쩌구로 29번길 37, 106호",
   },
   {
     id: "202607091030",
     customer: "키키",
-    productId: "p4",
+    productId: "pl6",
     status: "주문 접수 중",
     address: "어쩌구로 2번길 77, 303호",
   },
   {
     id: "202608220549",
     customer: "전재준",
-    productId: "p3",
+    productId: "pl2",
     status: "취소 접수 중",
     address: "어쩌구로 11번길 7, 501호",
   },

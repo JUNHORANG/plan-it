@@ -17,7 +17,7 @@
 */
 
 import { mountAppBar } from "/shared/components/app-bar.js";
-import { createInput } from "/shared/components/input.js";
+import { createSignupInput } from "./signup-input.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { mountStepper } from "/shared/components/stepper.js";
 import { openModal } from "/shared/components/modal.js";
@@ -37,6 +37,7 @@ const state = {
 };
 
 let timerInterval = null;
+let lastRenderedStep = 0; // 스텝퍼가 마지막으로 채워 그렸던 지점 — 이 이전 구간은 재애니메이션하지 않는다
 
 const appBar = mountAppBar("#app-bar", { title: STEP_TITLES[1], onBack: handleBack });
 const app = document.querySelector("#app");
@@ -75,7 +76,8 @@ function renderStep() {
       <div class="signup__fields" data-fields></div>
     </div>
   `;
-  mountStepper(document.querySelector("[data-stepper]"), { step: state.step, total: 3 });
+  mountStepper(document.querySelector("[data-stepper]"), { step: state.step, total: 3, from: lastRenderedStep });
+  lastRenderedStep = state.step;
 
   if (state.step === 1) renderNicknameStep();
   else if (state.step === 2) renderEmailStep();
@@ -97,7 +99,7 @@ function isValidPassword(value) {
 function renderNicknameStep() {
   const fields = document.querySelector("[data-fields]");
 
-  const nicknameInput = createInput({
+  const nicknameInput = createSignupInput({
     type: "text",
     label: "닉네임",
     placeholder: "한글, 영어, 숫자를 포함한 8자 이내로 작성해 주세요.",
@@ -157,7 +159,7 @@ function renderEmailStep() {
   let codeInput = null;
   let timerEl = null;
 
-  const emailInput = createInput({
+  const emailInput = createSignupInput({
     type: "email",
     label: "이메일",
     placeholder: "이메일을 작성해 주세요.",
@@ -210,7 +212,7 @@ function renderEmailStep() {
   }
 
   function revealCodeField() {
-    codeInput = createInput({
+    codeInput = createSignupInput({
       type: "text",
       label: "이메일 인증",
       placeholder: "인증 번호 6자리를 작성해 주세요.",
@@ -267,7 +269,7 @@ function renderEmailStep() {
 function renderPasswordStep() {
   const fields = document.querySelector("[data-fields]");
 
-  const passwordInput = createInput({
+  const passwordInput = createSignupInput({
     type: "password",
     label: "비밀번호",
     placeholder: "비밀번호를 작성해 주세요.",
@@ -276,7 +278,7 @@ function renderPasswordStep() {
   });
   fields.appendChild(passwordInput.el);
 
-  const confirmInput = createInput({
+  const confirmInput = createSignupInput({
     type: "password",
     label: "비밀번호 인증",
     placeholder: "비밀번호를 확인해 주세요.",

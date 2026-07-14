@@ -165,8 +165,11 @@ body {
     margin-left: -24px;
     margin-right: -24px;
   }
+  /* 세로 여백까지 0으로 지워버리면(margin: 0 24px) 스켈레톤이 "나의 포인트" 구분선에 거의
+     붙어버려 답답해 보인다(Figma 4561:1796 실측: 위쪽 25px 여백) — 가로만 24px로 넓히고
+     세로는 모바일과 같은 16px을 유지한다. */
   .store__item-skeleton {
-    margin: 0 24px;
+    margin: 16px 24px;
   }
   .store__points {
     padding: 20px 24px;
@@ -180,9 +183,6 @@ body {
     margin-left: -24px;
     margin-right: -24px;
   }
-  /* .store__item-skeleton {
-    margin: 24px;
-  } */
 }
 
 /* 타블렛 리스트 항목(4324:1295 실측) — 카테고리/이름 묶음과 가격을 한 줄에 좌우로 벌려 배치,

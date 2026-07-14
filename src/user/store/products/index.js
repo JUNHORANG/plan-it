@@ -42,13 +42,20 @@ async function load() {
   const pointsEl = document.querySelector("[data-points]");
   const listEl = document.querySelector("[data-list]");
 
-  // Figma "스토어 - 스켈레톤"(4534:1055) 실측: 포인트 값 89x19, 리스트는 여러 줄이 아니라
-  // 한 줄짜리 자리표시자(343x77) 하나.
+  // Figma "스토어 - 스켈레톤"(4534:1055 모바일 343x77 / 4561:1796 타블렛 551x69) 실측: 포인트
+  // 값 89x19, 리스트는 여러 줄이 아니라 한 줄짜리 자리표시자 하나. 다만 실측 높이(77·69)가
+  // 실제 리스트 행 높이(.store__item, 88px — 모바일/타블렛 공통)보다 낮아서 그대로 쓰면 로딩이
+  // 끝나고 실제 목록이 뜨는 순간 스켈레톤보다 커지며 "튀는" 게 보인다 — 실제 행 높이(88)에
+  // 맞춰서 그 점프를 없앤다.
   renderSkeleton(pointsEl, { width: 89, height: 19 });
   listEl.innerHTML = "";
   const row = document.createElement("div");
   row.className = "store__item-skeleton";
-  renderSkeleton(row, { width: "calc(100% - 32px)", height: 77 });
+  // 너비는 지정하지 않는다 — CSS margin(모바일 16px / 타블렛 16px 24px, index.css 참조)만으로
+  // 좌우를 들여쓰게 두면 블록 요소가 남는 공간을 자동으로 채운다. 예전엔 width:calc(100% - 32px)를
+  // 같이 줬는데, 그 32px(모바일 여백 16+16 기준)이 타블렛 여백(24+24=48px)과 안 맞아서 박스가
+  // 16px만큼 넘쳐(overflow) 오른쪽만 여백이 이상하게 보였다.
+  renderSkeleton(row, { height: 88 });
   listEl.appendChild(row);
 
   const [profile, products] = await Promise.all([getProfile(), getProducts()]);

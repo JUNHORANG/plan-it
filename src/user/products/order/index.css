@@ -33,6 +33,12 @@ body {
   flex-shrink: 0;
 }
 
+/* Figma "상점 - 구매 - 스켈레톤"(4555:1723): 이미지+가격+이름 각각이 아니라 그 영역
+   전체를 하나의 블록으로 가린다 — renderSkeleton()이 width/height/radius를 인라인으로 채움 */
+.order__product-skeleton {
+  flex-shrink: 0;
+}
+
 .order__product-price {
   font-size: 20px;
   font-weight: var(--font-weight-semibold);

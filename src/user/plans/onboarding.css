@@ -51,7 +51,9 @@
   min-height: 0;
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .onboarding__panel.is-visible {
@@ -91,6 +93,10 @@
   max-height: 100%;
 }
 
+/* Figma "컨트롤러"(4202:845) 실측: 터치 영역 49x59, 화면 좌우 여백 없이 가장자리에 딱 붙음.
+   .onboarding__stage는 .onboarding의 좌우 패딩(모바일 16px/타블렛 24px) 안쪽에 있어서, 그
+   패딩만큼 음수 마진으로 밖으로 빼서 실제 화면 가장자리에 맞춘다(아래 :first-of-type/
+   :last-of-type의 -16px, 타블렛은 -24px). */
 .onboarding__nav {
   position: absolute;
   top: 50%;
@@ -98,17 +104,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: 100px;
+  height: 100px;
   color: var(--color-body);
 }
 
 .onboarding__nav:first-of-type {
-  left: 0;
+  left: -16px;
 }
 
 .onboarding__nav:last-of-type {
-  right: 0;
+  right: -16px;
 }
 
 .onboarding__nav:disabled {
@@ -146,5 +152,13 @@
 
   .onboarding__image {
     max-width: min(333px, 100%);
+  }
+
+  .onboarding__nav:first-of-type {
+    left: -24px;
+  }
+
+  .onboarding__nav:last-of-type {
+    right: -24px;
   }
 }

@@ -7,7 +7,8 @@
 .signup {
   display: flex;
   flex-direction: column;
-  padding: 24px 0 120px;
+  min-height: calc(100vh - var(--app-bar-height));
+  padding: 5px 0 120px;
 }
 
 .signup__stepper {
@@ -17,14 +18,20 @@
 .signup__fields {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 30px;
 }
 
+/* Figma(4008:249) 실측: 타이머가 인증번호 입력창 바로 아래가 아니라 CTA 바로 위(둘 사이
+   30px)에 붙어 있다 — 뷰포트 높이에 상관없이 항상 그 위치에 오도록 남는 세로 공간을
+   margin-top:auto로 끌어와 붙인다(고정 px 여백이면 화면 높이에 따라 위치가 달라짐). */
 .signup__timer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  margin-top: auto;
+  padding-top: 30px;
 }
 
 .signup__timer-time {
@@ -48,6 +55,10 @@
 }
 
 @media (min-width: 600px) {
+  .signup {
+    min-height: calc(100vh - var(--app-bar-height-tablet));
+  }
+
   .signup__cta {
     left: 50%;
     right: auto;

@@ -33,7 +33,11 @@
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.09);
 }
 
-/* 데스크탑(4159:806) "qr 영역" — 모바일 접속용 QR을 넣을 자리. 지금은 비워둔다. */
+/* 데스크탑(4159:806) "qr 영역"(4405:1251) — 모바일 접속용 QR. 모든 페이지에 이미 빈
+   `<div id="desktop-qr" aria-hidden="true">`가 있어(보일러플레이트), HTML을 페이지마다
+   고치지 않고 여기 CSS 의사요소만으로 QR 이미지 + 라벨을 채운다. QR은 120x120로 박스
+   안(9,4) 위치, 라벨 "모바일 바로 보기"(4550:1674 실측: 16px Pretendard Medium,
+   --color-assist)는 박스 중앙 정렬로 위쪽 7px 띄워서 배치. */
 #desktop-qr {
   display: none;
 }
@@ -49,5 +53,27 @@
     background: var(--color-white);
     border: 1px solid var(--color-qr-border);
     border-radius: 5px;
+  }
+
+  #desktop-qr::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 9px;
+    width: 120px;
+    height: 120px;
+    background: url("/images/qr.svg") center / contain no-repeat;
+  }
+
+  #desktop-qr::after {
+    content: "모바일 바로 보기";
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-assist);
   }
 }

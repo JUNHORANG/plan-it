@@ -142,6 +142,7 @@
   --color-input-border: #f6f7f8; /* 입력창 기본 테두리 */
   --color-input-valid-bg: #f7fdf2; /* 입력창 검증 완료 배경 */
   --color-input-valid-border: #f2f7f2; /* 입력창 검증 완료 테두리 */
+  --color-input-error: #ff0000; /* 입력창 에러 테두리/문구 — "입력창 - 공통 UI" 상태 실측(4554:1722), 순빨강이라 범용 --color-error(#ef4444)와 다름 */
   --color-notification-badge: #ff0000; /* 헤더 종 아이콘 알림 뱃지 */
   --color-skeleton-from: #f2f2f2; /* 스켈레톤 그라디언트 시작/끝 */
   --color-skeleton-via: #d9d9d9; /* 스켈레톤 그라디언트 중앙(하이라이트) */
@@ -202,6 +203,11 @@ body {
 }
 
 html {
+  /* 라이트 모드 전용 디자인만 있고 다크 모드 스타일이 없는데 이 선언이 없으면, 모바일
+     브라우저가 기기 다크 모드일 때 "강제 다크"로 색을 임의로 반전시켜 화면이 깨져 보인다
+     (QR로 모바일 접속 시 로그인 첫 화면이 갑자기 어둡게 보인 원인). light로 명시해 그 자동
+     반전을 끈다. */
+  color-scheme: light;
   /* 데스크탑(4159:806): body(600px 카드) 바깥으로 보이는 캔버스 배경 */
   background-color: var(--color-page-bg);
   /* 스크롤이 부드럽게 — 단, shared/js/utils.js의 unlockScroll()은 오버레이 닫을 때 위치를

@@ -16,8 +16,7 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openModal } from "/shared/components/modal.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProfile, getOrders, cancelOrder } from "/shared/js/api.js";
-import { products } from "/shared/js/data.js";
+import { getProfile, getOrders, cancelOrder, getProducts } from "/shared/js/api.js";
 import { createElement, Info } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 mountHeader("#header");
@@ -34,6 +33,8 @@ app.innerHTML = `
     <div class="orders__list" data-list></div>
   </div>
 `;
+
+let products = [];
 
 load();
 
@@ -57,7 +58,8 @@ async function load() {
   renderSkeleton(item, { width: "100%", height: 265, radius: "12px" });
   listEl.appendChild(item);
 
-  const [profile, orders] = await Promise.all([getProfile(), getOrders()]);
+  const [profile, orders, productList] = await Promise.all([getProfile(), getOrders(), getProducts()]);
+  products = productList;
 
   clearSkeleton(pointsEl);
   pointsEl.textContent = `${profile.points.toLocaleString()} 포인트`;
