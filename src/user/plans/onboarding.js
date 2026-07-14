@@ -81,7 +81,7 @@ function openOnboarding() {
         <p class="onboarding__headline">${STEPS[step].headline}</p>
         <div class="onboarding__stage">
           <button class="onboarding__nav" type="button" aria-label="이전" data-prev${isFirst ? " disabled" : ""}></button>
-          <img class="onboarding__image" src="${STEPS[step].image}" alt="" />
+          <img class="onboarding__image${isLast ? " onboarding__image--step3" : ""}" src="${STEPS[step].image}" alt="" />
           <button class="onboarding__nav" type="button" aria-label="다음" data-next${isLast ? " disabled" : ""}></button>
         </div>
         <div class="onboarding__cta-slot"></div>
