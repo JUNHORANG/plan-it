@@ -138,9 +138,17 @@ export const ranking = [
   },
   { rank: 7, nickname: "ADP", points: 420, planet: "moon" },
   { rank: 8, nickname: "레몬에이드", points: 380, planet: "moon" },
+  { rank: 9, nickname: "달빛산책", points: 340, planet: "moon" },
+  { rank: 10, nickname: "초록지구", points: 295, planet: "earth" },
+  { rank: 11, nickname: "부지런한개미", points: 250, planet: "earth" },
+  { rank: 12, nickname: "야근탈출", points: 190, planet: "moon" },
+  { rank: 13, nickname: "느긋한거북이", points: 155, planet: "earth" },
+  { rank: 14, nickname: "별헤는밤", points: 120, planet: "moon" },
+  { rank: 15, nickname: "새벽러너", points: 95, planet: "earth" },
+  { rank: 16, nickname: "감자밭", points: 60, planet: "moon" },
 ];
 
-export const rankingMeta = { participants: 274 };
+export const rankingMeta = { participants: ranking.length };
 
 // 관리자 - 주문 관리(4388:2254) 실측 그대로 — 고객 닉네임·주문번호·상품·상태·주소지 매핑.
 // 사용자(user)의 orders[]는 "내 주문 내역"(단일 사용자 기준)이라 소유자 구분이 없는데,

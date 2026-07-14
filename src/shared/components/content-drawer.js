@@ -19,7 +19,7 @@ export function closeContentDrawer() {
   const { el } = active;
   el.classList.remove("is-open");
   active = null;
-  setTimeout(() => el.remove(), 250);
+  setTimeout(() => el.remove(), 380);
 }
 
 export function openContentDrawer({ title = "", render } = {}) {

@@ -75,13 +75,16 @@ function updateSubmitState() {
   emailInput.setValid(emailInput.getValue().trim().length > 0);
 }
 
+const ADMIN_EMAIL = "admin@email.com";
+const ADMIN_PASSWORD = "admin1234";
+
 async function handleLogin() {
   submit.setLoading(true);
   const result = await mockLogin(emailInput.getValue(), passwordInput.getValue());
   submit.setLoading(false);
 
   if (result.ok) {
-    location.href = "/user/plans/";
+    location.href = result.isAdmin ? "/admin/orders/" : "/user/plans/";
     return;
   }
 
@@ -92,6 +95,9 @@ async function handleLogin() {
 }
 
 async function mockLogin(email, password) {
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    return { ok: true, isAdmin: true };
+  }
   const profile = await getProfile(); // getProfile 자체에 지연이 있어 별도 delay 불필요
   return { ok: email === profile.email && password === "test1234" };
 }
