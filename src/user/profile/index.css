@@ -21,6 +21,10 @@
   flex-shrink: 0;
 }
 
+.profile__avatar-skeleton {
+  flex-shrink: 0;
+}
+
 .profile__names {
   display: flex;
   flex-direction: column;
@@ -49,6 +53,7 @@
   background: var(--color-page-bg);
   border-radius: var(--radius-md);
   overflow: hidden;
+  padding: 10px 0;
 }
 
 .profile__stat {

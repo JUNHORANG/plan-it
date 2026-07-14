@@ -10,6 +10,32 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// 회원가입 — 실제 백엔드 없이 목 동작만 흉내낸다.
+// 닉네임 중복 목록은 데모용 하드코딩(로그인의 test@planit.com 계정과 같은 성격),
+// 이메일 인증번호는 항상 "123456"이 정답인 것으로 검증한다.
+const TAKEN_NICKNAMES = ["관리자", "테스트유저", "admin", "test"];
+const MOCK_VERIFICATION_CODE = "123456";
+
+export async function checkNickname(nickname) {
+  await delay(500);
+  return { ok: !TAKEN_NICKNAMES.includes(nickname) };
+}
+
+export async function sendVerificationCode() {
+  await delay(500);
+  return { ok: true };
+}
+
+export async function verifyEmailCode(code) {
+  await delay(400);
+  return { ok: code === MOCK_VERIFICATION_CODE };
+}
+
+export async function signup({ nickname, email, password }) {
+  await delay(600);
+  return { ok: true, user: { nickname, email, password } };
+}
+
 export async function getProfile() {
   await delay(400);
   return { ...user };
@@ -55,6 +81,44 @@ export async function deletePlan(id) {
   if (index !== -1) plans.splice(index, 1);
 }
 
+export async function getPlan(id) {
+  await delay(300);
+  return plans.find((p) => p.id === id) || null;
+}
+
+export async function updatePlan(id, { title, time, startDate, endDate, recurrence }) {
+  await delay(500);
+  const plan = plans.find((p) => p.id === id);
+  if (!plan) return null;
+  Object.assign(plan, { title, time, date: startDate, startDate, endDate, recurrence });
+  return plan;
+}
+
+function generatePlanId() {
+  return "p" + String(Math.floor(100000 + Math.random() * 900000));
+}
+
+// startDate/endDate/recurrence는 일정 추가 폼 필드를 그대로 보관하지만(수정 화면에서
+// 프리필하는 용도), 실제 목록 조회(getPlansByDate)는 여전히 date(=startDate) 단일
+// 필드만 본다 — 주기(매일/매주 등)에 따라 여러 날짜에 걸쳐 항목을 늘리는 반복 일정
+// 전개는 이 목데이터 계층 범위 밖이라 구현하지 않는다.
+export async function addPlan({ title, time, startDate, endDate, recurrence }) {
+  await delay(500);
+  const plan = {
+    id: generatePlanId(),
+    date: startDate,
+    time,
+    title,
+    done: false,
+    pinned: false,
+    startDate,
+    endDate,
+    recurrence,
+  };
+  plans.push(plan);
+  return plan;
+}
+
 export async function getProducts() {
   await delay(500);
   return products;
@@ -74,6 +138,11 @@ export async function saveAddress(address) {
   await delay(300);
   storage.set("planit.address", address);
   return address;
+}
+
+export async function clearAddress() {
+  await delay(300);
+  storage.remove("planit.address");
 }
 
 function generateOrderId() {

@@ -34,6 +34,7 @@ import {
   getProfile,
   getAddress,
   saveAddress,
+  clearAddress,
   createOrder,
 } from "/shared/js/api.js";
 import {
@@ -55,7 +56,7 @@ const app = document.querySelector("#app");
 app.innerHTML = `
   <div class="order">
     <div class="order__product">
-      <img class="order__product-image" data-product-image hidden />
+      <img class="order__product-image" data-product-image style="display: none" />
       <div>
         <p class="order__product-price" data-product-price></p>
         <p class="order__product-name" data-product-name></p>
@@ -114,6 +115,9 @@ let product = null;
 let myPoints = 0;
 let savedAddress = null;
 let agreed = false;
+// "주소지 저장" 토글이 켜져 있는지(= 이 주소를 다음 구매에도 쓰도록 localStorage에 남길지)만
+// 따로 추적한다. savedAddress 자체는 토글 여부와 무관하게 "이번 주문에 쓸 주소"로 항상 쓰인다.
+let addressSaveEnabled = false;
 
 const addressInputs = {
   address: createInput({ placeholder: "주소를 입력해 주세요" }),
@@ -144,12 +148,23 @@ document
     setAddressFormOpen(!addressForm.classList.contains("is-open"));
   });
 
+// "주소지 저장" 토글 — 누르면 --color-primary로 바뀌어 유지되며(다음 구매에도 이 주소를
+// 쓰겠다는 뜻, spec.md "주소지 저장을 눌러 사용자 주소지를 다음 구매에도 사용할 수 있다"),
+// 다시 누르면 꺼서 저장을 취소(localStorage에서 제거)한다. 입력한 주소 자체는 토글 여부와
+// 무관하게 항상 이번 주문에 쓰인다 — 토글은 "다음 구매에도 남길지"만 결정한다.
 saveBtn.addEventListener("click", async () => {
-  const value = {
+  savedAddress = {
     address: addressInputs.address.getValue(),
     detail: addressInputs.detail.getValue(),
   };
-  savedAddress = await saveAddress(value);
+
+  addressSaveEnabled = !addressSaveEnabled;
+  if (addressSaveEnabled) {
+    await saveAddress(savedAddress);
+  } else {
+    await clearAddress();
+  }
+
   renderAddressValue();
   setAddressFormOpen(false);
 });
@@ -196,6 +211,7 @@ async function load() {
   product = fetchedProduct;
   myPoints = profile.points;
   savedAddress = address;
+  addressSaveEnabled = Boolean(address?.address);
 
   clearSkeleton(priceEl);
   clearSkeleton(nameEl);
@@ -205,7 +221,10 @@ async function load() {
   const image = document.querySelector("[data-product-image]");
   image.src = product.image;
   image.alt = product.name;
-  image.hidden = false;
+  // hidden 속성은 variables.css의 전역 img,svg{display:block} 리셋에 밀려 안 먹힌다(author
+  // 스타일시트의 display 선언이 선택자 우선순위와 무관하게 UA 기본 [hidden] 규칙을 이긴다) —
+  // 인라인 style.display로 직접 제어한다. (user/profile/index.js와 동일한 버그/수정)
+  image.style.display = "";
 
   priceEl.textContent = `${product.price.toLocaleString()} 포인트`;
   nameEl.textContent = product.name;
@@ -236,6 +255,8 @@ function renderAddressValue() {
     valueEl.textContent = "미설정";
     valueEl.classList.add("order-card__value--muted");
   }
+
+  saveBtn.classList.toggle("is-active", addressSaveEnabled);
 }
 
 function openConfirmSheet() {

@@ -19,12 +19,14 @@ import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
+import { maybeShowOnboarding } from "/user/plans/onboarding.js";
 import { getPlansByDate, setPlanDone, pinPlan, deletePlan } from "/shared/js/api.js";
 import { getWeekDates, formatFullDateLabel, toISODate } from "/shared/js/utils.js";
 import { createElement, Check, EllipsisVertical, Plus } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 mountHeader("#header", { hasNotification: true });
 mountNavDrawer("#nav-drawer");
+maybeShowOnboarding();
 
 const app = document.querySelector("#app");
 let selectedDate = new Date();

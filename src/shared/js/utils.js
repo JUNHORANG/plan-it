@@ -32,6 +32,14 @@ export function formatFullDateLabel(date) {
   return `${weekday}, ${month} ${date.getDate()}`;
 }
 
+/** "2026.07.12" 형식 (일정 추가/수정 화면 날짜 필드, Figma 4355:1141 실측) */
+export function formatDotDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}.${m}.${d}`;
+}
+
 /*
   오버레이(바텀시트 등)가 떠 있는 동안 배경 스크롤을 막는다. body에 overflow:hidden만 주면
   iOS Safari에서는 여전히 터치 스크롤이 새는 경우가 있어, body를 position:fixed로 고정하고

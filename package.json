@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "serve src -l 3122",
     "dev": "node scripts/dev-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "serve": "^14.2.6"
+  }
 }
