@@ -1,0 +1,71 @@
+/*
+  계정 탈퇴 (/user/auth/resign/) 전용 스타일
+  전용 Figma(4589:1159) 미확인(API rate limit) — signup 이메일 인증 스텝(signup/index.css)의
+  타이머 레이아웃 패턴을 그대로 재사용. blueprint.md §9 29번 참조.
+*/
+
+.resign {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height));
+  padding: 24px 0 120px;
+}
+
+.resign__title {
+  font-size: var(--font-size-header-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-header);
+}
+
+.resign__desc {
+  margin-top: 8px;
+  font-size: var(--font-size-body);
+  color: var(--color-assist);
+}
+
+.resign__field {
+  margin-top: 30px;
+}
+
+/* signup__timer(signup/index.css)와 동일한 이유: 뷰포트 높이와 무관하게 항상 CTA
+   바로 위에 붙도록 남는 세로 공간을 margin-top:auto로 끌어온다. */
+.resign__timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 30px;
+}
+
+.resign__timer-time {
+  font-size: 14px;
+  color: var(--color-error);
+}
+
+.resign__timer-extend {
+  font-size: 14px;
+  color: var(--color-modal-body);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.resign__cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: auto;
+}
+
+@media (min-width: 600px) {
+  /* --header-height는 모바일·타블렛 공통값이라 .resign의 min-height는 그대로 두고
+     CTA 폭/위치만 데스크탑 카드(552px) 기준으로 바꾼다. */
+  .resign__cta {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 552px;
+    transform: translateX(-50%);
+  }
+}

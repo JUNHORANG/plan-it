@@ -20,6 +20,7 @@ mountAppBar("#app-bar", {
 const app = document.querySelector("#app");
 app.innerHTML = `
   <div class="order-success">
+    <canvas class="order-success__confetti" aria-hidden="true"></canvas>
     <h1 class="order-success__title">구매 완료!</h1>
     <img class="order-success__image" src="/images/buy.png" alt="구매 완료 축하 일러스트" />
   </div>
@@ -34,3 +35,16 @@ const cta = createCtaButton({
 });
 cta.el.classList.add("order-success__cta");
 document.querySelector(".order-success").appendChild(cta.el);
+
+// confetti(@tsparticles/confetti)는 engine/shape/updater 등 서브패키지를 여러 개 더
+// 물어오는 무거운 CDN 번들이다 — 파일 최상단에서 정적 import로 걸어두면 그게 다 받아질
+// 때까지 위 app.innerHTML 렌더링(제목·이미지)까지 전부 멈춰서 화면이 늦게 떴다. 렌더링이
+// 끝난 뒤 동적 import로 따로 불러와서, 화면은 즉시 뜨고 색종이만 한 박자 늦게 붙게 한다.
+import("https://cdn.jsdelivr.net/npm/@tsparticles/confetti@latest/+esm").then(({ confetti }) => {
+  const confettiCanvas = document.querySelector(".order-success__confetti");
+  confetti.create(confettiCanvas, {
+    particleCount: 150,
+    spread: 100,
+    origin: { x: 0.5, y: 0.4 },
+  });
+});

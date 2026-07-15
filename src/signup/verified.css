@@ -1,0 +1,28 @@
+/*
+  이메일 인증 완료 랜딩 (/signup/verified) 전용 스타일 — 전용 Figma 프레임 없음(§9 참조).
+  회원가입 완료 화면(signup-complete)과 같은 "완료" 톤만 가볍게 재사용.
+*/
+
+.verified-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.verified-page__title {
+  font-family: var(--font-family-brand);
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.verified-page__desc {
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-assist);
+}

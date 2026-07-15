@@ -1,9 +1,9 @@
 /*
   입력창 — 공통 UI 컴포넌트
   참조: Figma 로그인 기본(4001:44) / 활성화(4006:955) / 검증(4006:989), 재사용 컴포넌트(4132:588)
-        / 입력창 상태(4554:1722 — 기본·검증·에러 3상태 테두리 실측)
+        / 입력창 상태(4132:661 — 비활성화·블러(text 있음)·활성화·에러 4상태 실측)
 
-  테두리는 상태(기본/검증/에러) 상관없이 2px로 통일, 색만 상태별로 바뀐다.
+  테두리는 상태(기본/검증/에러/비활성화) 상관없이 2px로 통일, 색만 상태별로 바뀐다.
 */
 
 .input-field {
@@ -38,6 +38,12 @@
 
 .input-field.is-error .input-field__control {
   border-color: var(--color-input-error);
+}
+
+.input-field__control:disabled {
+  background: var(--color-input-disabled-bg);
+  border-color: var(--color-input-disabled-border);
+  cursor: not-allowed;
 }
 
 .input-field__toggle {

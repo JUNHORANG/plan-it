@@ -32,9 +32,9 @@ const app = document.querySelector("#app");
 app.innerHTML = `
   <div class="login">
     <div class="login__brand">
-      <img class="login__mascot" src="/images/half_titi.png" alt="Plan It 지구 마스코트" />
-      <div class="login__logo">PLAN <em>!</em>T</div>
-      <p class="login__tagline">지구를 지키는 당신의 계획!</p>
+      <img class="login__mascot no-drag" src="/images/half_titi.png" alt="Plan It 지구 마스코트" />
+      <div class="login__logo no-drag">PLAN <em>!</em>T</div>
+      <p class="login__tagline no-drag">지구를 지키는 당신의 계획!</p>
     </div>
     <form class="login__form" id="login-form"></form>
     <p class="login__footer">
@@ -78,9 +78,22 @@ form.append(emailInput.el, passwordInput.el, submit.el);
 form.addEventListener("submit", (event) => event.preventDefault());
 
 function updateSubmitState() {
-  const filled = emailInput.getValue().trim().length > 0 && passwordInput.getValue().length > 0;
+  const filled =
+    emailInput.getValue().trim().length > 0 &&
+    passwordInput.getValue().length > 0;
   submit.setDisabled(!filled);
-  emailInput.setValid(emailInput.getValue().trim().length > 0);
+}
+
+// Figma(4132:661) "활성화"(포커스 중)와 "블러(text 있음)" 상태 구분: 포커스 중엔 항상
+// 활성화(초록 테두리)로 보이고, 포커스를 벗어나 값이 남아 있을 때만 블러 스타일(연두 배경)로
+// 바뀐다. 예전엔 onInput마다 setValid를 호출해서 타이핑 중에도 블러 스타일이 덮어씌워졌었다.
+// 비밀번호 입력창도 동일한 상태 전환이 있어야 하는데 이 배선이 아예 빠져 있어서 blur 후에도
+// 계속 기본(무클래스) 상태 — 옅은 회색 테두리라 비활성화처럼 보였다.
+for (const input of [emailInput, passwordInput]) {
+  input.control.addEventListener("focus", () => input.setValid(false));
+  input.control.addEventListener("blur", () => {
+    input.setValid(input.getValue().trim().length > 0);
+  });
 }
 
 async function handleLogin() {
@@ -94,7 +107,9 @@ async function handleLogin() {
   }
 
   emailInput.setError();
-  passwordInput.setError("아이디 또는 비밀번호가 맞지 않습니다! 다시 한번 확인해 주세요.");
+  passwordInput.setError(
+    "아이디 또는 비밀번호가 맞지 않습니다! 다시 한번 확인해 주세요.",
+  );
   submit.setDisabled(true); // Figma(4434:1479): 실패 직후 CTA는 다시 비활성 상태 — 값을 고쳐야 재시도 가능
   showToast("이메일 혹은 비밀번호를 확인해 주세요.", "error");
 }

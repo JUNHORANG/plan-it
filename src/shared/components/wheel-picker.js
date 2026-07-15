@@ -37,10 +37,16 @@ function createWheelColumn({ values, selectedIndex, onSettle }) {
 
   function renderItems() {
     list.innerHTML = "";
-    currentValues.forEach((value) => {
+    currentValues.forEach((value, i) => {
       const item = document.createElement("div");
       item.className = "wheel-picker__item";
       item.textContent = String(value);
+      // 마우스 휠 조작이 정밀하지 않다는 피드백 — 항목을 직접 클릭해도 그 값으로 스크롤되게
+      // 한다. scrollTo가 만들어내는 scroll 이벤트를 아래 col의 scroll 리스너가 그대로 받아
+      // highlight/onSettle까지 처리하므로 별도 로직 없이 자연스럽게 값이 확정된다.
+      item.addEventListener("click", () => {
+        col.scrollTo({ top: i * ITEM_HEIGHT, behavior: "smooth" });
+      });
       list.appendChild(item);
     });
   }
@@ -48,6 +54,19 @@ function createWheelColumn({ values, selectedIndex, onSettle }) {
   function highlight(index) {
     [...list.children].forEach((el, i) => el.classList.toggle("is-selected", i === index));
   }
+
+  // 마우스 휠 한 틱의 기본 deltaY(브라우저/기기마다 40~120px 등 제각각)가 항목 높이(39px)
+  // 보다 커서 한 번 굴릴 때마다 여러 칸씩 튀어 원하는 값에 맞추기 어렵다는 피드백 — 네이티브
+  // 스크롤을 막고 휠 한 틱당 정확히 한 칸(ITEM_HEIGHT)만 이동하도록 직접 제어한다.
+  col.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      if (e.deltaY === 0) return;
+      col.scrollTop += e.deltaY > 0 ? ITEM_HEIGHT : -ITEM_HEIGHT;
+    },
+    { passive: false },
+  );
 
   // 스크롤 가능한(overflow-y:auto) 요소는 바깥쪽 col이다 — list는 위아래 여백용 패딩만
   // 가진 콘텐츠 래퍼라 스크롤이 없다. scrollTop/scroll 이벤트는 반드시 col 기준이어야 한다
@@ -183,9 +202,12 @@ export function openDateWheelPicker({ title, date, minDate, onConfirm }) {
       const dayValues = range(1, daysInMonth(selYear, selMonth));
       const wheel = buildWheel([
         {
-          values: dayValues,
-          selectedIndex: selDay - 1,
-          onSettle: (_, value) => (selDay = value),
+          values: years,
+          selectedIndex: years.indexOf(selYear),
+          onSettle: (_, value) => {
+            selYear = value;
+            syncDayColumn();
+          },
         },
         {
           values: range(1, 12),
@@ -196,18 +218,15 @@ export function openDateWheelPicker({ title, date, minDate, onConfirm }) {
           },
         },
         {
-          values: years,
-          selectedIndex: years.indexOf(selYear),
-          onSettle: (_, value) => {
-            selYear = value;
-            syncDayColumn();
-          },
+          values: dayValues,
+          selectedIndex: selDay - 1,
+          onSettle: (_, value) => (selDay = value),
         },
       ]);
       body.appendChild(wheel.el);
       wheel.init();
 
-      const dayColumn = wheel.columns[0];
+      const dayColumn = wheel.columns[2];
       function syncDayColumn() {
         const max = daysInMonth(selYear, selMonth);
         if (selDay > max) selDay = max;

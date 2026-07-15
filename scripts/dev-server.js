@@ -31,6 +31,7 @@ const MIME = {
   ".woff": "font/woff",
   ".otf": "font/otf",
   ".ttf": "font/ttf",
+  ".md": "text/markdown; charset=utf-8",
 };
 
 // MPA라 라우트 이동마다 문서를 통째로 새로 받는다 — 지금까지 캐시 헤더가 하나도 없어서
@@ -59,6 +60,10 @@ function resolveFile(urlPath) {
       candidates.push(path.join(base, relPath, "index.html"));
     } else {
       candidates.push(path.join(base, relPath));
+      // 확장자 없는 경로(예: /user/plans/add)도 <path>.html로 서빙 — 주소창에 .html이
+      // 안 보이는 라우트(add/edit/success 등)를 위한 폴백. 디렉터리 형태(/)는 위 분기에서
+      // 이미 index.html로 처리하니 여기선 파일 형태만 대상으로 한다.
+      candidates.push(path.join(base, `${relPath}.html`));
     }
   }
 

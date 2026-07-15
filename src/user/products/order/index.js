@@ -293,7 +293,7 @@ function openConfirmSheet() {
         address: savedAddress,
       });
       if (result.ok) {
-        location.href = `/user/order/success/index.html?orderId=${result.order.id}`;
+        location.href = `/user/order/success/?orderId=${result.order.id}`;
       }
       return result;
     },

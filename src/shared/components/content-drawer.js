@@ -44,6 +44,7 @@ export function openContentDrawer({ title = "", render, renderFooter } = {}) {
         <h2 class="content-drawer__title">${title}</h2>
       </div>
       <div class="content-drawer__body"></div>
+      <div class="content-drawer__scroll-hint" aria-hidden="true"></div>
     </div>
   `;
   root.appendChild(el);
@@ -52,7 +53,24 @@ export function openContentDrawer({ title = "", render, renderFooter } = {}) {
   el.querySelector(".content-drawer__back").addEventListener("click", closeContentDrawer);
 
   const body = el.querySelector(".content-drawer__body");
-  if (render) render(body);
+  const scrollHint = el.querySelector(".content-drawer__scroll-hint");
+
+  // 약관/개인정보처리방침처럼 내용이 길어 스크롤이 필요한 드로워는 실제로 overflow-y:auto로
+  // 스크롤이 되는데도, OS/브라우저의 오버레이 스크롤바(맥 오토하이드 등)가 평소엔 안 보여서
+  // "스크롤이 안 되는 것"처럼 보인다는 피드백이 있었다 — 오버레이 스크롤바는 CSS로 항상
+  // 보이게 강제할 수 없어서(content-drawer.css 주석 참조), 대신 아래쪽에 더 볼 내용이 남아
+  // 있을 때만 옅은 그림자를 띄워 스크롤 가능함을 알려준다. 내용이 짧아 애초에 안 넘치는
+  // 드로워(예: 행성 변경)는 조건이 항상 거짓이라 그대로 안 보인다.
+  function updateScrollHint() {
+    const hasMore = body.scrollHeight - body.scrollTop - body.clientHeight > 4;
+    scrollHint.classList.toggle("is-visible", hasMore);
+  }
+  body.addEventListener("scroll", updateScrollHint);
+
+  // render가 비동기(예: openLegalDrawer의 fetch)일 수 있어, 완료된 뒤에도 다시 계산한다.
+  const renderResult = render ? render(body) : undefined;
+  Promise.resolve(renderResult).then(updateScrollHint);
+  requestAnimationFrame(updateScrollHint);
 
   if (renderFooter) {
     const panel = el.querySelector(".content-drawer__panel");

@@ -25,6 +25,7 @@ import {
   createElement,
   ChevronRight,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { marked } from "https://cdn.jsdelivr.net/npm/marked@18.0.6/+esm";
 
 await requireAuth();
 
@@ -229,38 +230,30 @@ function openPlanetDrawer() {
 }
 
 function openTermsDrawer() {
-  openContentDrawer({
-    title: "이용 약관",
-    render(body) {
-      body.innerHTML = `<p class="legal-text">${TERMS_TEXT}</p>`;
-    },
-  });
+  openLegalDrawer("이용 약관", "/legal/terms.md");
 }
 
 function openPrivacyDrawer() {
+  openLegalDrawer("개인 정보 처리 방침", "/legal/privacy.md");
+}
+
+// 실제 약관/개인정보 처리방침 본문(public/legal/*.md)을 그대로 가져와 렌더링한다.
+// 표(개인정보 수집 항목 등)·굵게·목록이 포함돼 있어 순수 텍스트로는 구조를 살릴 수
+// 없어서, marked로 실제 HTML로 변환해 붙인다(blueprint.md §9 13번 — 예전엔 자리표시자
+// 텍스트였다가 실제 문서가 생겨서 교체).
+function openLegalDrawer(title, url) {
   openContentDrawer({
-    title: "개인 정보 처리 방침",
-    render(body) {
-      body.innerHTML = `<p class="legal-text">${PRIVACY_TEXT}</p>`;
+    title,
+    async render(body) {
+      body.innerHTML = `<div class="legal-text"></div>`;
+      const el = body.querySelector(".legal-text");
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${url} ${res.status}`);
+        el.innerHTML = marked.parse(await res.text());
+      } catch {
+        el.textContent = "내용을 불러오지 못했습니다.";
+      }
     },
   });
 }
-
-// 정의서에 실제 약관/방침 문구가 없어 자리표시자로 작성 — 실제 문구 확정 시 교체 필요 (blueprint.md §9 참조)
-const TERMS_TEXT = `제1조(목적)
-이 약관은 Plan It(이하 "서비스")의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조(서비스의 제공)
-서비스는 일정 관리, 포인트 적립, 상점 이용 등의 기능을 제공합니다.
-
-제3조(이용자의 의무)
-이용자는 서비스 이용 시 관계 법령과 이 약관을 준수해야 합니다.`;
-
-const PRIVACY_TEXT = `1. 수집하는 개인정보 항목
-서비스는 이메일, 닉네임을 수집합니다.
-
-2. 개인정보의 수집 및 이용목적
-회원 식별, 서비스 제공 및 부정 이용 방지를 위해 이용합니다.
-
-3. 개인정보의 보유 및 이용기간
-회원 탈퇴 시까지 보관하며, 탈퇴 즉시 파기합니다.`;

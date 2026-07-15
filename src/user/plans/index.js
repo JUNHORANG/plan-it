@@ -11,7 +11,7 @@
   - 일정 체크박스: 매번 서버 재조회(loadPlans) + 스켈레톤을 띄우면 체크할 때마다 화면이
     깜빡여 UX가 나쁘다. 체크 시엔 로컬 상태만 낙관적으로 바꿔 리스트를 즉시 다시 그리고,
     저장 요청(setPlanDone)은 백그라운드로 보낸다(loadPlans의 500ms 지연·스켈레톤 없음).
-    모든 일정이 완료되면 renderList 내부에서 "일정 완료" CTA가 나타나 success.html로 이동한다.
+    모든 일정이 완료되면 renderList 내부에서 "일정 완료" CTA가 나타나 success로 이동한다.
 */
 
 import { mountHeader } from "/shared/components/header.js";
@@ -49,7 +49,7 @@ app.innerHTML = `
 
 document.querySelector("[data-home-add]").appendChild(createElement(Plus, { size: 14 }));
 document.querySelector("[data-home-add]").addEventListener("click", () => {
-  location.href = "/user/plans/add.html";
+  location.href = "/user/plans/add";
 });
 
 renderWeek();
@@ -173,11 +173,11 @@ function renderList(plans) {
     cta.className = "cta-button home__complete-cta";
     cta.textContent = "일정 완료!";
     cta.addEventListener("click", async () => {
-      // success.html의 "+N POINT" 애니메이션은 그동안 보여주기만 하고 실제 잔액엔
+      // success 페이지의 "+N POINT" 애니메이션은 그동안 보여주기만 하고 실제 잔액엔
       // 반영되지 않던 드리프트 버그가 있었다 — 이동하기 전 여기서 딱 한 번만 적립한다
-      // (success.html 자체에서 하면 새로고침마다 중복 적립될 수 있음).
+      // (success 페이지 자체에서 하면 새로고침마다 중복 적립될 수 있음).
       await awardPoints(points);
-      location.href = `/user/plans/success.html?points=${points}`;
+      location.href = `/user/plans/success?points=${points}`;
     });
     bodyEl.appendChild(cta);
     requestAnimationFrame(() => cta.classList.add("is-visible"));
@@ -195,7 +195,7 @@ function openMoreSheet(plan) {
     defaultValue: "pin",
     onSubmit: async (value) => {
       if (value === "edit") {
-        location.href = `/user/plans/edit.html?planId=${plan.id}`;
+        location.href = `/user/plans/edit?planId=${plan.id}`;
         return { ok: true };
       }
       if (value === "pin") {
