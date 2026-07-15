@@ -32,9 +32,9 @@ const STEPS = [
 ];
 
 export function maybeShowOnboarding() {
-  // TODO(발표용 임시): 원래는 spec.md 기준 1회만 노출해야 해서 아래 가드가 있어야 하지만,
-  // 개발 중 발표 데모를 위해 홈 진입할 때마다 보이도록 잠시 주석 처리. 되돌릴 때: 주석 해제.
-  // if (storage.get(STORAGE_KEY)) return;
+  // spec.md 기준 최초 1회만 노출 — planit.onboarded가 이미 있으면(건너뛰기 또는 step3 CTA로
+  // 한 번 닫은 적 있음) 다시 띄우지 않는다.
+  if (storage.get(STORAGE_KEY)) return;
   openOnboarding();
 }
 
@@ -73,7 +73,7 @@ function openOnboarding() {
     const isLast = step === STEPS.length - 1;
 
     el.innerHTML = `
-      <button class="onboarding__skip" type="button" data-skip>건너 뛰기</button>
+      <button class="onboarding__skip" type="button" data-skip>건너뛰기</button>
       <div class="onboarding__dots">
         ${STEPS.map((_, i) => `<span class="onboarding__dot${i <= step ? " is-filled" : ""}"></span>`).join("")}
       </div>
@@ -105,7 +105,7 @@ function openOnboarding() {
         disabled: false,
         onClick: () => {
           storage.set(STORAGE_KEY, true);
-          location.href = "/user/plans/";
+          location.href = "/user/plans/add";
         },
       });
       cta.el.classList.add("onboarding__cta");

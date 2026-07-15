@@ -179,6 +179,9 @@ body {
   padding: 4px 2px;
   transition: color 0.15s ease;
 }
+.order-card__save:hover {
+  color: var(--color-primary);
+}
 
 /* 토글 켜짐 — 이 주소를 다음 구매에도 쓰겠다는 뜻으로 계속 유지되는 색 */
 .order-card__save.is-active {

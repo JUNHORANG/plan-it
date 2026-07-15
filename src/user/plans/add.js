@@ -1,5 +1,5 @@
 /*
-  일정 추가 (/user/plans/add.html)
+  일정 추가 (/user/plans/add)
   참조: plan-form.js(공용 폼 로직 — add/edit이 공유)
 */
 

@@ -10,7 +10,7 @@
 .profile__head {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 14px;
   min-height: 66px;
 }
 
@@ -202,11 +202,89 @@
   }
 }
 
+/* 이용약관/개인정보 처리방침 — public/legal/*.md를 marked로 렌더링한 실제 HTML.
+   표(개인정보 수집 항목 등)가 좁은 화면에서 넘칠 수 있어 table만 가로 스크롤되게 처리 */
 .legal-text {
   font-size: 14px;
   line-height: 1.7;
   color: var(--color-body);
-  white-space: pre-line;
+}
+
+.legal-text h2 {
+  font-size: 17px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+  margin: 24px 0 8px;
+}
+
+.legal-text h2:first-child {
+  margin-top: 0;
+}
+
+.legal-text h3 {
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+  margin: 16px 0 6px;
+}
+
+.legal-text p {
+  margin: 0 0 12px;
+}
+
+.legal-text strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.legal-text ul,
+.legal-text ol {
+  margin: 0 0 12px;
+  padding-left: 18px;
+}
+
+.legal-text li {
+  margin-bottom: 4px;
+}
+
+.legal-text hr {
+  border: none;
+  border-top: 1px solid var(--color-row-border);
+  margin: 20px 0;
+}
+
+.legal-text blockquote {
+  margin: 0 0 12px;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-row-border);
+  color: var(--color-assist);
+}
+
+.legal-text table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.legal-text tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.legal-text th,
+.legal-text td {
+  border: 1px solid var(--color-row-border);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: normal;
+}
+
+.legal-text th {
+  background: var(--color-page-bg);
+  font-weight: var(--font-weight-semibold);
 }
 
 @media (min-width: 599px) {

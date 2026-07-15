@@ -80,7 +80,7 @@ document.querySelector("[data-calendar-next]").addEventListener("click", () => {
   renderMonth();
 });
 document.querySelector("[data-calendar-add]").addEventListener("click", () => {
-  location.href = "/user/plans/add.html";
+  location.href = "/user/plans/add";
 });
 
 initSheetResize();
@@ -207,7 +207,7 @@ function openMoreSheet(plan) {
     defaultValue: "pin",
     onSubmit: async (value) => {
       if (value === "edit") {
-        location.href = `/user/plans/edit.html?planId=${plan.id}`;
+        location.href = `/user/plans/edit?planId=${plan.id}`;
         return { ok: true };
       }
       if (value === "pin") {

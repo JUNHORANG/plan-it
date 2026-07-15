@@ -23,6 +23,9 @@
   color: var(--color-assist);
   padding: 4px;
 }
+.onboarding__skip:hover {
+  color: var(--color-accent);
+}
 
 .onboarding__dots {
   display: flex;

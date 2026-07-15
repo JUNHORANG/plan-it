@@ -14,7 +14,7 @@
 - **동적 경로는 쿼리스트링으로 처리** (정적 MPA는 path param 불가):
   - 구매: `/user/products/order/?id=123`
   - 구매 완료: `/user/order/success/?orderId=abc12345`
-  - 일정 수정: `/user/plans/edit.html?planId=45`
+  - 일정 수정: `/user/plans/edit?planId=45`
 - **`src/` vs `public/` 분리.** `src/`는 소스(html·css·js — `index.*`, `signup/`, `user/`, `admin/`, `shared/`, `404/`, `timeout/` 등), `public/`는 순수 정적 자산(`fonts/`, `images/`)만 둔다. 둘은 프로젝트 루트에서 형제 폴더다.
 - **공통 자원은 루트 절대경로(`/shared/...`, `/fonts/...`, `/images/...`)로 참조**한다. 폴더가 3단계까지 깊어져 상대경로(`../../../`)가 지저분해지므로, `src/`와 `public/`를 **하나의 서버 루트로 합쳐서 서빙**하는 것을 전제로 한다 (요청 경로를 `src/`에서 먼저 찾고 없으면 `public/`로 폴백).
 - **정적 서버 필수.** ES module `import`와 `fetch`는 `file://`에서 동작하지 않는다. 단, 위 병합 서빙이 필요해 범용 정적 서버(Live Server 등 단일 루트 지정 도구)로는 부족하다.
@@ -95,10 +95,11 @@ mountNavDrawer('#nav-drawer'); // 공통 GNB 렌더
 |---|---|---|---|---|
 | `/` | 로그인 | `index.html` | — | |
 | `/signup/` | 회원가입 (3-step) | `signup/index.html` | 앱바 | |
+| `/signup/verified` | 이메일 인증 완료 랜딩 (헤더 없음) | `signup/verified.html` | — | Supabase 확인 링크 리다이렉트 전용, `/signup/` 탭과 별개로 새 탭에서 열림 |
 | `/user/plans/` | 홈 | `user/plans/index.html` | 헤더 | `?date=` (선택) |
-| `/user/plans/add.html` | 일정 추가 | `user/plans/add.html` | 앱바 | |
-| `/user/plans/edit.html` | 일정 수정 | `user/plans/edit.html` | 앱바 | `?planId=` |
-| `/user/plans/success.html` | 일정 완료 ※ | `user/plans/success.html` | 앱바 | `?points=` |
+| `/user/plans/add` | 일정 추가 | `user/plans/add.html` | 앱바 | |
+| `/user/plans/edit` | 일정 수정 | `user/plans/edit.html` | 앱바 | `?planId=` |
+| `/user/plans/success` | 일정 완료 ※ | `user/plans/success.html` | 앱바 | `?points=` |
 | `/user/calendar/` | 캘린더 | `user/calendar/index.html` | 헤더 | |
 | `/user/ranking/` | 랭킹 | `user/ranking/index.html` | 헤더 | |
 | `/user/notification/` | 알림 | `user/notification/index.html` | 앱바 | |
@@ -108,6 +109,7 @@ mountNavDrawer('#nav-drawer'); // 공통 GNB 렌더
 | `/user/products/order/` | 구매 | `user/products/order/index.html` | 앱바 | `?id=` (제품) |
 | `/user/order/success/` | 구매 완료 | `user/order/success/index.html` | 앱바 | `?orderId=` |
 | `/user/auth/resign/` | 회원 탈퇴 | `user/auth/resign/index.html` | 헤더 | |
+| `/user/auth/resign/verified` | 탈퇴 인증 완료 랜딩 (헤더 없음) | `user/auth/resign/verified.html` | — | Supabase 확인 링크 리다이렉트 전용, `/user/auth/resign/` 탭과 별개로 새 탭에서 열림 |
 | `/timeout/` | 네트워크 지연 | `timeout/index.html` | 앱바 | |
 | (미매칭) | 404 | `404/index.html` | 앱바 | |
 
@@ -147,7 +149,10 @@ plan-it/
     │   └── signup/
     │       ├── index.html                # 회원가입 3-step (/signup/)
     │       ├── index.css
-    │       └── index.js
+    │       ├── index.js
+    │       ├── verified.html              # 이메일 인증 완료 랜딩 (/signup/verified, 스테퍼 없음)
+    │       ├── verified.css
+    │       └── verified.js
     │
     ├── 👤 고객
     │   └── user/
@@ -156,7 +161,7 @@ plan-it/
     │       │   ├── index.html             # 홈 (/user/plans/)
     │       │   ├── index.css
     │       │   ├── index.js
-    │       │   ├── add.html               # 일정 추가 (/user/plans/add.html)
+    │       │   ├── add.html               # 일정 추가 (/user/plans/add)
     │       │   ├── add.css
     │       │   ├── add.js
     │       │   ├── edit.html              # 일정 수정 (?planId=)
@@ -195,6 +200,7 @@ plan-it/
     │       └── auth/
     │           └── resign/                # 회원 탈퇴 (/user/auth/resign/)
     │               ├── index.html · index.css · index.js
+    │               └── verified.html · verified.css · verified.js  # 탈퇴 인증 완료 랜딩 (/user/auth/resign/verified, §9 29번)
     │
     ├── 🔴 관리자
     │   └── admin/
@@ -301,16 +307,19 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 
 ### 3단계: 인증
 - [x] `index.*` (로그인) — 이메일·비번 입력, 눈 아이콘, 유효성, 성공→`/user/plans/` / 회원가입 이동. Figma 기본(4001:44)·입력창 활성화(4006:955)·검증(4006:989)·에러(4434:1479)·타블렛(4146:1040) 기준. 실패 시 입력값 유지 + 두 입력창 빨간 테두리 + CTA 재비활성화, 에러 문구는 비밀번호 입력창 자체의 기본 에러 슬롯(`input.js`의 `setError(message)`)에만 표시(이메일은 테두리만, 문구 중복 없음) — 처음엔 절대좌표로 띄우는 별도 배너(`.login__error`)를 만들어 썼다가 불필요하게 복잡해 제거하고 `passwordInput.setError()`로 단순화. 이후 Figma(4434:1479) 좌표 실측 결과 에러 문구가 일반 문서 흐름을 차지하면 안 되고(버튼·회원가입 링크 위치가 에러 유무와 무관하게 고정) 메시지 없는 필드는 빈 자리도 차지하면 안 된다는 걸 확인 → `shared/components/input.css`의 `.input-field__error`를 `position:absolute`(부모 기준 `top:100%`)로 빼서 형제 요소를 안 밀어내게 하고, `:not(:empty)`로 메시지 없는 필드(이메일)는 렌더링 자체를 안 하게 수정 — 버튼/링크 위치가 Figma 실측과 정확히 일치(각각 461px/541px)함을 Playwright로 확인. 선행 작업으로 `shared/components/input.*`, `cta-button.*` 공통 컴포넌트 구현. 목 로그인(`mockLogin`)은 `shared/js/api.js` 생기면 교체 필요
-- [x] `signup/index.*` — 스텝퍼 3-step(①닉네임+중복확인 ②이메일 인증+5분 타이머+연장 ③비번+확인) + 완료 화면. Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)/완료(4008:340)/뒤로가기 모달(4106:699), 타블렛(4146:1105) 기준. `/signup/` 한 URL 안에서 스텝을 상태로만 전환(MPA지만 페이지 이동 없이 `#app` 재렌더링), 완료 화면도 같은 페이지의 마지막 상태. 뒤로가기(앱바)는 스텝 1~3에서 공용 `modal.js`로 확인 모달(취소하기/뒤로가기, 뒤로가기 색 `--color-accent`) 띄우고 확인 시 `/`로 이동, 완료 화면은 잃을 값이 없어 모달 없이 바로 이동. 새 공용 컴포넌트 `shared/components/stepper.js`(`mountStepper(el,{step,total,from})`, 현재 스텝까지 주조색 채움 애니메이션 — 이미 지나온 구간은 `from` 기준으로 애니메이션 없이 즉시 채움, 새로 도달한 구간만 0.6s로 서서히 채움) 구현. 입력창은 `shared/components/input.js`를 처음엔 `label`/`showValidIcon` 옵션으로 확장해 재사용했으나, 회원가입 입력창엔 라벨이 있어 라벨 없는 로그인/구매 화면과 아이콘(눈·체크) 세로 위치가 달라야 하는데 같은 CSS 클래스를 공유하다 보니 회원가입에 맞춰 고칠 때마다 로그인·구매 입력창 레이아웃이 같이 깨짐 → **`shared/components/input.js`는 원래대로 되돌리고(label/showValidIcon 제거, 로그인/구매 전용으로 유지)**, 회원가입 전용 `signup/signup-input.js`+`signup-input.css`(`createSignupInput()`, 클래스명 `signup-field*`부터 완전히 분리)를 새로 만들어 회원가입 3-step은 이걸로 교체. `shared/js/api.js`에 `checkNickname`/`sendVerificationCode`/`verifyEmailCode`/`signup` 목 함수 추가(중복 닉네임 목록·인증번호 "123456" 하드코딩은 로그인 `mockLogin`과 같은 데모 목적). 완료 화면 일러스트는 Figma 전용 이미지가 없어 기존 에셋(`front_titi.png` 지구 + `shining.png` 반짝임 2개)으로 대체, 제목은 `plans/success`와 동일하게 `--font-family-brand`(Gmarket Sans) 36px 재사용. 이메일 인증 타이머(4008:249 실측: 인증번호 입력창 바로 아래가 아니라 CTA 바로 위, 30px 간격)는 처음엔 입력창 바로 아래에 붙여 그렸다가 실측과 다름을 확인 → `.signup__fields`를 `flex:1`로 채우고 `.signup__timer`에 `margin-top:auto`를 줘서 뷰포트 높이와 무관하게 항상 CTA 바로 위에 붙게 수정 — §9 23번 참조
-- [ ] `user/auth/resign/index.*` — 이메일 인증 후 탈퇴, 시간초과 시 이동
+- [x] `signup/index.*` — 스텝퍼 3-step(①닉네임+중복확인 ②이메일 인증+5분 타이머+연장 ③비번+확인) + 완료 화면. Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)/완료(4008:340)/뒤로가기 모달(4106:699), 타블렛(4146:1105) 기준. `/signup/` 한 URL 안에서 스텝을 상태로만 전환(MPA지만 페이지 이동 없이 `#app` 재렌더링), 완료 화면도 같은 페이지의 마지막 상태. 뒤로가기(앱바)는 스텝 1~3에서 공용 `modal.js`로 확인 모달(취소하기/뒤로가기, 뒤로가기 색 `--color-accent`) 띄우고 확인 시 `/`로 이동, 완료 화면은 잃을 값이 없어 모달 없이 바로 이동. 새 공용 컴포넌트 `shared/components/stepper.js`(`mountStepper(el,{step,total,from})`, 현재 스텝까지 주조색 채움 애니메이션 — 이미 지나온 구간은 `from` 기준으로 애니메이션 없이 즉시 채움, 새로 도달한 구간만 0.6s로 서서히 채움) 구현. 입력창은 `shared/components/input.js`를 처음엔 `label`/`showValidIcon` 옵션으로 확장해 재사용했으나, 회원가입 입력창엔 라벨이 있어 라벨 없는 로그인/구매 화면과 아이콘(눈·체크) 세로 위치가 달라야 하는데 같은 CSS 클래스를 공유하다 보니 회원가입에 맞춰 고칠 때마다 로그인·구매 입력창 레이아웃이 같이 깨짐 → **`shared/components/input.js`는 원래대로 되돌리고(label/showValidIcon 제거, 로그인/구매 전용으로 유지)**, 회원가입 전용 `signup/signup-input.js`+`signup-input.css`(`createSignupInput()`, 클래스명 `signup-field*`부터 완전히 분리)를 새로 만들어 회원가입 3-step은 이걸로 교체. `shared/js/api.js`에 `checkNickname`/`sendVerificationCode`/`verifyEmailCode`/`signup` 목 함수 추가(중복 닉네임 목록·인증번호 "123456" 하드코딩은 로그인 `mockLogin`과 같은 데모 목적, 이후 Supabase 연동으로 전부 실 API 교체 — 아래 갱신 참조). 완료 화면 일러스트는 Figma 전용 이미지가 없어 기존 에셋(`front_titi.png` 지구 + `shining.png` 반짝임 2개)으로 대체, 제목은 `plans/success`와 동일하게 `--font-family-brand`(Gmarket Sans) 36px 재사용. 이메일 인증 타이머(4008:249 실측: 인증번호 입력창 바로 아래가 아니라 CTA 바로 위, 30px 간격)는 처음엔 입력창 바로 아래에 붙여 그렸다가 실측과 다름을 확인 → `.signup__fields`를 `flex:1`로 채우고 `.signup__timer`에 `margin-top:auto`를 줘서 뷰포트 높이와 무관하게 항상 CTA 바로 위에 붙게 수정 — §9 23번 참조
+  - [x] 이메일 인증 방식 변경(2단계) — 6자리 코드 입력(`verifyEmailCode`/`auth.verifyOtp`) 대신 Supabase 기본 발송 템플릿의 확인 링크 클릭 방식으로 전환. 코드를 이메일 본문에 실제로 채워 보내려면 커스텀 SMTP + 템플릿(`{{ .Token }}`) 설정이 필요해 로컬/데모 환경엔 과함. `sendVerificationCode`가 `emailRedirectTo: `${origin}/signup/verified``로 확인 메일을 보내고, 사용자가 메일의 링크를 클릭하면(다른 탭에서 세션이 만들어지고 supabase-js가 storage 이벤트로 원래 탭에도 그 세션을 동기화) 이 탭의 "다음" CTA는 메일 발송 직후부터 바로 눌러볼 수 있다 — 클릭 시점에 새 RPC `is_email_verified(p_email)`(`is_nickname_available`과 동일하게 anon 실행 가능한 SECURITY DEFINER, `auth.users.email_confirmed_at`만 boolean으로 노출)로 실제 확인 여부를 조회해 아니면 토스트로 실패 안내, 맞으면 3단계로 이동. 코드 입력창이 없어졌으니 `verifyEmailCode` API는 제거, 5분 타이머·연장 버튼 UX는 그대로 유지. 리다이렉트 대상을 처음엔 `/signup/`으로 뒀다가 스테퍼가 1단계부터 다시 그려져 "회원가입을 처음부터 다시 하는 것"처럼 보이는 문제가 있어(Supabase 확인 링크 클릭 후 앱으로 되돌아오는 자체는 링크형 인증인 한 피할 수 없는 동작), 스테퍼 없이 짧은 안내만 보여주는 `signup/verified.*` 랜딩 페이지로 분리 — §2 라우팅 맵 참조. **주의**: Supabase 대시보드 Authentication > URL Configuration > Redirect URLs에 앱 origin이 허용돼 있어야 리다이렉트가 동작한다(확인 필요 — 로컬 개발 포트 기준)
+- [x] `user/auth/resign/index.*` + `verified.*` — 로그인 이메일 확인 링크 인증 후 탈퇴, 시간초과 시 `/user/plans/`로 이동 — §9 29번 참조
 
 ### 4단계: 홈 & 일정
-- [x] `user/plans/index.*` (1차) — Figma 일정-기본(4066:724)/리스트(4005:67)/스켈레톤(4095:444) 기준. 다음 일정 제목(완료 안 된 항목 중 가장 이른 시간, 없으면 "일정을 추가해 주세요!") / 금주 월~일 날짜 선택 클릭 시 해당 날짜 데이터 재조회 / 날짜별 목록(시간 오름차순) / 체크박스로 완료 토글 / 전체완료 시 "일정 완료!" CTA → `success.html`. `empty_list.png`는 선택한 날짜에 일정이 0개일 때만 표시
-  - [x] 더보기(⋮) → 고정·수정·삭제 바텀시트 연동. 고정=상단 정렬(다중 고정 가능, 2개 이상이면 시간 오름차순 재정렬), 삭제=목록에서 제거, 수정=`/user/plans/edit.html?planId=` 이동(페이지는 아직 없음). 고정된 항목은 제목 옆에 빨간 점(Figma 4007:232 실측 `#eb0000`) 표시
-  - [x] 최초 진입 온보딩 3-step — Figma 온보딩-step1(4163:2534)/step2(4164:1021)/step3(4164:1039) + 타블렛(4180:821/838/857) 기준, `user/plans/onboarding.js`(신규, `maybeShowOnboarding()`)로 분리해 `index.js`에서 헤더/나브 mount 직후 호출. `#overlay-root`에 전체 화면 흰 배경으로 마운트(배경 클릭/X로 닫는 방법 없음 — spec.md대로 건너뛰기 또는 step3 CTA로만 닫힘), 페이지네이션 점 3개(현재 스텝까지 검정, 나머지 회색)·좌우 화살표(첫/마지막 스텝에서 각각 비활성)·헤드라인 강조 단어(초록, Figma 텍스트 런 실측: "루틴"/"포인트"/"식물")·`public/images/Onboarding_step1~3.png`(이미 존재하던 에셋) 반영. `planit.onboarded` localStorage 플래그로 1회만 노출. step3 CTA는 공용 `createCtaButton` 재사용, 클릭 시 플래그 설정 + `/user/plans/add.html` 이동 — §9 22번 참조. 이후 보완: (1) 이미지 폭을 스텝 공통 고정값(277px)으로 두면 원본 에셋 비율이 step3만 유독 좁아(1312×2656 vs 다른 두 스텝 1573×2656) step3만 세로로 길쭉해 보이던 문제 → Figma처럼 높이 기준(`max-height:100%`)+`max-width`로 비율 유지하며 맞추도록 수정, 최소 뷰포트(360×640)에서 step3의 CTA가 차지하는 만큼 이미지가 자연스럽게 더 줄어들어 겹침 없음. (2) 좌우 화살표 버튼이 너무 작다는 피드백으로 44px→56px(아이콘 30→40)로 확대. (3) 스텝 전환이 즉시 바뀌어 딱딱해 보이는 문제 → 헤드라인+이미지+화살표를 감싸는 `.onboarding__panel`에 페이드 아웃(180ms)→콘텐츠 교체→페이드 인(180ms) 트랜지션 추가, 애니메이션 중 중복 클릭 무시. (4) (2)에서 아이콘을 30→40으로 키웠다고 적었지만 실제로는 전혀 반영이 안 되고 있었음 — 이 lucide CDN 빌드는 `createElement`의 `{size}` 옵션 자체를 매핑하지 않고 항상 기본 24x24로 렌더링한다(`user/products/order/index.js`에서 이미 발견됐던 것과 같은 문제인데 이 파일엔 그때 적용 안 함) — `{width,height}`로 지정해야 실제 반영됨을 확인, 32x32로 교체. 버튼 터치 영역도 Figma "컨트롤러"(4202:845) 실측 49x59로 교체(기존 56x56은 실측값이 아니라 대충 키운 값), 위치도 화면 패딩(모바일 16px/타블렛 24px) 안쪽이 아니라 화면 가장자리에 딱 붙어야 해서(`left`/`right`에 그 패딩만큼 음수 마진) 수정
+- [x] `user/plans/index.*` (1차) — Figma 일정-기본(4066:724)/리스트(4005:67)/스켈레톤(4095:444) 기준. 다음 일정 제목(완료 안 된 항목 중 가장 이른 시간, 없으면 "일정을 추가해 주세요!") / 금주 월~일 날짜 선택 클릭 시 해당 날짜 데이터 재조회 / 날짜별 목록(시간 오름차순) / 체크박스로 완료 토글 / 전체완료 시 "일정 완료!" CTA → `success`. `empty_list.png`는 선택한 날짜에 일정이 0개일 때만 표시
+  - [x] 더보기(⋮) → 고정·수정·삭제 바텀시트 연동. 고정=상단 정렬(다중 고정 가능, 2개 이상이면 시간 오름차순 재정렬), 삭제=목록에서 제거, 수정=`/user/plans/edit?planId=` 이동(페이지는 아직 없음). 고정된 항목은 제목 옆에 빨간 점(Figma 4007:232 실측 `#eb0000`) 표시
+  - [x] 최초 진입 온보딩 3-step — Figma 온보딩-step1(4163:2534)/step2(4164:1021)/step3(4164:1039) + 타블렛(4180:821/838/857) 기준, `user/plans/onboarding.js`(신규, `maybeShowOnboarding()`)로 분리해 `index.js`에서 헤더/나브 mount 직후 호출. `#overlay-root`에 전체 화면 흰 배경으로 마운트(배경 클릭/X로 닫는 방법 없음 — spec.md대로 건너뛰기 또는 step3 CTA로만 닫힘), 페이지네이션 점 3개(현재 스텝까지 검정, 나머지 회색)·좌우 화살표(첫/마지막 스텝에서 각각 비활성)·헤드라인 강조 단어(초록, Figma 텍스트 런 실측: "루틴"/"포인트"/"식물")·`public/images/Onboarding_step1~3.png`(이미 존재하던 에셋) 반영. `planit.onboarded` localStorage 플래그로 1회만 노출. step3 CTA는 공용 `createCtaButton` 재사용, 클릭 시 플래그 설정 + `/user/plans/add` 이동 — §9 22번 참조. 이후 보완: (1) 이미지 폭을 스텝 공통 고정값(277px)으로 두면 원본 에셋 비율이 step3만 유독 좁아(1312×2656 vs 다른 두 스텝 1573×2656) step3만 세로로 길쭉해 보이던 문제 → Figma처럼 높이 기준(`max-height:100%`)+`max-width`로 비율 유지하며 맞추도록 수정, 최소 뷰포트(360×640)에서 step3의 CTA가 차지하는 만큼 이미지가 자연스럽게 더 줄어들어 겹침 없음. (2) 좌우 화살표 버튼이 너무 작다는 피드백으로 44px→56px(아이콘 30→40)로 확대. (3) 스텝 전환이 즉시 바뀌어 딱딱해 보이는 문제 → 헤드라인+이미지+화살표를 감싸는 `.onboarding__panel`에 페이드 아웃(180ms)→콘텐츠 교체→페이드 인(180ms) 트랜지션 추가, 애니메이션 중 중복 클릭 무시. (4) (2)에서 아이콘을 30→40으로 키웠다고 적었지만 실제로는 전혀 반영이 안 되고 있었음 — 이 lucide CDN 빌드는 `createElement`의 `{size}` 옵션 자체를 매핑하지 않고 항상 기본 24x24로 렌더링한다(`user/products/order/index.js`에서 이미 발견됐던 것과 같은 문제인데 이 파일엔 그때 적용 안 함) — `{width,height}`로 지정해야 실제 반영됨을 확인, 32x32로 교체. 버튼 터치 영역도 Figma "컨트롤러"(4202:845) 실측 49x59로 교체(기존 56x56은 실측값이 아니라 대충 키운 값), 위치도 화면 패딩(모바일 16px/타블렛 24px) 안쪽이 아니라 화면 가장자리에 딱 붙어야 해서(`left`/`right`에 그 패딩만큼 음수 마진) 수정
   - [ ] `?date=` 쿼리스트링 연동 (현재는 클릭 시 메모리 상태만 갱신, URL 미반영)
   - [ ] `requireAuth` 가드 (로그인 성공 시 토큰 저장 로직도 아직 없음)
-- [x] `user/plans/add.*` — Figma "일정 추가/수정"(4355:1141) + 휠 피커 바텀시트(4079:1055 시간, 4079:1096 시작 날짜, 4208:872 종료 날짜) + 주기 바텀시트(4080:341) 반영. 항상 초록 테두리인 30자 제한 textarea(`--color-input-valid-bg`, 스크롤/포커스 무관), 시간·시작일·종료일·주기 4개 행. 휠 피커는 새 공용 컴포넌트 `shared/components/wheel-picker.js`(openTimeWheelPicker/openDateWheelPicker, `openBottomSheet` 셸 재사용)로 구현 — 스크롤 스냅 컬럼 3행(37/39/37 실측을 39px 균일로 단순화). 날짜 휠은 일/월/년 순서(라벨 없음), 시간 휠은 시/분(라벨 있음). 종료 날짜는 주기가 "당일"일 때만 필수/선택 가능하고 그 외엔 "없음"으로 비활성 처리(spec.md "일정 추가" 6번). CTA 라벨이 Figma에 "견적 갱신"으로 잘못 남아있어(다른 화면 복붙 잔재) "확인"으로 대체. `addPlan()`을 shared/js/api.js에 추가했으나 반복 주기(매일/매주 등)에 따라 여러 날짜에 일정을 전개하는 로직은 목데이터 계층 밖이라 미구현(시작일에만 생성) — Playwright로 휠 스크롤·스냅·날짜 재계산·CTA 활성화 전 구간 직접 검증 완료. addPlan()으로 만든 일정은 pinPlan/deletePlan 등 기존 목데이터 함수들과 동일하게 페이지 새로고침 시 초기화됨(진짜 백엔드 없는 이 프로젝트의 공통 한계, 신규 버그 아님)
+- [x] `user/plans/add.*` — Figma "일정 추가/수정"(4355:1141) + 휠 피커 바텀시트(4079:1055 시간, 4079:1096 시작 날짜, 4208:872 종료 날짜) + 주기 바텀시트(4080:341) 반영. 항상 초록 테두리인 30자 제한 textarea(`--color-input-valid-bg`, 스크롤/포커스 무관), 시간·시작일·종료일·주기 4개 행. 휠 피커는 새 공용 컴포넌트 `shared/components/wheel-picker.js`(openTimeWheelPicker/openDateWheelPicker, `openBottomSheet` 셸 재사용)로 구현 — 스크롤 스냅 컬럼 3행(37/39/37 실측을 39px 균일로 단순화). 날짜 휠은 년/월/일 순서(라벨 없음), 시간 휠은 시/분(라벨 있음). 마우스 휠 조작 정밀도가 낮다는
+  피드백으로 항목 클릭으로도 값을 선택할 수 있게 했고, 네이티브 휠 스크롤은 막고 휠 한 틱당 정확히
+  한 칸(39px)만 이동하도록 직접 제어해 스크롤 속도를 늦췄다(§9 참조). 종료 날짜는 주기가 "당일"일 때만 필수/선택 가능하고 그 외엔 "없음"으로 비활성 처리(spec.md "일정 추가" 6번). CTA 라벨이 Figma에 "견적 갱신"으로 잘못 남아있어(다른 화면 복붙 잔재) "확인"으로 대체. `addPlan()`을 shared/js/api.js에 추가했으나 반복 주기(매일/매주 등)에 따라 여러 날짜에 일정을 전개하는 로직은 목데이터 계층 밖이라 미구현(시작일에만 생성) — Playwright로 휠 스크롤·스냅·날짜 재계산·CTA 활성화 전 구간 직접 검증 완료. addPlan()으로 만든 일정은 pinPlan/deletePlan 등 기존 목데이터 함수들과 동일하게 페이지 새로고침 시 초기화됨(진짜 백엔드 없는 이 프로젝트의 공통 한계, 신규 버그 아님)
 - [x] `user/plans/edit.*` — add 폼 로직을 `user/plans/plan-form.js`(신규, `initPlanForm()`)로 뽑아내 add.js/edit.js가 공유. CSS도 별도 파일 없이 `add.css`를 그대로 링크(사용자 지정). `?planId=`로 `getPlan()` 조회 후 프리필 — 시드 데이터(add 화면을 거치지 않은 최초 목데이터)엔 startDate/endDate/recurrence가 없어 그 경우 `date`를 시작/종료 날짜로, 주기는 "당일"로 간주. 잘못된 planId면 `/user/plans/`로 리다이렉트. `updatePlan()`을 shared/js/api.js에 추가. Playwright로 홈 더보기→수정 진입 시 프리필 값 일치, 제목 수정 후 저장→홈 리다이렉트까지 확인 — addPlan과 동일하게 페이지 새로고침 시 초기화되는 한계는 동일
 - [x] `user/plans/success.*` — 완료 일러스트(`good_titi.png`) + 지급 포인트(`?points=`, 완료 개수×10) 카운트업 애니메이션(아래→위 등장 후 위로 사라짐) → CTA로 `/user/profile/` 이동. 전용 Figma "/plans/success"(4006:940) 반영 완료 — §9 참조
 
@@ -355,8 +364,8 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 ## 7. 화면 흐름 (핵심 여정)
 
 ```
-로그인(/) → 홈(/user/plans/) → 일정 추가(add.html) → 수행(체크) → 전체 완료
-      → 일정 완료(success.html?points=) → 프로필(/user/profile/)
+로그인(/) → 홈(/user/plans/) → 일정 추가(add) → 수행(체크) → 전체 완료
+      → 일정 완료(success?points=) → 프로필(/user/profile/)
       → 상점(/user/store/products/) → 제품(order/?id=) → 구매
       → 구매 완료(order/success/?orderId=) → 주문 내역(/user/profile/orders/)
 ```
@@ -414,5 +423,7 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 27. **온보딩 컨트롤러(chevron) 크기·위치 Figma 실측 수정** — Figma "컨트롤러"(4202:845, 타블렛 4180:821 등) 실측 결과 터치 영역이 기존 구현(56x56)보다 훨씬 크고, 화면 좌우 여백 없이 가장자리에 딱 붙어 있음을 확인. `.onboarding__nav`를 Figma 실측(49x59)으로 먼저 맞췄으나 이후 사용자가 100x100으로 직접 재조정(보존). 위치는 `.onboarding__stage`가 `.onboarding`의 좌우 패딩(모바일 16px/타블렛 24px) 안쪽에 있어 그대로 두면 화면 가장자리에서 안쪽으로 들어가 보이므로, `:first-of-type{left:-16px}`/`:last-of-type{right:-16px}`(타블렛 `-24px`) 음수 마진으로 밀어내 실제 화면 가장자리에 플러시하게 붙임. 아이콘은 lucide CDN의 `{size}` prop이 무시되고 항상 24px로 렌더링되는 버그(다른 화면에서도 발견된 동일 이슈, `user/products/order/index.js` 참조)로 인해 `size:40`을 줘도 실제로는 24px로만 나오고 있었던 게 "화살표가 너무 작다"는 문제의 원인 → `{width, height}`로 직접 지정(이후 사용자 요청으로 44px까지 확대)하도록 수정.
 
 28. **온보딩 step3 이미지 Figma 갱신분 반영** — Figma에서 step3(4164:1039, 그룹 4164:1060) 디자인이 변경되어, 프로필 화면 목업 안의 "STORE" 카드가 이전엔 화면 오른쪽 끝에서 잘려 보이던 것이 이제 완전히 화면 안에 들어오도록 수정됨 → `public/images/Onboarding_step3.png` 재추출. REST `figma_get_component_image`가 429로 막혀 `figma_execute`로 `node.exportAsync({format:"PNG", constraint:{type:"SCALE", value:N}})`를 직접 실행해 base64로 받는 우회 경로 사용. 원본과 동일한 배율(5.312, `2656/500`)로 내보내니 드롭섀도우 효과가 있는 노드 특성상 이미지 오른쪽에 어두운 노이즈/얼룩 아티팩트가 생기는 내보내기 버그 발견(scale=2는 깨끗, scale=5.312는 깨짐) → scale=4로 재시도해 아티팩트 없이 깨끗한 1135x2000 PNG 확보, 최종본으로 교체. `.onboarding__image`가 `max-height:100%` 기준으로 비율을 유지한 채 스케일하므로(§ CSS 주석 참조) 소스 픽셀 해상도가 step1/2(1573x2656)와 달라도 실제 화면에 표시되는 크기는 동일한 스테이지 높이에 맞춰져 시각적으로 일치.
+
+29. **회원 탈퇴 인증 시간 초과 이동 도메인 오타 + Figma 미확인** — spec.md "회원 탈퇴" 6번 "인증 시간을 넘기면 도메인 /planit으로 이동한다"의 `/planit`은 실제 존재하는 라우트가 아니라(1번·3번과 같은 유형의 오타) `/user/plans/`(홈)로 해석해 구현. 전용 Figma(4589:1159)도 계속 API rate limit(429)로 실측 못 받아와 spec.md 문구 + signup 이메일 인증 스텝(§9 23번)과 동일한 컴포넌트/흐름(공용 `shared/components/input.js` 비활성화 상태로 로그인 이메일 읽기 전용 표시, 5분 타이머+연장)을 그대로 재사용해 우선 구현 — 나중에 Figma 확인되면 세부 스타일만 맞추면 됨. 이메일 인증도 signup과 동일하게 SMTP 없이 6자리 코드 대신 확인 링크 방식(`sendResignVerification`이 `emailRedirectTo: /user/auth/resign/verified`로 발송, `is_resign_verified`류 전용 RPC로 확인 여부만 조회 — signup의 `is_email_verified`는 "언젠가 한 번이라도 확인됐는지"라 이미 가입된 계정엔 항상 true라 재사용 불가, `profiles.resign_confirmed_at`을 매 시도마다 초기화→재확인하는 별도 RPC 3종 사용). 탈퇴 자체는 `delete_own_account()` RPC(`auth.users` 삭제, `profiles.id`가 `auth.users.id`에 CASCADE라 plans/orders/notifications까지 함께 삭제)로 처리, 성공 시 로그인(`/`)으로 이동.
 
 > 위 항목은 구현 착수 전 확정 권장.

@@ -106,7 +106,7 @@ function openPurchaseConfirmSheet(product) {
     remaining,
     submitLabel: `${product.price.toLocaleString()} 포인트 사용`,
     onConfirm: () => {
-      location.href = `/user/products/order/index.html?id=${product.id}`;
+      location.href = `/user/products/order/?id=${product.id}`;
     },
   });
 }

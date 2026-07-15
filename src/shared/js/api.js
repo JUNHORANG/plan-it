@@ -15,10 +15,16 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// 회원가입 — Supabase Auth 이메일 OTP(6자리) 흐름으로 동작한다.
+// 회원가입 — Supabase Auth 이메일 확인 링크 흐름으로 동작한다.
 // 1단계(닉네임 중복확인)는 profiles.nickname을 확인하는 전용 RPC(anon 호출 가능)를 쓰고,
-// 2단계에서 signInWithOtp로 인증번호를 보낼 때 그 닉네임을 user_metadata에 실어 보내면
+// 2단계에서 signInWithOtp로 확인 메일을 보낼 때 그 닉네임을 user_metadata에 실어 보내면
 // 계정 생성 시점(handle_new_user 트리거)에 그대로 profiles.nickname으로 들어간다.
+// 원래는 이메일로 온 6자리 코드를 입력받아 verifyOtp로 검증했는데, 코드 자리에 실제 6자리를
+// 채워 보내려면 Supabase 프로젝트에 커스텀 SMTP + 이메일 템플릿({{ .Token }}) 설정이
+// 필요해서(로컬/데모 환경엔 과함) 기본 발송 템플릿의 확인 링크를 그대로 쓰는 방식으로
+// 변경했다 — 사용자가 메일의 링크를 클릭해 확인을 마치면(다른 탭에서 세션이 생기고,
+// supabase-js가 storage 이벤트로 그 세션을 이 탭에도 동기화해준다) "다음" 버튼을 눌러
+// is_email_verified RPC로 실제 확인 여부만 조회해 다음 스텝으로 넘어간다.
 // 3단계는 2단계에서 이미 발급된 세션에 updateUser로 비밀번호만 추가한다.
 export async function checkNickname(nickname) {
   const { data, error } = await supabase.rpc("is_nickname_available", { p_nickname: nickname });
@@ -29,16 +35,28 @@ export async function checkNickname(nickname) {
 export async function sendVerificationCode(email, nickname) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true, data: { nickname } },
+    options: {
+      shouldCreateUser: true,
+      data: { nickname },
+      // 메일의 확인 링크를 클릭하면 Supabase가 인증 처리를 마친 뒤 반드시 이 URL로
+      // 리다이렉트한다(링크형 인증인 한 이 한 번의 이동 자체는 피할 수 없음) — 처음엔
+      // /signup/으로 보냈다가 스테퍼가 1단계부터 다시 그려져 "회원가입을 처음부터 다시
+      // 하는 것"처럼 보이는 문제가 있어, 스테퍼 없는 조용한 안내 페이지(signup/verified.js)로
+      // 분리했다. 그 페이지가 로드되며 URL의 세션 토큰을 감지/저장하고, 그 세션이 storage
+      // 이벤트로 원래 탭(아직 2단계에 열려 있는)에도 동기화된다.
+      // Supabase 대시보드(Authentication > URL Configuration > Redirect URLs)에 이
+      // origin이 허용돼 있어야 리다이렉트가 거부되지 않는다.
+      emailRedirectTo: `${location.origin}/signup/verified`,
+    },
   });
   if (error) return { ok: false, message: error.message };
   return { ok: true };
 }
 
-export async function verifyEmailCode(email, code) {
-  const { error } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
-  if (error) return { ok: false, message: error.message };
-  return { ok: true };
+export async function checkEmailVerified(email) {
+  const { data, error } = await supabase.rpc("is_email_verified", { p_email: email });
+  if (error) return { ok: false };
+  return { ok: data === true };
 }
 
 export async function signup({ password }) {
@@ -106,6 +124,44 @@ export async function awardPoints(points) {
 
 export async function logout() {
   await supabase.auth.signOut();
+}
+
+// 계정 탈퇴 — 이미 로그인된 계정의 이메일로만 진행된다(새로 이메일을 입력받지 않음).
+// signup의 이메일 인증과 같은 이유(커스텀 SMTP 없이 로컬/데모에서 6자리 코드를 못 보냄)로
+// 링크 클릭 방식을 쓰지만, "이미 확인된 이메일"이라 signup의 is_email_verified(그 이메일이
+// 언젠가 한 번이라도 확인됐는지)는 재사용할 수 없다 — 이번 탈퇴 시도에서 새로 확인했는지를
+// 구분해야 해서 profiles.resign_confirmed_at을 매 시도마다 초기화→재확인하는 전용 RPC
+// 3종을 쓴다(user/auth/resign/index.js 참조).
+export async function sendResignVerification(email) {
+  const { error: startError } = await supabase.rpc("start_resign_verification");
+  if (startError) return { ok: false, message: "탈퇴 인증 준비 중 오류가 발생했습니다." };
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: `${location.origin}/user/auth/resign/verified`,
+    },
+  });
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
+}
+
+export async function checkResignVerified() {
+  const { data, error } = await supabase.rpc("is_resign_verified");
+  if (error) return { ok: false };
+  return { ok: data === true };
+}
+
+export async function confirmResignVerification() {
+  await supabase.rpc("confirm_resign_verification");
+}
+
+export async function deleteAccount() {
+  const { error } = await supabase.rpc("delete_own_account");
+  if (error) return { ok: false, message: error.message };
+  await supabase.auth.signOut();
+  return { ok: true };
 }
 
 // 일정 — public.plans 테이블. repeat 컬럼은 한글 값(당일/매일/매주/격주/매월/매년)인데
@@ -253,16 +309,25 @@ function mapOrderFromDb(row) {
     pointsUsed: row.points_used,
     remainingAfter: row.remaining_after,
     address: row.address,
+    addressDetail: row.address_detail,
   };
 }
 
 // 주문 — public.orders 테이블. 포인트 차감 + 주문 생성을 create_order RPC 하나로 묶어서
 // 원자적으로 처리한다(둘을 따로 호출하면 차감만 성공하고 주문 생성은 실패하는 반쪽 상태가
 // 생길 수 있음 — supabase/migrations의 create_order 함수 참조).
+//
+// address는 { address, detail } 객체로 들어오는데(user/products/order/index.js의
+// savedAddress), create_order RPC는 이걸 p_address/p_address_detail 두 개의 별도 text
+// 파라미터로 받는다 — 객체를 통째로 p_address 하나에 넘기면 PostgREST가 그 객체를 JSON
+// 문자열로 직렬화해 text 컬럼에 그대로 박아넣어서("{\"address\":...,\"detail\":...}"),
+// 관리자 페이지 등에서 주소가 JSON 텍스트로 그대로 보이는 버그가 있었다 — 반드시 분리해서
+// 전달해야 한다.
 export async function createOrder({ productId, address }) {
   const { data, error } = await supabase.rpc("create_order", {
     p_product_id: productId,
-    p_address: address,
+    p_address: address?.address ?? "",
+    p_address_detail: address?.detail || null,
   });
   if (error) {
     if (error.message?.includes("insufficient_points")) {
@@ -348,9 +413,15 @@ export async function getRanking() {
   // 계속 옛날 포인트를 보여주는 눈에 띄는 불일치가 생긴다 — 실제 로그인 계정(profiles)으로
   // 덮어쓴다.
   const profile = await getProfile();
-  const list = ranking.map((r) =>
+  const merged = ranking.map((r) =>
     r.isMe && profile ? { ...r, nickname: profile.nickname, points: profile.points, planet: profile.planet } : r
   );
+  // ranking[]의 rank는 시드 시점 포인트 기준으로 고정돼 있어, 위에서 내 포인트만 바꿔치기하면
+  // 실제 포인트 순서와 무관하게 원래 순위(예: 6등)에 그대로 머문다 — 포인트 내림차순으로
+  // 다시 정렬하고 순위를 1부터 새로 매겨야 실제 등수가 반영된다.
+  const list = [...merged]
+    .sort((a, b) => b.points - a.points)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
   return { meta: rankingMeta, list };
 }
 
@@ -361,7 +432,7 @@ export async function getRanking() {
 export async function getAdminOrders() {
   const { data, error } = await supabase
     .from("orders")
-    .select("id, product_id, status, address, profiles(nickname)")
+    .select("id, product_id, status, address, address_detail, profiles(nickname)")
     .order("created_at", { ascending: false });
   if (error) return [];
   return data.map((row) => ({
@@ -369,7 +440,7 @@ export async function getAdminOrders() {
     customer: row.profiles?.nickname ?? "",
     productId: row.product_id,
     status: row.status,
-    address: row.address,
+    address: [row.address, row.address_detail].filter(Boolean).join(" "),
   }));
 }
 

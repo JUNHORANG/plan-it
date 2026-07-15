@@ -142,7 +142,9 @@
   --color-input-border: #f6f7f8; /* 입력창 기본 테두리 */
   --color-input-valid-bg: #f7fdf2; /* 입력창 검증 완료 배경 */
   --color-input-valid-border: #f2f7f2; /* 입력창 검증 완료 테두리 */
-  --color-input-error: #ff0000; /* 입력창 에러 테두리/문구 — "입력창 - 공통 UI" 상태 실측(4554:1722), 순빨강이라 범용 --color-error(#ef4444)와 다름 */
+  --color-input-disabled-bg: #f3f4f5; /* 입력창 비활성화 배경 (재사용 컴포넌트 4132:693 실측) */
+  --color-input-disabled-border: #f1f2f3; /* 입력창 비활성화 테두리 (재사용 컴포넌트 4132:693 실측) */
+  --color-input-error: #ef4444; /* 입력창 에러 테두리/문구 — 재사용 컴포넌트 4132:703 실측, 범용 --color-error와 동일값으로 갱신 (과거 4554:1722 순빨강 실측은 폐기) */
   --color-notification-badge: #ff0000; /* 헤더 종 아이콘 알림 뱃지 */
   --color-skeleton-from: #f2f2f2; /* 스켈레톤 그라디언트 시작/끝 */
   --color-skeleton-via: #d9d9d9; /* 스켈레톤 그라디언트 중앙(하이라이트) */
@@ -291,4 +293,11 @@ img,
 svg {
   display: block;
   max-width: 100%;
+}
+
+.no-drag {
+  -webkit-user-select: none; /* 크롬, 사파리, 오페라 */
+  -moz-user-select: none; /* 파이어폭스 */
+  -ms-user-select: none; /* 익스플로러, 엣지 */
+  user-select: none; /* 표준 속성 */
 }
