@@ -1,5 +1,5 @@
 /*
-  구매 완료 (/user/order/success/?orderId=)
+  구매 완료 (/user/store/success?orderId=)
   참조: spec.md "구매 완료" — 일정 완료(success) 화면과 같은 "완료" 템플릿 톤 재사용
   (전용 Figma 프레임은 API rate limit로 확인 못함 — blueprint.md §9 참조)
 */

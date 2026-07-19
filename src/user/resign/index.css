@@ -1,5 +1,5 @@
 /*
-  계정 탈퇴 (/user/auth/resign/) 전용 스타일
+  계정 탈퇴 (/user/resign/) 전용 스타일
   전용 Figma(4589:1159) 미확인(API rate limit) — signup 이메일 인증 스텝(signup/index.css)의
   타이머 레이아웃 패턴을 그대로 재사용. blueprint.md §9 29번 참조.
 */

@@ -1,5 +1,5 @@
 /*
-  탈퇴 인증 완료 랜딩 (/user/auth/resign/verified)
+  탈퇴 인증 완료 랜딩 (/user/resign/verified)
   참조: shared/js/api.js의 sendResignVerification — emailRedirectTo가 이 페이지를 가리킨다.
         signup/verified.js와 같은 이유로 폼 없는 조용한 안내만 보여준다.
 

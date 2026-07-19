@@ -19,7 +19,7 @@ import {
 const MENU_ITEMS = [
   { label: "홈", path: "/user/plans/" },
   { label: "캘린더", path: "/user/calendar/" },
-  { label: "스토어", path: "/user/store/products/" },
+  { label: "스토어", path: "/user/store/" },
   { label: "랭킹", path: "/user/ranking/" },
   { label: "프로필", path: "/user/profile/" },
   { label: "알림", path: "/user/notification/" },

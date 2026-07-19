@@ -1,5 +1,5 @@
 /*
-  계정 탈퇴 (/user/auth/resign/)
+  계정 탈퇴 (/user/resign/)
   참조: spec.md "회원 탈퇴", Figma 계정 탈퇴(4589:1159) — Figma API rate limit(429)로 세부
   실측을 못 받아와 spec.md 문구 + signup 이메일 인증 스텝(blueprint.md §9 23번)과 동일한
   컴포넌트/흐름을 재사용해 우선 구현했다. 나중에 Figma 확인되면 세부 스타일만 맞추면 됨

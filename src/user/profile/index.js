@@ -56,11 +56,11 @@ app.innerHTML = `
         <img class="profile__stat-icon point" src="/images/point_icon.png" alt="" />
         <span class="profile__stat-label" data-points></span>
       </div>
-      <a class="profile__stat" href="/user/store/products/">
+      <a class="profile__stat" href="/user/store/">
         <img class="profile__stat-icon store" src="/images/store_icon.png" alt="" />
         <span class="profile__stat-label">STORE</span>
       </a>
-      <a class="profile__stat" href="/user/profile/orders/">
+      <a class="profile__stat" href="/user/store/history">
         <img class="profile__stat-icon orders" src="/images/truck.png" alt="" />
         <span class="profile__stat-label">주문 내역</span>
       </a>
@@ -144,7 +144,7 @@ function handleSettingAction(action) {
   if (action === "planet") return openPlanetDrawer();
   if (action === "terms") return openTermsDrawer();
   if (action === "privacy") return openPrivacyDrawer();
-  if (action === "resign") return void (location.href = "/user/auth/resign/");
+  if (action === "resign") return void (location.href = "/user/resign/");
 }
 
 function openLogoutModal() {
