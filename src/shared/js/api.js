@@ -8,7 +8,7 @@
 */
 
 import { ranking, rankingMeta } from "./data.js";
-import { storage, toISODate } from "./utils.js";
+import { toISODate } from "./utils.js";
 import { supabase } from "./supabase-client.js";
 
 function delay(ms) {
@@ -131,7 +131,7 @@ export async function logout() {
 // 링크 클릭 방식을 쓰지만, "이미 확인된 이메일"이라 signup의 is_email_verified(그 이메일이
 // 언젠가 한 번이라도 확인됐는지)는 재사용할 수 없다 — 이번 탈퇴 시도에서 새로 확인했는지를
 // 구분해야 해서 profiles.resign_confirmed_at을 매 시도마다 초기화→재확인하는 전용 RPC
-// 3종을 쓴다(user/auth/resign/index.js 참조).
+// 3종을 쓴다(user/resign/index.js 참조).
 export async function sendResignVerification(email) {
   const { error: startError } = await supabase.rpc("start_resign_verification");
   if (startError) return { ok: false, message: "탈퇴 인증 준비 중 오류가 발생했습니다." };
@@ -140,7 +140,7 @@ export async function sendResignVerification(email) {
     email,
     options: {
       shouldCreateUser: false,
-      emailRedirectTo: `${location.origin}/user/auth/resign/verified`,
+      emailRedirectTo: `${location.origin}/user/resign/verified`,
     },
   });
   if (error) return { ok: false, message: error.message };
@@ -285,20 +285,42 @@ export async function getProduct(id) {
   return data;
 }
 
+// 저장된 배송 주소 — profiles.address/address_detail 컬럼(로그인 계정에 귀속). 예전엔
+// localStorage(planit.address)에만 있어 다른 기기/브라우저에서 재로그인하면 사라지고, 같은
+// 브라우저를 여러 계정이 공유하면 계정 간에 주소가 그대로 노출되는 문제가 있어 profiles로
+// 이전했다(다른 사용자 데이터 — points/planet_id 등 — 와 동일하게 RLS로 계정별 격리).
 export async function getAddress() {
-  await delay(150);
-  return storage.get("planit.address");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("address, address_detail")
+    .eq("id", user.id)
+    .single();
+  if (error || !data.address) return null;
+  return { address: data.address, detail: data.address_detail };
 }
 
 export async function saveAddress(address) {
-  await delay(300);
-  storage.set("planit.address", address);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ address: address?.address ?? null, address_detail: address?.detail || null })
+    .eq("id", user.id);
+  if (error) return null;
   return address;
 }
 
 export async function clearAddress() {
-  await delay(300);
-  storage.remove("planit.address");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await supabase.from("profiles").update({ address: null, address_detail: null }).eq("id", user.id);
 }
 
 function mapOrderFromDb(row) {
@@ -317,7 +339,7 @@ function mapOrderFromDb(row) {
 // 원자적으로 처리한다(둘을 따로 호출하면 차감만 성공하고 주문 생성은 실패하는 반쪽 상태가
 // 생길 수 있음 — supabase/migrations의 create_order 함수 참조).
 //
-// address는 { address, detail } 객체로 들어오는데(user/products/order/index.js의
+// address는 { address, detail } 객체로 들어오는데(user/store/buy.js의
 // savedAddress), create_order RPC는 이걸 p_address/p_address_detail 두 개의 별도 text
 // 파라미터로 받는다 — 객체를 통째로 p_address 하나에 넘기면 PostgREST가 그 객체를 JSON
 // 문자열로 직렬화해 text 컬럼에 그대로 박아넣어서("{\"address\":...,\"detail\":...}"),

@@ -89,7 +89,7 @@ function openOnboarding() {
     `;
 
     // 이 lucide CDN 빌드는 createElement의 {size} 옵션을 매핑하지 않고 항상 기본 24x24로
-    // 렌더링한다(다른 화면에서도 발견된 같은 문제, 예: user/products/order/index.js 주석 참조) —
+    // 렌더링한다(다른 화면에서도 발견된 같은 문제, 예: user/store/buy.js 주석 참조) —
     // {width, height}를 직접 지정해야 실제로 반영된다. size:40으로 지정했었지만 실제로는 계속
     // 24px로 나오고 있었던 게 "화살표가 너무 작다" 문제의 원인.
     el.querySelector("[data-prev]").appendChild(createElement(ChevronLeft, { width: 44, height: 44 }));

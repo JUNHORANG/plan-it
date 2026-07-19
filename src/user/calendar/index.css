@@ -4,7 +4,7 @@
         캘린더-바텀시트(4008:405, 더보기는 shared/components/bottom-sheet.js 재사용)
 
   이 페이지만 배경이 흰색이 아니라 --color-calendar-bg(#f9f9f9)라 body 배경을 오버라이드한다
-  (다른 화면엔 영향 없음, user/products/order 페이지와 동일한 패턴). 헤더도 이 페이지에서만
+  (다른 화면엔 영향 없음, user/store/buy 페이지와 동일한 패턴). 헤더도 이 페이지에서만
   투명 처리해 캘린더/바텀시트 배경과 하나로 이어지게 한다(#header는 다른 페이지와 공유하는
   sticky 흰 배경이라 여기서만 오버라이드).
 */

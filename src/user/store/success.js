@@ -1,7 +1,8 @@
 /*
-  구매 완료 (/user/order/success/?orderId=)
-  참조: spec.md "구매 완료" — 안내 문구 + 일러스트 → CTA로 /user/profile/orders/ 이동
-  (blueprint.md §9: "/products/orders" 표기는 "/user/profile/orders/"로 해석)
+  구매 완료 (/user/store/success?orderId=)
+  참조: spec.md "구매 완료" — 안내 문구 + 일러스트 → CTA로 /user/store/history 이동
+  (blueprint.md §9: "/products/orders" 표기는 "/user/profile/orders/"로 해석했던 것을,
+  §10 폴더 구조 재정리로 /user/store/history로 이동)
 */
 
 import { mountAppBar } from "/shared/components/app-bar.js";
@@ -13,7 +14,7 @@ await requireAuth();
 mountAppBar("#app-bar", {
   title: "",
   onBack: () => {
-    location.href = "/user/store/products/";
+    location.href = "/user/store/";
   },
 });
 
@@ -30,7 +31,7 @@ const cta = createCtaButton({
   label: "주문 내역 확인하기",
   disabled: false,
   onClick: () => {
-    location.href = "/user/profile/orders/";
+    location.href = "/user/store/history";
   },
 });
 cta.el.classList.add("order-success__cta");
