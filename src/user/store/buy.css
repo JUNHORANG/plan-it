@@ -1,5 +1,5 @@
 /*
-  구매 (/user/products/order/?id=)
+  구매 (/user/store/buy?id=)
   참조: Figma "상점 - 구매"(4293:1252 기본) / 주소지 입력 활성화(4295:1489) / 구매 동의 체크(4295:1464)
   — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
 */
@@ -178,6 +178,9 @@ body {
   color: var(--color-assist);
   padding: 4px 2px;
   transition: color 0.15s ease;
+}
+.order-card__save:hover {
+  color: var(--color-primary);
 }
 
 /* 토글 켜짐 — 이 주소를 다음 구매에도 쓰겠다는 뜻으로 계속 유지되는 색 */

@@ -1,26 +1,42 @@
 /*
   관리자 - 상점 관리 (/admin/products/)
   참조: spec.md "상점 관리", Figma "관리자 - 상점 관리 - 기본"(4392:2654) /
-        "관리자 - 상점 관리 - 제품 수정"(4404:1119)
+        "관리자 - 상점 관리 - 제품 수정"(4404:1119) / 카테고리 드롭다운 펼침 상태(4616:1064)
 
   - 좌측 제품 목록 + 우측 추가/수정 폼(같은 폼을 재사용, 수정 버튼 클릭 시 프리필).
-  - 카테고리는 spec.md의 "씨앗·식물·묘목"이 아니라 상점(user/store/products)에서 이미 확정한
+  - 카테고리는 spec.md의 "씨앗·식물·묘목"이 아니라 상점(user/store)에서 이미 확정한
     실제 카테고리 "나무"/"다육식물"을 그대로 사용 — Figma 제품 수정(4404:1119) 목업의 드롭다운엔
     "묘목"이 선택돼 있었지만, 정작 그 제품(사과 나무 묘목)은 목록에 "나무"로 분류돼 있어
     드롭다운 쪽이 갱신 안 된 낡은 값으로 판단(§9 참조).
   - Figma엔 폼 제출 버튼이 없어(레이아웃 끝에서 잘림으로 추정) 실제 동작을 위해
     공용 `createCtaButton`으로 추가/수정 버튼을 붙였다.
+  - 카테고리 선택은 브라우저 기본 <select>가 아니라 Figma(4616:1064) 실측대로 커스텀
+    드롭다운 — 클릭하면 같은 박스가 아래로 펼쳐지며(팝업/오버레이 아님) 옵션 목록이 그
+    안에 나타나고, 옵션 클릭 시 값 반영 후 접힌다.
 */
 
 import { mountAdminHeader } from "/shared/components/admin-header.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { showToast } from "/shared/components/toast.js";
 import { getProducts, addProduct, updateProduct, deleteProduct } from "/shared/js/api.js";
+import { requireAdmin } from "/shared/js/utils.js";
 import { createElement, ImageUp, ChevronDown } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+
+await requireAdmin();
 
 mountAdminHeader("#admin-header");
 
 const CATEGORIES = ["나무", "다육식물"];
+const CATEGORY_PLACEHOLDER = "카테고리를 선택해 주세요.";
+
+// 폼이 renderForm()으로 통째로 다시 그려질 때마다 리스너를 새로 붙이면 이전 드롭다운
+// DOM에 달린 리스너가 계속 쌓인다 — document 클릭 리스너는 한 번만 붙이고, 그 시점에
+// 열려 있는 드롭다운을 찾아서 닫는 식으로 처리한다.
+document.addEventListener("click", (event) => {
+  document.querySelectorAll(".product-form__category.is-open").forEach((wrap) => {
+    if (!wrap.contains(event.target)) closeCategoryDropdown(wrap);
+  });
+});
 
 const app = document.querySelector("#app");
 app.innerHTML = `
@@ -104,19 +120,30 @@ function renderForm(values = {}) {
     <input class="product-form__input" type="number" min="0" placeholder="제품 가격을 작성해 주세요." data-field="price" value="${values.price ?? ""}" />
 
     <p class="product-form__label">제품 카테고리</p>
-    <div class="product-form__select-wrap">
-      <select class="product-form__select" data-field="category" required>
-        <option value="" disabled ${!values.category ? "selected" : ""}>카테고리를 선택해 주세요.</option>
+    <div class="product-form__category" data-category>
+      <button
+        type="button"
+        class="product-form__category-trigger"
+        data-category-trigger
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span class="product-form__category-value" data-category-value></span>
+        <span class="product-form__category-chevron" data-category-chevron></span>
+      </button>
+      <div class="product-form__category-list" data-category-list role="listbox">
         ${CATEGORIES.map(
-          (c) => `<option value="${c}" ${values.category === c ? "selected" : ""}>${c}</option>`,
+          (c) => `<button type="button" class="product-form__category-option" role="option" data-value="${c}">${c}</button>`,
         ).join("")}
-      </select>
+      </div>
+      <input type="hidden" data-field="category" value="${values.category ?? ""}" />
     </div>
 
     <div class="product-form__cta" data-cta-slot></div>
   `;
 
-  formEl.querySelector(".product-form__select-wrap").appendChild(createElement(ChevronDown, { size: 18 }));
+  formEl.querySelector("[data-category-chevron]").appendChild(createElement(ChevronDown, { size: 18 }));
+  setupCategoryDropdown(formEl, values.category ?? "");
 
   renderPhotoArea(values.image ?? null);
 
@@ -132,6 +159,50 @@ function renderForm(values = {}) {
     formEl.querySelector(`[data-field="${field}"]`).addEventListener("change", refreshDisabled);
   });
   refreshDisabled();
+}
+
+function setupCategoryDropdown(formEl, initialCategory) {
+  const wrap = formEl.querySelector("[data-category]");
+  const trigger = wrap.querySelector("[data-category-trigger]");
+  const valueEl = wrap.querySelector("[data-category-value]");
+  const listEl = wrap.querySelector("[data-category-list]");
+  const hiddenInput = wrap.querySelector('[data-field="category"]');
+
+  function setCategory(category) {
+    hiddenInput.value = category;
+    valueEl.textContent = category || CATEGORY_PLACEHOLDER;
+    valueEl.classList.toggle("is-placeholder", !category);
+    listEl.querySelectorAll("[data-value]").forEach((opt) => {
+      opt.setAttribute("aria-selected", String(opt.dataset.value === category));
+    });
+  }
+
+  trigger.addEventListener("click", () => {
+    wrap.classList.contains("is-open") ? closeCategoryDropdown(wrap) : openCategoryDropdown(wrap);
+  });
+
+  listEl.querySelectorAll("[data-value]").forEach((opt) => {
+    opt.addEventListener("click", () => {
+      setCategory(opt.dataset.value);
+      closeCategoryDropdown(wrap);
+      hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
+
+  setCategory(initialCategory);
+}
+
+function openCategoryDropdown(wrap) {
+  const listEl = wrap.querySelector("[data-category-list]");
+  wrap.classList.add("is-open");
+  wrap.querySelector("[data-category-trigger]").setAttribute("aria-expanded", "true");
+  listEl.style.maxHeight = `${listEl.scrollHeight}px`;
+}
+
+function closeCategoryDropdown(wrap) {
+  wrap.classList.remove("is-open");
+  wrap.querySelector("[data-category-trigger]").setAttribute("aria-expanded", "false");
+  wrap.querySelector("[data-category-list]").style.maxHeight = "";
 }
 
 function renderPhotoArea(image) {

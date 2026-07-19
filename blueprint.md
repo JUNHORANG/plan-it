@@ -14,7 +14,7 @@
 - **동적 경로는 쿼리스트링으로 처리** (정적 MPA는 path param 불가):
   - 구매: `/user/products/order/?id=123`
   - 구매 완료: `/user/order/success/?orderId=abc12345`
-  - 일정 수정: `/user/plans/edit.html?planId=45`
+  - 일정 수정: `/user/plans/edit?planId=45`
 - **`src/` vs `public/` 분리.** `src/`는 소스(html·css·js — `index.*`, `signup/`, `user/`, `admin/`, `shared/`, `404/`, `timeout/` 등), `public/`는 순수 정적 자산(`fonts/`, `images/`)만 둔다. 둘은 프로젝트 루트에서 형제 폴더다.
 - **공통 자원은 루트 절대경로(`/shared/...`, `/fonts/...`, `/images/...`)로 참조**한다. 폴더가 3단계까지 깊어져 상대경로(`../../../`)가 지저분해지므로, `src/`와 `public/`를 **하나의 서버 루트로 합쳐서 서빙**하는 것을 전제로 한다 (요청 경로를 `src/`에서 먼저 찾고 없으면 `public/`로 폴백).
 - **정적 서버 필수.** ES module `import`와 `fetch`는 `file://`에서 동작하지 않는다. 단, 위 병합 서빙이 필요해 범용 정적 서버(Live Server 등 단일 루트 지정 도구)로는 부족하다.
@@ -95,19 +95,21 @@ mountNavDrawer('#nav-drawer'); // 공통 GNB 렌더
 |---|---|---|---|---|
 | `/` | 로그인 | `index.html` | — | |
 | `/signup/` | 회원가입 (3-step) | `signup/index.html` | 앱바 | |
+| `/signup/verified` | 이메일 인증 완료 랜딩 (헤더 없음) | `signup/verified.html` | — | Supabase 확인 링크 리다이렉트 전용, `/signup/` 탭과 별개로 새 탭에서 열림 |
 | `/user/plans/` | 홈 | `user/plans/index.html` | 헤더 | `?date=` (선택) |
-| `/user/plans/add.html` | 일정 추가 | `user/plans/add.html` | 앱바 | |
-| `/user/plans/edit.html` | 일정 수정 | `user/plans/edit.html` | 앱바 | `?planId=` |
-| `/user/plans/success.html` | 일정 완료 ※ | `user/plans/success.html` | 앱바 | `?points=` |
+| `/user/plans/add` | 일정 추가 | `user/plans/add.html` | 앱바 | |
+| `/user/plans/edit` | 일정 수정 | `user/plans/edit.html` | 앱바 | `?planId=` |
+| `/user/plans/success` | 일정 완료 ※ | `user/plans/success.html` | 앱바 | `?points=` |
 | `/user/calendar/` | 캘린더 | `user/calendar/index.html` | 헤더 | |
 | `/user/ranking/` | 랭킹 | `user/ranking/index.html` | 헤더 | |
 | `/user/notification/` | 알림 | `user/notification/index.html` | 앱바 | |
 | `/user/profile/` | 프로필 | `user/profile/index.html` | 헤더 | |
-| `/user/profile/orders/` | 주문 내역 ※ | `user/profile/orders/index.html` | 헤더 | |
-| `/user/store/products/` | 상점 | `user/store/products/index.html` | 헤더 | |
-| `/user/products/order/` | 구매 | `user/products/order/index.html` | 앱바 | `?id=` (제품) |
-| `/user/order/success/` | 구매 완료 | `user/order/success/index.html` | 앱바 | `?orderId=` |
-| `/user/auth/resign/` | 회원 탈퇴 | `user/auth/resign/index.html` | 헤더 | |
+| `/user/store/` | 상점 목록 | `user/store/index.html` | 헤더 | |
+| `/user/store/buy` | 구매 | `user/store/buy.html` | 앱바 | `?id=` (제품) |
+| `/user/store/success` | 구매 완료 | `user/store/success.html` | 앱바 | `?orderId=` |
+| `/user/store/history` | 주문 내역 ※ | `user/store/history.html` | 헤더 | |
+| `/user/resign/` | 회원 탈퇴 | `user/resign/index.html` | 헤더 | |
+| `/user/resign/verified` | 탈퇴 인증 완료 랜딩 (헤더 없음) | `user/resign/verified.html` | — | Supabase 확인 링크 리다이렉트 전용, `/user/resign/` 탭과 별개로 새 탭에서 열림 |
 | `/timeout/` | 네트워크 지연 | `timeout/index.html` | 앱바 | |
 | (미매칭) | 404 | `404/index.html` | 앱바 | |
 
@@ -121,6 +123,7 @@ mountNavDrawer('#nav-drawer'); // 공통 GNB 렌더
 - 행성 변경 / 이용 약관 / 개인 정보 처리 방침
 
 > ※ 정의서 내 표기 불일치 항목 → 아래 **9. 확인 필요 항목** 참조
+> ※ `store`/`resign` 경로는 **10. 폴더 구조 재정리** 결과로 반영된 신규 경로다 (구 경로: `/user/store/products/`, `/user/products/order/`, `/user/order/success/`, `/user/profile/orders/`, `/user/auth/resign/`). 실제 파일 이동은 아직 실행 전이며, 승인 후 §10 체크리스트대로 진행한다.
 
 ---
 
@@ -147,7 +150,10 @@ plan-it/
     │   └── signup/
     │       ├── index.html                # 회원가입 3-step (/signup/)
     │       ├── index.css
-    │       └── index.js
+    │       ├── index.js
+    │       ├── verified.html              # 이메일 인증 완료 랜딩 (/signup/verified, 스테퍼 없음)
+    │       ├── verified.css
+    │       └── verified.js
     │
     ├── 👤 고객
     │   └── user/
@@ -156,7 +162,7 @@ plan-it/
     │       │   ├── index.html             # 홈 (/user/plans/)
     │       │   ├── index.css
     │       │   ├── index.js
-    │       │   ├── add.html               # 일정 추가 (/user/plans/add.html)
+    │       │   ├── add.html               # 일정 추가 (/user/plans/add)
     │       │   ├── add.css
     │       │   ├── add.js
     │       │   ├── edit.html              # 일정 수정 (?planId=)
@@ -175,26 +181,18 @@ plan-it/
     │       ├── notification/              # 알림 (/user/notification/)
     │       │   ├── index.html · index.css · index.js
     │       │
-    │       ├── profile/                   # 프로필 (/user/profile/)
+    │       ├── profile/                   # 프로필 (/user/profile/) — orders 하위 폴더 없음(→ store/history로 이동, §10)
     │       │   ├── index.html · index.css · index.js
-    │       │   └── orders/                # 주문 내역 (/user/profile/orders/)
-    │       │       ├── index.html · index.css · index.js
     │       │
-    │       ├── store/
-    │       │   └── products/              # 상점 (/user/store/products/)
-    │       │       ├── index.html · index.css · index.js
+    │       ├── store/                     # 🆕 상점 시스템 — 목록·구매·완료·내역 통합 (§10, 구 store/products + products/order + order/success + profile/orders)
+    │       │   ├── index.html · index.css · index.js      # 상점 목록 (/user/store/)
+    │       │   ├── buy.html · buy.css · buy.js             # 구매 (/user/store/buy?id=)
+    │       │   ├── success.html · success.css · success.js # 구매 완료 (/user/store/success?orderId=)
+    │       │   └── history.html · history.css · history.js # 주문 내역 (/user/store/history)
     │       │
-    │       ├── products/
-    │       │   └── order/                 # 구매 (/user/products/order/?id=)
-    │       │       ├── index.html · index.css · index.js
-    │       │
-    │       ├── order/
-    │       │   └── success/               # 구매 완료 (/user/order/success/?orderId=)
-    │       │       ├── index.html · index.css · index.js
-    │       │
-    │       └── auth/
-    │           └── resign/                # 회원 탈퇴 (/user/auth/resign/)
-    │               ├── index.html · index.css · index.js
+    │       └── resign/                    # 🆕 회원 탈퇴 (§10, 구 auth/resign — auth/ 래퍼 제거)
+    │           ├── index.html · index.css · index.js
+    │           └── verified.html · verified.css · verified.js  # 탈퇴 인증 완료 랜딩 (/user/resign/verified)
     │
     ├── 🔴 관리자
     │   └── admin/
@@ -214,8 +212,9 @@ plan-it/
             │   └── layout.css             # 헤더/앱바/하단 공통 레이아웃
             │
             ├── js/
-            │   ├── data.js                # 목 데이터 (일정/제품/랭킹/알림/주문)
-            │   ├── api.js                 # 목 API (성공/실패/지연 시뮬레이션 · 실패 시 /timeout 이동)
+            │   ├── data.js                # 남은 목데이터: planets(표시용 카탈로그) · ranking/rankingMeta
+            │   ├── api.js                 # Supabase 연동 계층 (일정/유저/상점/주문/알림/관리자 — §8 데이터 모델)
+            │   ├── supabase-client.js     # Supabase 클라이언트 인스턴스
             │   └── utils.js               # 날짜·시간·포인트 포맷, storage, requireAuth, 쿼리파싱, 라우팅
             │
             └── components/                # 공통 UI 컴포넌트 (ES 모듈, mountX / openX)
@@ -264,12 +263,14 @@ plan-it/
 
 MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공유한다.
 
+> **갱신 이력**: 이 표는 Supabase 연동 전(localStorage 통합 상태 관리, §9 25번) 기준 문서였다. 현재는 유저(닉네임/이메일/포인트/행성/주소)·일정·상품·주문·알림이 모두 Supabase 테이블(`profiles`/`plans`/`products`/`orders`/`notifications`, RLS로 계정별 격리)에서 직접 관리되고, `shared/js/state.js`와 `planit.state` 키는 삭제됐다. localStorage에는 아래 두 키만 남는다.
+
 | 키 | 용도 |
 |---|---|
-| `planit.auth` | 로그인 토큰/유저 정보 (없으면 가드가 `/`로 보냄) — 아직 미구현 |
 | `planit.onboarded` | 홈 최초 진입 온보딩 노출 여부 |
-| `planit.address` | 저장된 배송 주소지 (구매 페이지 프리필) |
-| `planit.state` | 유저(닉네임/이메일/포인트/행성)·일정·상품(식물 카탈로그)·주문을 한 번에 담는 통합 상태(`shared/js/state.js`가 유일한 소유자). 원래 여기 두 줄로 나눠 예약했던 `planit.plans`/`planit.orders`는 이 키 하나로 통합됨 — §9 25번 참조 |
+
+> `planit.auth`는 별도 키로 쓰지 않는다 — Supabase Auth(`supabase.auth`)가 세션을 자체 관리하고, `shared/js/utils.js`의 `requireAuth()`가 세션 유무로 가드한다.
+> `planit.address`는 더 이상 쓰지 않는다 — `profiles.address`/`profiles.address_detail` 컬럼으로 이전(§10-1 참조). 다른 브라우저/기기에서 재로그인해도 주소가 유지되고, 같은 브라우저를 여러 계정이 공유해도 계정 간에 섞이지 않는다.
 
 ---
 
@@ -301,16 +302,19 @@ MPA라 메모리 상태가 페이지마다 초기화되므로, 아래 키로 공
 
 ### 3단계: 인증
 - [x] `index.*` (로그인) — 이메일·비번 입력, 눈 아이콘, 유효성, 성공→`/user/plans/` / 회원가입 이동. Figma 기본(4001:44)·입력창 활성화(4006:955)·검증(4006:989)·에러(4434:1479)·타블렛(4146:1040) 기준. 실패 시 입력값 유지 + 두 입력창 빨간 테두리 + CTA 재비활성화, 에러 문구는 비밀번호 입력창 자체의 기본 에러 슬롯(`input.js`의 `setError(message)`)에만 표시(이메일은 테두리만, 문구 중복 없음) — 처음엔 절대좌표로 띄우는 별도 배너(`.login__error`)를 만들어 썼다가 불필요하게 복잡해 제거하고 `passwordInput.setError()`로 단순화. 이후 Figma(4434:1479) 좌표 실측 결과 에러 문구가 일반 문서 흐름을 차지하면 안 되고(버튼·회원가입 링크 위치가 에러 유무와 무관하게 고정) 메시지 없는 필드는 빈 자리도 차지하면 안 된다는 걸 확인 → `shared/components/input.css`의 `.input-field__error`를 `position:absolute`(부모 기준 `top:100%`)로 빼서 형제 요소를 안 밀어내게 하고, `:not(:empty)`로 메시지 없는 필드(이메일)는 렌더링 자체를 안 하게 수정 — 버튼/링크 위치가 Figma 실측과 정확히 일치(각각 461px/541px)함을 Playwright로 확인. 선행 작업으로 `shared/components/input.*`, `cta-button.*` 공통 컴포넌트 구현. 목 로그인(`mockLogin`)은 `shared/js/api.js` 생기면 교체 필요
-- [x] `signup/index.*` — 스텝퍼 3-step(①닉네임+중복확인 ②이메일 인증+5분 타이머+연장 ③비번+확인) + 완료 화면. Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)/완료(4008:340)/뒤로가기 모달(4106:699), 타블렛(4146:1105) 기준. `/signup/` 한 URL 안에서 스텝을 상태로만 전환(MPA지만 페이지 이동 없이 `#app` 재렌더링), 완료 화면도 같은 페이지의 마지막 상태. 뒤로가기(앱바)는 스텝 1~3에서 공용 `modal.js`로 확인 모달(취소하기/뒤로가기, 뒤로가기 색 `--color-accent`) 띄우고 확인 시 `/`로 이동, 완료 화면은 잃을 값이 없어 모달 없이 바로 이동. 새 공용 컴포넌트 `shared/components/stepper.js`(`mountStepper(el,{step,total,from})`, 현재 스텝까지 주조색 채움 애니메이션 — 이미 지나온 구간은 `from` 기준으로 애니메이션 없이 즉시 채움, 새로 도달한 구간만 0.6s로 서서히 채움) 구현. 입력창은 `shared/components/input.js`를 처음엔 `label`/`showValidIcon` 옵션으로 확장해 재사용했으나, 회원가입 입력창엔 라벨이 있어 라벨 없는 로그인/구매 화면과 아이콘(눈·체크) 세로 위치가 달라야 하는데 같은 CSS 클래스를 공유하다 보니 회원가입에 맞춰 고칠 때마다 로그인·구매 입력창 레이아웃이 같이 깨짐 → **`shared/components/input.js`는 원래대로 되돌리고(label/showValidIcon 제거, 로그인/구매 전용으로 유지)**, 회원가입 전용 `signup/signup-input.js`+`signup-input.css`(`createSignupInput()`, 클래스명 `signup-field*`부터 완전히 분리)를 새로 만들어 회원가입 3-step은 이걸로 교체. `shared/js/api.js`에 `checkNickname`/`sendVerificationCode`/`verifyEmailCode`/`signup` 목 함수 추가(중복 닉네임 목록·인증번호 "123456" 하드코딩은 로그인 `mockLogin`과 같은 데모 목적). 완료 화면 일러스트는 Figma 전용 이미지가 없어 기존 에셋(`front_titi.png` 지구 + `shining.png` 반짝임 2개)으로 대체, 제목은 `plans/success`와 동일하게 `--font-family-brand`(Gmarket Sans) 36px 재사용. 이메일 인증 타이머(4008:249 실측: 인증번호 입력창 바로 아래가 아니라 CTA 바로 위, 30px 간격)는 처음엔 입력창 바로 아래에 붙여 그렸다가 실측과 다름을 확인 → `.signup__fields`를 `flex:1`로 채우고 `.signup__timer`에 `margin-top:auto`를 줘서 뷰포트 높이와 무관하게 항상 CTA 바로 위에 붙게 수정 — §9 23번 참조
-- [ ] `user/auth/resign/index.*` — 이메일 인증 후 탈퇴, 시간초과 시 이동
+- [x] `signup/index.*` — 스텝퍼 3-step(①닉네임+중복확인 ②이메일 인증+5분 타이머+연장 ③비번+확인) + 완료 화면. Figma 회원가입-닉네임(4008:358/680)/이메일(4007:482, 4008:249)/비밀번호(4008:290)/완료(4008:340)/뒤로가기 모달(4106:699), 타블렛(4146:1105) 기준. `/signup/` 한 URL 안에서 스텝을 상태로만 전환(MPA지만 페이지 이동 없이 `#app` 재렌더링), 완료 화면도 같은 페이지의 마지막 상태. 뒤로가기(앱바)는 스텝 1~3에서 공용 `modal.js`로 확인 모달(취소하기/뒤로가기, 뒤로가기 색 `--color-accent`) 띄우고 확인 시 `/`로 이동, 완료 화면은 잃을 값이 없어 모달 없이 바로 이동. 새 공용 컴포넌트 `shared/components/stepper.js`(`mountStepper(el,{step,total,from})`, 현재 스텝까지 주조색 채움 애니메이션 — 이미 지나온 구간은 `from` 기준으로 애니메이션 없이 즉시 채움, 새로 도달한 구간만 0.6s로 서서히 채움) 구현. 입력창은 `shared/components/input.js`를 처음엔 `label`/`showValidIcon` 옵션으로 확장해 재사용했으나, 회원가입 입력창엔 라벨이 있어 라벨 없는 로그인/구매 화면과 아이콘(눈·체크) 세로 위치가 달라야 하는데 같은 CSS 클래스를 공유하다 보니 회원가입에 맞춰 고칠 때마다 로그인·구매 입력창 레이아웃이 같이 깨짐 → **`shared/components/input.js`는 원래대로 되돌리고(label/showValidIcon 제거, 로그인/구매 전용으로 유지)**, 회원가입 전용 `signup/signup-input.js`+`signup-input.css`(`createSignupInput()`, 클래스명 `signup-field*`부터 완전히 분리)를 새로 만들어 회원가입 3-step은 이걸로 교체. `shared/js/api.js`에 `checkNickname`/`sendVerificationCode`/`verifyEmailCode`/`signup` 목 함수 추가(중복 닉네임 목록·인증번호 "123456" 하드코딩은 로그인 `mockLogin`과 같은 데모 목적, 이후 Supabase 연동으로 전부 실 API 교체 — 아래 갱신 참조). 완료 화면 일러스트는 Figma 전용 이미지가 없어 기존 에셋(`front_titi.png` 지구 + `shining.png` 반짝임 2개)으로 대체, 제목은 `plans/success`와 동일하게 `--font-family-brand`(Gmarket Sans) 36px 재사용. 이메일 인증 타이머(4008:249 실측: 인증번호 입력창 바로 아래가 아니라 CTA 바로 위, 30px 간격)는 처음엔 입력창 바로 아래에 붙여 그렸다가 실측과 다름을 확인 → `.signup__fields`를 `flex:1`로 채우고 `.signup__timer`에 `margin-top:auto`를 줘서 뷰포트 높이와 무관하게 항상 CTA 바로 위에 붙게 수정 — §9 23번 참조
+  - [x] 이메일 인증 방식 변경(2단계) — 6자리 코드 입력(`verifyEmailCode`/`auth.verifyOtp`) 대신 Supabase 기본 발송 템플릿의 확인 링크 클릭 방식으로 전환. 코드를 이메일 본문에 실제로 채워 보내려면 커스텀 SMTP + 템플릿(`{{ .Token }}`) 설정이 필요해 로컬/데모 환경엔 과함. `sendVerificationCode`가 `emailRedirectTo: `${origin}/signup/verified``로 확인 메일을 보내고, 사용자가 메일의 링크를 클릭하면(다른 탭에서 세션이 만들어지고 supabase-js가 storage 이벤트로 원래 탭에도 그 세션을 동기화) 이 탭의 "다음" CTA는 메일 발송 직후부터 바로 눌러볼 수 있다 — 클릭 시점에 새 RPC `is_email_verified(p_email)`(`is_nickname_available`과 동일하게 anon 실행 가능한 SECURITY DEFINER, `auth.users.email_confirmed_at`만 boolean으로 노출)로 실제 확인 여부를 조회해 아니면 토스트로 실패 안내, 맞으면 3단계로 이동. 코드 입력창이 없어졌으니 `verifyEmailCode` API는 제거, 5분 타이머·연장 버튼 UX는 그대로 유지. 리다이렉트 대상을 처음엔 `/signup/`으로 뒀다가 스테퍼가 1단계부터 다시 그려져 "회원가입을 처음부터 다시 하는 것"처럼 보이는 문제가 있어(Supabase 확인 링크 클릭 후 앱으로 되돌아오는 자체는 링크형 인증인 한 피할 수 없는 동작), 스테퍼 없이 짧은 안내만 보여주는 `signup/verified.*` 랜딩 페이지로 분리 — §2 라우팅 맵 참조. **주의**: Supabase 대시보드 Authentication > URL Configuration > Redirect URLs에 앱 origin이 허용돼 있어야 리다이렉트가 동작한다(확인 필요 — 로컬 개발 포트 기준)
+- [x] `user/auth/resign/index.*` + `verified.*` — 로그인 이메일 확인 링크 인증 후 탈퇴, 시간초과 시 `/user/plans/`로 이동 — §9 29번 참조
 
 ### 4단계: 홈 & 일정
-- [x] `user/plans/index.*` (1차) — Figma 일정-기본(4066:724)/리스트(4005:67)/스켈레톤(4095:444) 기준. 다음 일정 제목(완료 안 된 항목 중 가장 이른 시간, 없으면 "일정을 추가해 주세요!") / 금주 월~일 날짜 선택 클릭 시 해당 날짜 데이터 재조회 / 날짜별 목록(시간 오름차순) / 체크박스로 완료 토글 / 전체완료 시 "일정 완료!" CTA → `success.html`. `empty_list.png`는 선택한 날짜에 일정이 0개일 때만 표시
-  - [x] 더보기(⋮) → 고정·수정·삭제 바텀시트 연동. 고정=상단 정렬(다중 고정 가능, 2개 이상이면 시간 오름차순 재정렬), 삭제=목록에서 제거, 수정=`/user/plans/edit.html?planId=` 이동(페이지는 아직 없음). 고정된 항목은 제목 옆에 빨간 점(Figma 4007:232 실측 `#eb0000`) 표시
-  - [x] 최초 진입 온보딩 3-step — Figma 온보딩-step1(4163:2534)/step2(4164:1021)/step3(4164:1039) + 타블렛(4180:821/838/857) 기준, `user/plans/onboarding.js`(신규, `maybeShowOnboarding()`)로 분리해 `index.js`에서 헤더/나브 mount 직후 호출. `#overlay-root`에 전체 화면 흰 배경으로 마운트(배경 클릭/X로 닫는 방법 없음 — spec.md대로 건너뛰기 또는 step3 CTA로만 닫힘), 페이지네이션 점 3개(현재 스텝까지 검정, 나머지 회색)·좌우 화살표(첫/마지막 스텝에서 각각 비활성)·헤드라인 강조 단어(초록, Figma 텍스트 런 실측: "루틴"/"포인트"/"식물")·`public/images/Onboarding_step1~3.png`(이미 존재하던 에셋) 반영. `planit.onboarded` localStorage 플래그로 1회만 노출. step3 CTA는 공용 `createCtaButton` 재사용, 클릭 시 플래그 설정 + `/user/plans/add.html` 이동 — §9 22번 참조. 이후 보완: (1) 이미지 폭을 스텝 공통 고정값(277px)으로 두면 원본 에셋 비율이 step3만 유독 좁아(1312×2656 vs 다른 두 스텝 1573×2656) step3만 세로로 길쭉해 보이던 문제 → Figma처럼 높이 기준(`max-height:100%`)+`max-width`로 비율 유지하며 맞추도록 수정, 최소 뷰포트(360×640)에서 step3의 CTA가 차지하는 만큼 이미지가 자연스럽게 더 줄어들어 겹침 없음. (2) 좌우 화살표 버튼이 너무 작다는 피드백으로 44px→56px(아이콘 30→40)로 확대. (3) 스텝 전환이 즉시 바뀌어 딱딱해 보이는 문제 → 헤드라인+이미지+화살표를 감싸는 `.onboarding__panel`에 페이드 아웃(180ms)→콘텐츠 교체→페이드 인(180ms) 트랜지션 추가, 애니메이션 중 중복 클릭 무시. (4) (2)에서 아이콘을 30→40으로 키웠다고 적었지만 실제로는 전혀 반영이 안 되고 있었음 — 이 lucide CDN 빌드는 `createElement`의 `{size}` 옵션 자체를 매핑하지 않고 항상 기본 24x24로 렌더링한다(`user/products/order/index.js`에서 이미 발견됐던 것과 같은 문제인데 이 파일엔 그때 적용 안 함) — `{width,height}`로 지정해야 실제 반영됨을 확인, 32x32로 교체. 버튼 터치 영역도 Figma "컨트롤러"(4202:845) 실측 49x59로 교체(기존 56x56은 실측값이 아니라 대충 키운 값), 위치도 화면 패딩(모바일 16px/타블렛 24px) 안쪽이 아니라 화면 가장자리에 딱 붙어야 해서(`left`/`right`에 그 패딩만큼 음수 마진) 수정
+- [x] `user/plans/index.*` (1차) — Figma 일정-기본(4066:724)/리스트(4005:67)/스켈레톤(4095:444) 기준. 다음 일정 제목(완료 안 된 항목 중 가장 이른 시간, 없으면 "일정을 추가해 주세요!") / 금주 월~일 날짜 선택 클릭 시 해당 날짜 데이터 재조회 / 날짜별 목록(시간 오름차순) / 체크박스로 완료 토글 / 전체완료 시 "일정 완료!" CTA → `success`. `empty_list.png`는 선택한 날짜에 일정이 0개일 때만 표시
+  - [x] 더보기(⋮) → 고정·수정·삭제 바텀시트 연동. 고정=상단 정렬(다중 고정 가능, 2개 이상이면 시간 오름차순 재정렬), 삭제=목록에서 제거, 수정=`/user/plans/edit?planId=` 이동(페이지는 아직 없음). 고정된 항목은 제목 옆에 빨간 점(Figma 4007:232 실측 `#eb0000`) 표시
+  - [x] 최초 진입 온보딩 3-step — Figma 온보딩-step1(4163:2534)/step2(4164:1021)/step3(4164:1039) + 타블렛(4180:821/838/857) 기준, `user/plans/onboarding.js`(신규, `maybeShowOnboarding()`)로 분리해 `index.js`에서 헤더/나브 mount 직후 호출. `#overlay-root`에 전체 화면 흰 배경으로 마운트(배경 클릭/X로 닫는 방법 없음 — spec.md대로 건너뛰기 또는 step3 CTA로만 닫힘), 페이지네이션 점 3개(현재 스텝까지 검정, 나머지 회색)·좌우 화살표(첫/마지막 스텝에서 각각 비활성)·헤드라인 강조 단어(초록, Figma 텍스트 런 실측: "루틴"/"포인트"/"식물")·`public/images/Onboarding_step1~3.png`(이미 존재하던 에셋) 반영. `planit.onboarded` localStorage 플래그로 1회만 노출. step3 CTA는 공용 `createCtaButton` 재사용, 클릭 시 플래그 설정 + `/user/plans/add` 이동 — §9 22번 참조. 이후 보완: (1) 이미지 폭을 스텝 공통 고정값(277px)으로 두면 원본 에셋 비율이 step3만 유독 좁아(1312×2656 vs 다른 두 스텝 1573×2656) step3만 세로로 길쭉해 보이던 문제 → Figma처럼 높이 기준(`max-height:100%`)+`max-width`로 비율 유지하며 맞추도록 수정, 최소 뷰포트(360×640)에서 step3의 CTA가 차지하는 만큼 이미지가 자연스럽게 더 줄어들어 겹침 없음. (2) 좌우 화살표 버튼이 너무 작다는 피드백으로 44px→56px(아이콘 30→40)로 확대. (3) 스텝 전환이 즉시 바뀌어 딱딱해 보이는 문제 → 헤드라인+이미지+화살표를 감싸는 `.onboarding__panel`에 페이드 아웃(180ms)→콘텐츠 교체→페이드 인(180ms) 트랜지션 추가, 애니메이션 중 중복 클릭 무시. (4) (2)에서 아이콘을 30→40으로 키웠다고 적었지만 실제로는 전혀 반영이 안 되고 있었음 — 이 lucide CDN 빌드는 `createElement`의 `{size}` 옵션 자체를 매핑하지 않고 항상 기본 24x24로 렌더링한다(`user/products/order/index.js`에서 이미 발견됐던 것과 같은 문제인데 이 파일엔 그때 적용 안 함) — `{width,height}`로 지정해야 실제 반영됨을 확인, 32x32로 교체. 버튼 터치 영역도 Figma "컨트롤러"(4202:845) 실측 49x59로 교체(기존 56x56은 실측값이 아니라 대충 키운 값), 위치도 화면 패딩(모바일 16px/타블렛 24px) 안쪽이 아니라 화면 가장자리에 딱 붙어야 해서(`left`/`right`에 그 패딩만큼 음수 마진) 수정
   - [ ] `?date=` 쿼리스트링 연동 (현재는 클릭 시 메모리 상태만 갱신, URL 미반영)
   - [ ] `requireAuth` 가드 (로그인 성공 시 토큰 저장 로직도 아직 없음)
-- [x] `user/plans/add.*` — Figma "일정 추가/수정"(4355:1141) + 휠 피커 바텀시트(4079:1055 시간, 4079:1096 시작 날짜, 4208:872 종료 날짜) + 주기 바텀시트(4080:341) 반영. 항상 초록 테두리인 30자 제한 textarea(`--color-input-valid-bg`, 스크롤/포커스 무관), 시간·시작일·종료일·주기 4개 행. 휠 피커는 새 공용 컴포넌트 `shared/components/wheel-picker.js`(openTimeWheelPicker/openDateWheelPicker, `openBottomSheet` 셸 재사용)로 구현 — 스크롤 스냅 컬럼 3행(37/39/37 실측을 39px 균일로 단순화). 날짜 휠은 일/월/년 순서(라벨 없음), 시간 휠은 시/분(라벨 있음). 종료 날짜는 주기가 "당일"일 때만 필수/선택 가능하고 그 외엔 "없음"으로 비활성 처리(spec.md "일정 추가" 6번). CTA 라벨이 Figma에 "견적 갱신"으로 잘못 남아있어(다른 화면 복붙 잔재) "확인"으로 대체. `addPlan()`을 shared/js/api.js에 추가했으나 반복 주기(매일/매주 등)에 따라 여러 날짜에 일정을 전개하는 로직은 목데이터 계층 밖이라 미구현(시작일에만 생성) — Playwright로 휠 스크롤·스냅·날짜 재계산·CTA 활성화 전 구간 직접 검증 완료. addPlan()으로 만든 일정은 pinPlan/deletePlan 등 기존 목데이터 함수들과 동일하게 페이지 새로고침 시 초기화됨(진짜 백엔드 없는 이 프로젝트의 공통 한계, 신규 버그 아님)
+- [x] `user/plans/add.*` — Figma "일정 추가/수정"(4355:1141) + 휠 피커 바텀시트(4079:1055 시간, 4079:1096 시작 날짜, 4208:872 종료 날짜) + 주기 바텀시트(4080:341) 반영. 항상 초록 테두리인 30자 제한 textarea(`--color-input-valid-bg`, 스크롤/포커스 무관), 시간·시작일·종료일·주기 4개 행. 휠 피커는 새 공용 컴포넌트 `shared/components/wheel-picker.js`(openTimeWheelPicker/openDateWheelPicker, `openBottomSheet` 셸 재사용)로 구현 — 스크롤 스냅 컬럼 3행(37/39/37 실측을 39px 균일로 단순화). 날짜 휠은 년/월/일 순서(라벨 없음), 시간 휠은 시/분(라벨 있음). 마우스 휠 조작 정밀도가 낮다는
+  피드백으로 항목 클릭으로도 값을 선택할 수 있게 했고, 네이티브 휠 스크롤은 막고 휠 한 틱당 정확히
+  한 칸(39px)만 이동하도록 직접 제어해 스크롤 속도를 늦췄다(§9 참조). 종료 날짜는 주기가 "당일"일 때만 필수/선택 가능하고 그 외엔 "없음"으로 비활성 처리(spec.md "일정 추가" 6번). CTA 라벨이 Figma에 "견적 갱신"으로 잘못 남아있어(다른 화면 복붙 잔재) "확인"으로 대체. `addPlan()`을 shared/js/api.js에 추가했으나 반복 주기(매일/매주 등)에 따라 여러 날짜에 일정을 전개하는 로직은 목데이터 계층 밖이라 미구현(시작일에만 생성) — Playwright로 휠 스크롤·스냅·날짜 재계산·CTA 활성화 전 구간 직접 검증 완료. addPlan()으로 만든 일정은 pinPlan/deletePlan 등 기존 목데이터 함수들과 동일하게 페이지 새로고침 시 초기화됨(진짜 백엔드 없는 이 프로젝트의 공통 한계, 신규 버그 아님)
 - [x] `user/plans/edit.*` — add 폼 로직을 `user/plans/plan-form.js`(신규, `initPlanForm()`)로 뽑아내 add.js/edit.js가 공유. CSS도 별도 파일 없이 `add.css`를 그대로 링크(사용자 지정). `?planId=`로 `getPlan()` 조회 후 프리필 — 시드 데이터(add 화면을 거치지 않은 최초 목데이터)엔 startDate/endDate/recurrence가 없어 그 경우 `date`를 시작/종료 날짜로, 주기는 "당일"로 간주. 잘못된 planId면 `/user/plans/`로 리다이렉트. `updatePlan()`을 shared/js/api.js에 추가. Playwright로 홈 더보기→수정 진입 시 프리필 값 일치, 제목 수정 후 저장→홈 리다이렉트까지 확인 — addPlan과 동일하게 페이지 새로고침 시 초기화되는 한계는 동일
 - [x] `user/plans/success.*` — 완료 일러스트(`good_titi.png`) + 지급 포인트(`?points=`, 완료 개수×10) 카운트업 애니메이션(아래→위 등장 후 위로 사라짐) → CTA로 `/user/profile/` 이동. 전용 Figma "/plans/success"(4006:940) 반영 완료 — §9 참조
 
@@ -355,33 +359,35 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 ## 7. 화면 흐름 (핵심 여정)
 
 ```
-로그인(/) → 홈(/user/plans/) → 일정 추가(add.html) → 수행(체크) → 전체 완료
-      → 일정 완료(success.html?points=) → 프로필(/user/profile/)
-      → 상점(/user/store/products/) → 제품(order/?id=) → 구매
-      → 구매 완료(order/success/?orderId=) → 주문 내역(/user/profile/orders/)
+로그인(/) → 홈(/user/plans/) → 일정 추가(add) → 수행(체크) → 전체 완료
+      → 일정 완료(success?points=) → 프로필(/user/profile/)
+      → 상점(/user/store/) → 구매(buy?id=)
+      → 구매 완료(success?orderId=) → 주문 내역(/user/store/history)
 ```
 
 ---
 
-## 8. 데이터 모델 (목 데이터 초안)
+## 8. 데이터 모델
 
-- **User**: `{ nickname, email, points, planet }` — `shared/js/data.js`의 `user`가 시드값, 실제 읽기/쓰기는 `shared/js/state.js`(localStorage `planit.state`)를 통함 — §9 25번 참조
-- **Planet**: `{ id, name, image }` — `shared/js/data.js`의 `planets` 목데이터. 현재 지구/달 2종만 존재(§9)
-- **Plan**: `{ id, title, time, startDate, endDate, repeat(당일·매일·매주·격주·매월·매년), done, pinned }` — `data.js`가 시드, 실제 상태는 `state.js` 경유(§9 25번)
-- **Product**: `{ id, name, price, category(나무·다육식물 — spec.md "씨앗·식물·묘목"은 §9 15번대로 실제 미채택), image }` — 예전 `data.js`의 7종 카탈로그는 폐기되고 `shared/js/plants.js`의 20종(`pl1~pl20`)이 `state.js`의 시드로 쓰임(§9 25번). `shared/js/api.js`의 `addProduct`/`updateProduct`/`deleteProduct`로 CRUD(관리자 상점 관리에서 사용), 전부 `state.js` 경유
-- **Order**: `{ id(8자리), productId, status(주문 접수 중·취소 접수 중·주문 배송 중), pointsUsed, remainingAfter, address }` — "내 주문 내역"(소유자 구분 없이 단일 사용자 기준), `state.js`의 `orders`(빈 배열로 시작)에 저장돼 페이지 이동에도 유지됨(§9 25번). `remainingAfter`는 주문 직후 시점의 잔여 포인트 스냅샷(주문 내역 화면 표시용), `createOrder()`가 생성 시점에 기록
-- **AdminOrder**: `{ id(주문번호), customer(닉네임), productId, status, address }` — `shared/js/data.js`의 `adminOrders` 목데이터(관리자 주문 관리 전용, §9 19번대로 `orders`와 분리, 이번 범위 밖이라 여전히 메모리 배열). `productId`는 `plants.js` 교체에 맞춰 `pl1~pl20` 기준으로 갱신됨(§9 25번). `shipOrder()`(접수중→배송중), `cancelAdminOrder()`(취소접수중 항목을 리스트에서 삭제)로 상태 전환
-- **Ranking**: `{ rank, nickname, points, planet, isMe? }` — `shared/js/data.js`의 `ranking`/`rankingMeta`
-- **Notification**: `{ id, planId, time, title, done, section(오늘·어제) }` — `shared/js/data.js`의 `notifications`, "오늘" 항목은 `plans[today]`에서 파생
+> **갱신 이력**: 이 표는 원래 localStorage 목데이터(`data.js`/`plants.js`/`state.js`) 초안이었다. Supabase 연동(§5 참조) 이후 Ranking을 뺀 전부가 실제 DB 테이블로 옮겨갔고 `state.js`/`plants.js`는 삭제됐다 — 아래는 2026-07-19 기준 실제 스키마(`public` 스키마, `mcp__supabase__list_tables`로 확인)다. `shared/js/data.js`에는 이제 `planets`(표시용 카탈로그)와 `ranking`/`rankingMeta`(목데이터) 두 개만 남아 있다. §9(1~29번)의 옛 표기(`state.js`/`plants.js`/`adminOrders` 등)는 그 시점 기준 히스토리라 그대로 둔다.
+
+- **User** (`public.profiles`, RLS로 계정별 격리): `{ id(uuid, auth.users FK), nickname(unique), email, points(≥0), planet_id(FK planets.id, 기본 earth), is_admin, address?, address_detail?, resign_confirmed_at?, created_at }`. `shared/js/api.js`의 `getProfile()`/`setPlanet()`/`awardPoints()`/`getAddress()`/`saveAddress()`/`clearAddress()`가 직접 조회·갱신한다. 랭킹은 별도 테이블 없이 이 테이블의 `points`로 정렬해서 계산(아래 Ranking 참조). 주소는 §10-1로 이전됨
+- **Planet**: 두 계층이 있다 — 실제 DB `public.planets`(`{ id, name, image, sort_order }`, `profiles.planet_id`가 참조, 현재 지구/달 2행만 존재)와 프로필 드로워 표시용 `shared/js/data.js`의 `planets`(12종 전체 카탈로그, DB에 없는 10종은 `image: null`로 항상 잠금 상태로만 렌더링 — §9 13번 참조)
+- **Plan** (`public.plans`, RLS): `{ id(uuid), user_id(FK profiles), title(1~30자), plan_time, start_date, end_date?, repeat(당일·매일·매주·격주·매월·매년), done, pinned, created_at }`. `repeat`는 한글 컬럼값이라 프론트의 영문 토큰(day/daily/weekly/biweekly/monthly/yearly)과 `api.js`의 `RECURRENCE_TO_DB`/`RECURRENCE_FROM_DB`로 상호 변환. 반복 주기에 따라 여러 날짜에 걸쳐 일정을 전개하는 로직은 미구현 — `addPlan()`은 `start_date` 한 날짜에만 행을 만든다(§6 4단계 로그 참조)
+- **Product** (`public.products`, RLS): `{ id(text), name, category(나무|다육식물 — spec.md "씨앗·식물·묘목"은 §9 15번대로 실제 미채택), price(>0), image, created_at }`. 관리자 CRUD는 `addProduct()`/`updateProduct()`/`deleteProduct()`(id는 `pl${Date.now()}`로 클라이언트에서 생성)
+- **Order** (`public.orders`, RLS: 본인 소유 또는 관리자만): `{ id(text, DB 기본값 generate_order_id()), user_id(FK profiles), product_id(FK products), status(주문 접수 중·취소 접수 중·주문 배송 중), points_used(>0), remaining_after(≥0), address, address_detail?, created_at }`. 생성은 포인트 차감+주문 생성을 원자적으로 묶은 `create_order` RPC(`createOrder()`), 취소 요청은 `cancelOrder()`(status만 변경), 관리자 배송/취소 승인은 `shipOrder()`/`cancelAdminOrder()`(승인 시 행 자체 삭제)
+- **AdminOrder**: 별도 테이블 없음 — 예전 `data.js`의 `adminOrders` 배열은 폐기되고, `getAdminOrders()`가 `orders`를 `profiles(nickname)`와 조인해 그대로 조회한다(관리자는 RLS로 전체 유저 주문 열람 허용, 사용자는 본인 주문만)
+- **Ranking**: `{ rank, nickname, points, planet, isMe? }` — 유일하게 남은 목데이터(`shared/js/data.js`의 `ranking`/`rankingMeta`, 다른 유저 15명분). 다중 유저 랭킹 집계 기능이 이번 범위 밖이라(§9 6번) 실 DB로 못 옮겼다. `getRanking()`이 "나의 순위"(6등) 항목만 실시간 `profiles`로 덮어쓰고 포인트 기준으로 재정렬해 순위를 매긴다
+- **Notification** (`public.notifications`, RLS): `{ id(uuid), user_id(FK profiles), plan_id?(FK plans), title, occurred_at, done, created_at }`. `section`(오늘·어제)은 저장 컬럼이 아니라 `occurred_at`을 그때그때 오늘/어제와 비교해 계산. `done`은 연결된 `plan_id`가 있으면 그 `plans.done`을 우선 사용(일정 완료 시 알림도 즉시 반영). DB 크론잡 `create_upcoming_plan_notifications()`가 일정 시작 10분 전에 행을 생성
 
 ---
 
 ## 9. 확인 필요 항목 (정의서 내 표기 불일치)
 
 1. **일정 완료 도메인** — 본문 `/user/plants/success` vs 흐름 `/user/plans/success` → `plans`로 가정(오타)
-2. **주문 내역 도메인** — 섹션 헤더 `/user/products/orders` vs 프로필 버튼 `/user/profile/orders` → `/user/profile/orders`로 가정
+2. **주문 내역 도메인** — 섹션 헤더 `/user/products/orders` vs 프로필 버튼 `/user/profile/orders` → `/user/profile/orders`로 가정 (이후 §10 폴더 구조 재정리로 `/user/store/history`로 다시 이동 — §9 30번 참조)
 3. **로그인 성공 이동** — `/index`로 기재되나 실제 홈은 `/user/plans` → `/user/plans/`로 해석
-4. **구매 완료 이동** — CTA가 `/products/orders`로 기재 → `/user/profile/orders/`로 해석
+4. **구매 완료 이동** — CTA가 `/products/orders`로 기재 → `/user/profile/orders/`로 해석 (이후 §10 폴더 구조 재정리로 `/user/store/history`로 다시 이동 — §9 30번 참조)
 5. **일정 완료 이동** — CTA가 `/profile`로 기재 → `/user/profile/`로 해석
 6. **상점 사용자 흐름** — MVP 정의서 "상점" 흐름이 "랭킹" 흐름과 동일하게 복붙된 오류 → 재정의 필요
 7. **타블렛 브레이크포인트 폭** — 정의서·Figma 모두 타블렛은 "최소 높이 600px"만 명시, 폭 기준 없음. Figma "나브" 타블렛 프레임(4146:1022) 실측 폭이 600px라 `--breakpoint-tablet: 600px`로 가정해 `nav-drawer.css`에 반영함 → 실제 타블렛 폭 기준(예: 768px 등) 확정 필요
@@ -415,4 +421,66 @@ spec.md 텍스트 + 기존 디자인 토큰/컴포넌트 언어로 구현 — §
 
 28. **온보딩 step3 이미지 Figma 갱신분 반영** — Figma에서 step3(4164:1039, 그룹 4164:1060) 디자인이 변경되어, 프로필 화면 목업 안의 "STORE" 카드가 이전엔 화면 오른쪽 끝에서 잘려 보이던 것이 이제 완전히 화면 안에 들어오도록 수정됨 → `public/images/Onboarding_step3.png` 재추출. REST `figma_get_component_image`가 429로 막혀 `figma_execute`로 `node.exportAsync({format:"PNG", constraint:{type:"SCALE", value:N}})`를 직접 실행해 base64로 받는 우회 경로 사용. 원본과 동일한 배율(5.312, `2656/500`)로 내보내니 드롭섀도우 효과가 있는 노드 특성상 이미지 오른쪽에 어두운 노이즈/얼룩 아티팩트가 생기는 내보내기 버그 발견(scale=2는 깨끗, scale=5.312는 깨짐) → scale=4로 재시도해 아티팩트 없이 깨끗한 1135x2000 PNG 확보, 최종본으로 교체. `.onboarding__image`가 `max-height:100%` 기준으로 비율을 유지한 채 스케일하므로(§ CSS 주석 참조) 소스 픽셀 해상도가 step1/2(1573x2656)와 달라도 실제 화면에 표시되는 크기는 동일한 스테이지 높이에 맞춰져 시각적으로 일치.
 
+29. **회원 탈퇴 인증 시간 초과 이동 도메인 오타 + Figma 미확인** — spec.md "회원 탈퇴" 6번 "인증 시간을 넘기면 도메인 /planit으로 이동한다"의 `/planit`은 실제 존재하는 라우트가 아니라(1번·3번과 같은 유형의 오타) `/user/plans/`(홈)로 해석해 구현. 전용 Figma(4589:1159)도 계속 API rate limit(429)로 실측 못 받아와 spec.md 문구 + signup 이메일 인증 스텝(§9 23번)과 동일한 컴포넌트/흐름(공용 `shared/components/input.js` 비활성화 상태로 로그인 이메일 읽기 전용 표시, 5분 타이머+연장)을 그대로 재사용해 우선 구현 — 나중에 Figma 확인되면 세부 스타일만 맞추면 됨. 이메일 인증도 signup과 동일하게 SMTP 없이 6자리 코드 대신 확인 링크 방식(`sendResignVerification`이 `emailRedirectTo: /user/auth/resign/verified`로 발송, `is_resign_verified`류 전용 RPC로 확인 여부만 조회 — signup의 `is_email_verified`는 "언젠가 한 번이라도 확인됐는지"라 이미 가입된 계정엔 항상 true라 재사용 불가, `profiles.resign_confirmed_at`을 매 시도마다 초기화→재확인하는 별도 RPC 3종 사용). 탈퇴 자체는 `delete_own_account()` RPC(`auth.users` 삭제, `profiles.id`가 `auth.users.id`에 CASCADE라 plans/orders/notifications까지 함께 삭제)로 처리, 성공 시 로그인(`/`)으로 이동.
+
+30. **상점/구매/주문내역/회원탈퇴 도메인 — spec.md 원본 표기 vs §10 폴더 구조 재정리 후 최종 경로** — spec.md는 원본 요구사항 문서라 CLAUDE.md 방침대로 그대로 두고, 실제 채택 경로만 여기 정리한다. spec.md 안에서도 같은 화면을 가리키는 표기가 서로 갈리던 부분(예: 79번줄 `/user/store` vs 296·338번줄 `/user/store/products`)이 있었는데, §10 재정리로 그 표기 차이 자체가 무의미해졌다(전부 `/user/store/`로 통합됐기 때문).
+
+| 화면 | spec.md 표기(라인) | 최종 채택 경로 |
+|---|---|---|
+| 상점 목록 | `/user/store`(79) · `/user/store/products`(296, 338) | `/user/store/` |
+| 구매 | `/user/products/order/:product_id`(356, 363) | `/user/store/buy?id=` |
+| 구매 완료 | `/user/order/success`(439) · `/user/order/success/order_id`(389) | `/user/store/success?orderId=` |
+| 구매 완료 CTA 이동 | `/products/orders`(447, 오타 추정) | `/user/store/history` |
+| 주문 내역 | `/user/profile/orders`(297) · `/user/products/orders`(312, 오타 추정) | `/user/store/history` |
+| 회원 탈퇴 | `/user/auth/resign`(305, 558) | `/user/resign/` |
+
+기존 §9 2번(주문 내역 도메인)·4번(구매 완료 이동)이 가정했던 `/user/profile/orders/`는 §10 재정리로 `/user/store/history`로 다시 한번 바뀌었다 — 2번·4번은 "그 시점" 해석 기록으로 그대로 두고, 최종 채택 경로는 이 30번을 따른다.
+
 > 위 항목은 구현 착수 전 확정 권장.
+
+---
+
+## 10. 폴더 구조 재정리 — `user/` 시스템 단위 재배치 (완료, 2026-07-19)
+
+> **실행 완료.** `git mv`로 6개 화면 파일을 이동하고, 아래 "영향 범위" 26개 파일의 경로 문자열을 전부 새 경로로 치환했다. `npm run dev`로 신규 경로(`/user/store/`, `/user/store/buy`, `/user/store/success`, `/user/store/history`, `/user/resign/`, `/user/resign/verified`) 전부 200, 구 경로 전부 404 확인 완료(§10 실행 체크리스트 참조). §2 라우팅 맵 · §3 폴더 구조 · §7 화면 흐름은 이 신규 경로 기준으로 이미 갱신돼 있다. 반면 §6(작업 TODO 로그)과 §9(확인 필요 항목 1~29번)에 나오는 `user/store/products`, `user/products/order`, `user/order/success`, `user/profile/orders`, `user/auth/resign` 등의 경로 표기는 **구현 당시 기준 히스토리**라 그대로 남겨뒀다 — 실제 이동 후에도 로그 자체는 수정하지 않는다.
+
+### 배경 · 원칙
+
+- `store/products`(상점 목록) · `products/order`(구매) · `order/success`(구매 완료) · `profile/orders`(주문 내역) 4개가 실제로는 "상점" 이용 흐름 하나(목록→구매→완료→내역)인데 서로 다른 최상위 폴더에 흩어져 있어, 1번 설계 원칙("코로케이션")과 어긋나 있었다.
+- `auth/resign`은 하위 액션이 탈퇴 하나뿐인데 `auth/` 래퍼가 불필요하게 한 겹 더 있었다.
+- 사용자가 제시한 참고 구조(메뉴/마이페이지/장바구니/주문내역처럼 화면 묶음이 곧 최상위 폴더가 되는 "시스템 단위" 배치)와 동일한 원칙을 적용해, **관련 화면을 하나의 최상위 폴더**로 모으고 불필요한 중첩 폴더(액션이 하나뿐인 폴더)는 제거한다.
+- `plans/`, `calendar/`, `ranking/`, `notification/`은 이미 시스템 단위 폴더라 변경하지 않는다.
+
+### 경로 매핑
+
+| 시스템 | 구 URL | 구 파일 | 신규 URL | 신규 파일 |
+|---|---|---|---|---|
+| 상점 목록 | `/user/store/products/` | `user/store/products/index.*` | `/user/store/` | `user/store/index.*` |
+| 구매 | `/user/products/order/?id=` | `user/products/order/index.*` | `/user/store/buy?id=` | `user/store/buy.*` |
+| 구매 완료 | `/user/order/success/?orderId=` | `user/order/success/index.*` | `/user/store/success?orderId=` | `user/store/success.*` |
+| 주문 내역 | `/user/profile/orders/` | `user/profile/orders/index.*` | `/user/store/history` | `user/store/history.*` |
+| 회원 탈퇴 | `/user/auth/resign/` | `user/auth/resign/index.*` | `/user/resign/` | `user/resign/index.*` |
+| 탈퇴 인증 완료 | `/user/auth/resign/verified` | `user/auth/resign/verified.*` | `/user/resign/verified` | `user/resign/verified.*` |
+
+`구매`(구 `order`)와 `주문 내역`(구 `orders`)이 단수/복수로만 구분돼 있던 것도 이번에 `buy`/`history`로 이름을 갈라 눈으로 헷갈릴 여지를 없앴다(CLAUDE.md에 이미 기록된 `/user/plants/` vs `/user/plans/` 류 오타 문제와 같은 유형의 위험을 사전 제거).
+
+### 영향 범위 (경로 문자열을 참조 중인 파일, grep 확인 완료 · 26개)
+
+**상점 관련 경로 참조**
+`shared/js/api.js`, `shared/components/purchase-sheet.js`, `shared/components/nav-drawer.js`, `user/plans/onboarding.js`, `user/calendar/index.css`(주석 언급뿐), `user/profile/index.js`, `admin/orders/index.js`, `admin/products/index.js`, 그리고 이동 대상 자신인 `user/store/products/index.{html,css,js}` · `user/products/order/index.{html,css,js}` · `user/order/success/index.{html,css,js}` · `user/profile/orders/index.{html,css,js}`
+
+**회원 탈퇴 경로 참조**
+이동 대상 자신인 `user/auth/resign/index.{html,css,js}` · `user/auth/resign/verified.{html,css,js}`
+
+### 실행 체크리스트 (완료)
+
+1. [x] `git mv`로 위 6개 화면의 파일 이동/이름변경(히스토리 보존) — `store/products/index.*` → `store/index.*`, `products/order/index.*` → `store/buy.*`, `order/success/index.*` → `store/success.*`, `profile/orders/index.*` → `store/history.*`, `auth/resign/*` → `resign/*`. 이제 빈 폴더가 된 `user/store/products/`, `user/products/`, `user/order/`, `user/profile/orders/`, `user/auth/`는 삭제
+2. [x] 각 이동한 `.html`의 `<script type="module" src="...">` / `<link rel="stylesheet" href="...">` 경로 수정
+3. [x] 위 "영향 범위"의 26개 파일에서 구 경로 문자열(`/user/store/products`, `/user/products/order`, `/user/order/success`, `/user/profile/orders`, `/user/auth/resign`) 전부 치환 — 기능 경로(`location.href`, nav-drawer 메뉴, 프로필 링크, `shared/js/api.js`의 `emailRedirectTo`)와 주석 모두 갱신. `user/store/history.*`·`user/store/success.js`에 남은 "profile/orders" 문자열 2건은 Figma 프레임 이름/과거 해석을 가리키는 인용이라 의도적으로 유지
+4. [x] `npm run dev` + `curl`로 신규 경로 6개(`/user/store/`, `/user/store/buy`, `/user/store/success`, `/user/store/history`, `/user/resign/`, `/user/resign/verified`) 200 응답, 구 경로 5개 404 응답 확인. 이동된 `.js`/`.css` 정적 서빙과 `node --check` 문법 검사도 통과. 로그인이 필요한 실제 클릭 흐름(구매 완료→주문내역, 탈퇴 이메일 링크 등)은 이번 검증 범위 밖 — 다음 로그인 세션에서 수동 확인 권장
+5. [ ] **Supabase 대시보드 확인 필요**: `sendResignVerification`의 `emailRedirectTo`가 `/user/auth/resign/verified` → `/user/resign/verified`로 바뀌었다. Authentication > URL Configuration > Redirect URLs 허용 목록이 와일드카드(`/user/**`)가 아니라 구 경로를 정확히 등록해뒀다면 여기도 갱신해야 실제 탈퇴 인증 메일 링크가 동작한다
+6. [ ] 관리자(`admin/orders`, `admin/products`)는 경로 문자열만 주석에 있었고 기능 참조는 없어 실사용 여정 확인은 낮은 우선순위 — 필요 시 수동 확인
+
+### 10-1. 주소 저장 Supabase 이전 (완료, 2026-07-19)
+
+`planit.address`(localStorage) → `profiles.address`/`profiles.address_detail` 컬럼(마이그레이션 `add_profile_address_columns`)으로 이전. 다른 사용자 데이터(`points`/`planet_id`)와 동일하게 RLS로 로그인 계정에 귀속되므로, 다른 브라우저/기기에서 재로그인해도 저장한 주소가 유지되고 같은 브라우저를 여러 계정이 공유해도 주소가 계정 간에 섞이지 않는다. `shared/js/api.js`의 `getAddress()`/`saveAddress()`/`clearAddress()`가 localStorage 대신 `profiles` 테이블을 조회/갱신하도록 교체됐고, 반환/인자 형태(`{ address, detail }`)는 그대로라 호출부(`user/store/buy.js`)는 수정하지 않았다.

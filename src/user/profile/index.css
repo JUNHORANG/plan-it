@@ -10,7 +10,7 @@
 .profile__head {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 14px;
   min-height: 66px;
 }
 
@@ -115,48 +115,176 @@
   color: var(--color-body);
 }
 
-/* 행성 변경 드로워 — 컬렉션 그리드 */
+/* 행성 변경 드로워 — 컬렉션 그리드. Figma "프로필 - 행성 변경 - 드로워"(4084:669),
+   미보유 상태(4084:785), 타블렛(4149:1612) 실측 */
 .planet-picker {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 15px 22px;
 }
 
 .planet-picker__item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 8px;
-  border: 2px solid var(--color-row-border);
-  border-radius: var(--radius-md);
+  gap: 10px;
 }
 
-.planet-picker__item.is-selected {
-  border-color: var(--color-primary);
+.planet-picker__item.is-locked {
+  cursor: default;
+}
+
+.planet-picker__image-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planet-picker__item.is-locked .planet-picker__image-wrap {
+  background: #f2f2f2;
+  border: 1px solid #cfcfcf;
 }
 
 .planet-picker__image {
-  width: 56px;
-  height: 56px;
+  width: 131px;
+  height: 131px;
   object-fit: contain;
 }
 
+/* 미보유 행성 자리표시자 — 감은 눈 (Figma 실측: 흰 타원 17x27 + 그 안쪽 아래 회색 원 11x11) */
+.planet-picker__placeholder {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.planet-picker__eye {
+  position: relative;
+  width: 17px;
+  height: 27px;
+  background: var(--color-white);
+  border-radius: 50%;
+}
+
+.planet-picker__eye::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #eaeaea;
+}
+
 .planet-picker__name {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: var(--font-weight-medium);
   color: var(--color-body);
 }
 
-.planet-picker__cta {
-  margin-top: 24px;
+/* 현재 그리드에서 선택(=변경 대상으로 지정)된 행성의 라벨만 강조색으로 표시 */
+.planet-picker__name.is-picked {
+  color: var(--color-accent);
 }
 
+/* 하단 고정은 이 CTA를 body가 아니라 content-drawer의 renderFooter 슬롯(body와 형제,
+   flex-shrink:0)에 넣는 것으로 처리한다 — shared/components/content-drawer.js 참조.
+   그래서 이 버튼 자체엔 position:fixed 등 별도 위치 지정이 필요 없다. */
+
+@media (min-width: 600px) {
+  .planet-picker {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px 24px;
+  }
+}
+
+/* 이용약관/개인정보 처리방침 — public/legal/*.md를 marked로 렌더링한 실제 HTML.
+   표(개인정보 수집 항목 등)가 좁은 화면에서 넘칠 수 있어 table만 가로 스크롤되게 처리 */
 .legal-text {
   font-size: 14px;
   line-height: 1.7;
   color: var(--color-body);
-  white-space: pre-line;
+}
+
+.legal-text h2 {
+  font-size: 17px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+  margin: 24px 0 8px;
+}
+
+.legal-text h2:first-child {
+  margin-top: 0;
+}
+
+.legal-text h3 {
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-header);
+  margin: 16px 0 6px;
+}
+
+.legal-text p {
+  margin: 0 0 12px;
+}
+
+.legal-text strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.legal-text ul,
+.legal-text ol {
+  margin: 0 0 12px;
+  padding-left: 18px;
+}
+
+.legal-text li {
+  margin-bottom: 4px;
+}
+
+.legal-text hr {
+  border: none;
+  border-top: 1px solid var(--color-row-border);
+  margin: 20px 0;
+}
+
+.legal-text blockquote {
+  margin: 0 0 12px;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-row-border);
+  color: var(--color-assist);
+}
+
+.legal-text table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.legal-text tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.legal-text th,
+.legal-text td {
+  border: 1px solid var(--color-row-border);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: normal;
+}
+
+.legal-text th {
+  background: var(--color-page-bg);
+  font-weight: var(--font-weight-semibold);
 }
 
 @media (min-width: 599px) {

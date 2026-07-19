@@ -1,7 +1,7 @@
 /*
   구매 확인 바텀시트 — Figma "구매창"(4278:893) 실측 그대로 커스텀 마크업으로 구현.
   shared/components/bottom-sheet.js(제목+X 헤더 있는 공용 UI)는 이 디자인과 안 맞아
-  별도 컴포넌트로 분리. 상점 목록(user/store/products)과 구매(user/products/order)
+  별도 컴포넌트로 분리. 상점 목록(user/store/index.js)과 구매(user/store/buy.js)
   양쪽에서 재사용 — 구매 페이지에서는 backdrop:false로 배경 딤 없이 사용한다
   (외부 클릭 시 닫히는 동작 자체는 유지하기 위해 backdrop 엘리먼트는 그대로 두고
   시각적 딤/블러만 뺀다 — purchase-sheet--no-backdrop 참조).

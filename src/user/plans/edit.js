@@ -1,5 +1,5 @@
 /*
-  일정 수정 (/user/plans/edit.html?planId=)
+  일정 수정 (/user/plans/edit?planId=)
   참조: plan-form.js(공용 폼 로직 — add/edit이 공유), blueprint.md §4단계
         "user/plans/edit.* — add 로직 재사용 + ?planId= 프리필"
 
@@ -10,6 +10,9 @@
 
 import { initPlanForm } from "./plan-form.js";
 import { getPlan, updatePlan } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 const planId = new URLSearchParams(location.search).get("planId");
 const plan = await getPlan(planId);

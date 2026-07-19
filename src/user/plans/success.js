@@ -1,5 +1,5 @@
 /*
-  일정 완료 (/user/plans/success.html)
+  일정 완료 (/user/plans/success)
   참조: Figma "/plans/success"(4006:940) — 안내 문구 + 지급 포인트 애니메이션 + CTA로 /user/profile/ 이동
   (blueprint.md §9: "/profile" 표기는 "/user/profile/"로 해석)
 
@@ -8,6 +8,9 @@
 
 import { mountAppBar } from "/shared/components/app-bar.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 mountAppBar("#app-bar", {
   title: "",

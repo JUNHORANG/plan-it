@@ -1,17 +1,30 @@
 /*
-  구매 완료 (/user/order/success/?orderId=)
+  구매 완료 (/user/store/success?orderId=)
   참조: spec.md "구매 완료" — 일정 완료(success) 화면과 같은 "완료" 템플릿 톤 재사용
   (전용 Figma 프레임은 API rate limit로 확인 못함 — blueprint.md §9 참조)
 */
 
 .order-success {
   position: relative;
+  /* z-index:0으로 이 요소를 독립된 stacking context의 기준점으로 만든다 — 안 그러면
+     아래 confetti canvas(z-index:-1)가 .order-success 바깥(예: 상위 문서 배경)까지
+     밀려날 수 있다. 이렇게 해야 canvas가 딱 이 박스 안에서만 제목/이미지 뒤로 가라앉는다. */
+  z-index: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: calc(100vh - var(--app-bar-height));
   padding: 100px 0 0px;
   text-align: center;
+}
+
+.order-success__confetti {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .order-success__title {

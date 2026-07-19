@@ -1,7 +1,38 @@
 /*
-  공통 유틸 — 날짜 포맷, storage 래퍼
+  공통 유틸 — 날짜 포맷, storage 래퍼, 인증 가드
   참조: blueprint.md §3 shared/js/utils.js
 */
+import { supabase } from "./supabase-client.js";
+
+/** 세션 없으면 로그인(/)으로 리다이렉트. user/** 페이지 진입 시 최상단에서 호출 */
+export async function requireAuth() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) {
+    location.href = "/";
+    return null;
+  }
+  return session;
+}
+
+/** requireAuth + profiles.is_admin 확인. admin/** 페이지 전용 — 관리자가 아니면 홈으로 되돌림 */
+export async function requireAdmin() {
+  const session = await requireAuth();
+  if (!session) return null;
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error || !data?.is_admin) {
+    location.href = "/user/plans/";
+    return null;
+  }
+  return session;
+}
 
 export function toISODate(date) {
   const d = new Date(date);

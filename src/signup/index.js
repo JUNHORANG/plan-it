@@ -10,10 +10,16 @@
   뒤로가기(앱바)는 스텝 1~3에서는 항상 확인 모달을 띄우고("뒤로가기" 선택 시 로그인으로 이동),
   완료 화면에서는 잃을 입력값이 없으므로 모달 없이 바로 이동한다.
 
-  §9 참조: (1) Figma 실제 라벨이 spec.md 문구와 달라("인증 번호 전송"이 아니라 "이메일 인증",
-  "인증 번호 확인" 중간 단계 없이 코드 입력 즉시 "다음"으로 검증+다음 스텝 동시 처리) Figma를
-  따름. (2) spec.md 6번 "다음 CTA 버튼을 클릭하면 사용자 정보 입력 단계로 이동한다"는 실제
-  Figma에 없는 4번째 스텝을 가리키는 문구라 무시하고 비밀번호 다음은 바로 완료 화면으로 이동.
+  §9 참조: (1) Figma 실제 라벨이 spec.md 문구와 달라("인증 번호 전송"이 아니라 "이메일 인증")
+  Figma를 따름. (2) spec.md 6번 "다음 CTA 버튼을 클릭하면 사용자 정보 입력 단계로 이동한다"는
+  실제 Figma에 없는 4번째 스텝을 가리키는 문구라 무시하고 비밀번호 다음은 바로 완료 화면으로 이동.
+
+  이메일 인증 방식: spec.md/Figma는 6자리 코드 입력을 가리키지만, 코드를 이메일 본문에
+  실제로 채워 보내려면 Supabase 커스텀 SMTP + 템플릿({{ .Token }}) 설정이 필요해 로컬/데모
+  환경엔 과함 — 대신 Supabase 기본 발송 템플릿의 확인 링크를 그대로 쓰고, 메일 발송 직후부터
+  "다음" CTA를 누를 수 있게 한 뒤 클릭 시점에 `is_email_verified` RPC로 실제 확인 여부만
+  조회한다(확인 전이면 토스트로 실패 안내). 코드 입력창 자체가 없어졌으니 5분 타이머·연장은
+  "링크가 유효한 시간" UX로 그대로 유지(shared/js/api.js 주석 참조).
 */
 
 import { mountAppBar } from "/shared/components/app-bar.js";
@@ -22,7 +28,7 @@ import { createCtaButton } from "/shared/components/cta-button.js";
 import { mountStepper } from "/shared/components/stepper.js";
 import { openModal } from "/shared/components/modal.js";
 import { showToast } from "/shared/components/toast.js";
-import { checkNickname, sendVerificationCode, verifyEmailCode, signup } from "/shared/js/api.js";
+import { checkNickname, sendVerificationCode, checkEmailVerified, signup } from "/shared/js/api.js";
 
 const STEP_TITLES = { 1: "닉네임 설정", 2: "이메일 인증", 3: "비밀번호 설정" };
 const TIMER_SECONDS = 5 * 60;
@@ -153,10 +159,8 @@ function renderNicknameStep() {
 function renderEmailStep() {
   const fields = document.querySelector("[data-fields]");
   let phase = "email";
-  let code = "";
   let timeLeft = TIMER_SECONDS;
   let expired = false;
-  let codeInput = null;
   let timerEl = null;
 
   const emailInput = createSignupInput({
@@ -184,48 +188,38 @@ function renderEmailStep() {
   async function handleCtaClick() {
     if (phase === "email") {
       cta.setLoading(true);
-      await sendVerificationCode(state.email);
+      const sendResult = await sendVerificationCode(state.email, state.nickname);
       cta.setLoading(false);
 
-      phase = "code";
+      if (!sendResult.ok) {
+        showToast(sendResult.message || "인증 메일 전송에 실패했습니다.", "error");
+        return;
+      }
+
+      phase = "sent";
       state.codeSent = true;
       emailInput.setValid(true);
       emailInput.control.disabled = true;
-      revealCodeField();
+      revealTimer();
       cta.setLabel("다음");
-      cta.setDisabled(true);
+      cta.setDisabled(false); // 메일 발송 직후부터 바로 누를 수 있다 — 확인 여부는 클릭 시점에 조회
+      showToast("인증 메일을 보냈어요. 메일함에서 링크를 확인해 주세요.", "success");
       return;
     }
 
     cta.setLoading(true);
-    const result = await verifyEmailCode(code);
+    const result = await checkEmailVerified(state.email);
     cta.setLoading(false);
 
     if (result.ok) {
       state.step = 3;
       renderStep();
     } else {
-      codeInput.setError("인증번호가 일치하지 않습니다.");
-      showToast("인증번호가 일치하지 않습니다.", "error");
-      cta.setDisabled(true);
+      showToast("이메일 인증에 실패했습니다.", "error");
     }
   }
 
-  function revealCodeField() {
-    codeInput = createSignupInput({
-      type: "text",
-      label: "이메일 인증",
-      placeholder: "인증 번호 6자리를 작성해 주세요.",
-      validateOnBlur: false,
-      onInput: (value) => {
-        code = value;
-        cta.setDisabled(expired || code.length !== 6);
-      },
-    });
-    codeInput.control.maxLength = 6;
-    codeInput.control.inputMode = "numeric";
-    fields.appendChild(codeInput.el);
-
+  function revealTimer() {
     const timerWrap = document.createElement("div");
     timerWrap.className = "signup__timer";
     timerWrap.innerHTML = `
@@ -235,11 +229,22 @@ function renderEmailStep() {
     fields.appendChild(timerWrap);
     timerEl = timerWrap.querySelector("[data-timer]");
 
-    timerWrap.querySelector("[data-extend]").addEventListener("click", () => {
+    const extendBtn = timerWrap.querySelector("[data-extend]");
+    extendBtn.addEventListener("click", async () => {
+      extendBtn.disabled = true;
+      const result = await sendVerificationCode(state.email, state.nickname);
+      extendBtn.disabled = false;
+
+      if (!result.ok) {
+        showToast(result.message || "인증 메일 재전송에 실패했습니다.", "error");
+        return;
+      }
+
       timeLeft = TIMER_SECONDS;
       expired = false;
-      cta.setDisabled(code.length !== 6);
+      cta.setDisabled(false);
       startTimer();
+      showToast("인증 메일을 다시 보냈어요.", "success");
     });
 
     startTimer();
@@ -293,8 +298,14 @@ function renderPasswordStep() {
     onClick: async () => {
       cta.setLoading(true);
       state.password = passwordInput.getValue();
-      await signup({ nickname: state.nickname, email: state.email, password: state.password });
+      const result = await signup({ password: state.password });
       cta.setLoading(false);
+
+      if (!result.ok) {
+        showToast(result.message || "회원가입에 실패했습니다.", "error");
+        return;
+      }
+
       state.step = "done";
       renderStep();
     },
@@ -328,7 +339,8 @@ function renderComplete() {
     label: "로그인 하기",
     disabled: false,
     onClick: () => {
-      location.href = "/";
+      // 2단계에서 이메일 확인 링크를 클릭한 시점에 이미 Supabase 세션이 발급된 상태라 재로그인 없이 홈으로 이동
+      location.href = "/user/plans/";
     },
   });
   cta.el.classList.add("signup__cta");

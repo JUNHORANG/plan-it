@@ -31,6 +31,7 @@ const MIME = {
   ".woff": "font/woff",
   ".otf": "font/otf",
   ".ttf": "font/ttf",
+  ".md": "text/markdown; charset=utf-8",
 };
 
 // MPA라 라우트 이동마다 문서를 통째로 새로 받는다 — 지금까지 캐시 헤더가 하나도 없어서
@@ -59,6 +60,10 @@ function resolveFile(urlPath) {
       candidates.push(path.join(base, relPath, "index.html"));
     } else {
       candidates.push(path.join(base, relPath));
+      // 확장자 없는 경로(예: /user/plans/add)도 <path>.html로 서빙 — 주소창에 .html이
+      // 안 보이는 라우트(add/edit/success 등)를 위한 폴백. 디렉터리 형태(/)는 위 분기에서
+      // 이미 index.html로 처리하니 여기선 파일 형태만 대상으로 한다.
+      candidates.push(path.join(base, `${relPath}.html`));
     }
   }
 
@@ -69,6 +74,16 @@ function resolveFile(urlPath) {
     }
   }
   return null;
+}
+
+// MPA라 라우트마다 index.html이 물리적으로 따로 존재해서, 파비콘 <link>를 파일마다
+// 심으면 페이지 추가할 때마다 빠뜨리기 쉽다. 서버가 서빙 시점에 한 번만 주입해서
+// 소스에서는 신경 쓸 필요가 없게 한다.
+const FAVICON_TAG = '<link rel="icon" type="image/png" href="/favicon.png" />';
+
+function injectFavicon(html) {
+  if (html.includes(FAVICON_TAG)) return html;
+  return html.replace("</head>", `    ${FAVICON_TAG}\n  </head>`);
 }
 
 function sendFile(req, res, filePath, statusCode = 200) {
@@ -86,6 +101,13 @@ function sendFile(req, res, filePath, statusCode = 200) {
   if (req.headers["if-none-match"] === etag) {
     res.writeHead(304, headers);
     res.end();
+    return;
+  }
+
+  if (ext === ".html") {
+    const html = injectFavicon(fs.readFileSync(filePath, "utf8"));
+    res.writeHead(statusCode, headers);
+    res.end(html);
     return;
   }
 

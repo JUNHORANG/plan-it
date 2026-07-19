@@ -1,5 +1,5 @@
 /*
-  구매 (/user/products/order/?id=)
+  구매 (/user/store/buy?id=)
   참조: Figma "상점 - 구매"(4293:1252 기본) / 주소지 입력 활성화(4295:1489) / 구매 동의 체크(4295:1464)
   — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
 
@@ -43,13 +43,16 @@ import {
   ChevronDown,
   Check,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { requireAuth } from "/shared/js/utils.js";
+
+await requireAuth();
 
 const productId = new URLSearchParams(location.search).get("id");
 
 mountAppBar("#app-bar", {
   title: "결제",
   onBack: () => {
-    location.href = "/user/store/products/";
+    location.href = "/user/store/";
   },
 });
 
@@ -290,7 +293,7 @@ function openConfirmSheet() {
         address: savedAddress,
       });
       if (result.ok) {
-        location.href = `/user/order/success/index.html?orderId=${result.order.id}`;
+        location.href = `/user/store/success?orderId=${result.order.id}`;
       }
       return result;
     },

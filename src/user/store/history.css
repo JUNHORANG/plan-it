@@ -1,5 +1,5 @@
 /*
-  주문 내역 (/user/profile/orders/) 전용 스타일
+  주문 내역 (/user/store/history) 전용 스타일
   참조: Figma "profile/orders"(4376:1786) — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
 */
 
@@ -28,9 +28,7 @@ body {
 }
 
 .orders__points-pill {
-  padding: 2px 10px;
   border-radius: 5px;
-  background: var(--color-surface);
   font-size: 16px;
   font-weight: var(--font-weight-medium);
   color: var(--color-primary);
@@ -38,8 +36,7 @@ body {
 }
 
 .orders__count {
-  margin-top: 24px;
-  margin-bottom: 16px;
+  margin: 30px 0;
   font-size: 18px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-body);

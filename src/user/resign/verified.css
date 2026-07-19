@@ -1,0 +1,28 @@
+/*
+  탈퇴 인증 완료 랜딩 (/user/resign/verified) 전용 스타일 — 전용 Figma 프레임 없음(§9 29번).
+  signup/verified.css와 동일한 "완료" 톤.
+*/
+
+.verified-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.verified-page__title {
+  font-family: var(--font-family-brand);
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-body);
+}
+
+.verified-page__desc {
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-assist);
+}

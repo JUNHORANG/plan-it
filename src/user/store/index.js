@@ -1,7 +1,7 @@
 /*
-  상점 (/user/store/products/)
+  상점 (/user/store/)
   참조: Figma "/store"(4278:843) — 아이콘+"스토어" 타이틀, 나의 포인트(라벨+칩), 단일 열 상품 리스트
-  (썸네일+카테고리/이름/가격) → 행 클릭 시 구매 확인 바텀시트 → /user/products/order/?id=
+  (썸네일+카테고리/이름/가격) → 행 클릭 시 구매 확인 바텀시트 → /user/store/buy?id=
   카테고리는 spec.md의 "씨앗·식물·묘목"이 아니라 Figma 실측값 "나무"/"다육식물"을 그대로 사용
   (blueprint.md §9 참조).
 
@@ -13,9 +13,12 @@ import { mountHeader } from "/shared/components/header.js";
 import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openPurchaseSheet } from "/shared/components/purchase-sheet.js";
-import { getProfile, getProducts } from "/shared/js/api.js";
+import { getProfile, getProducts, hasUnreadNotifications } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
 
-mountHeader("#header");
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");
@@ -103,7 +106,7 @@ function openPurchaseConfirmSheet(product) {
     remaining,
     submitLabel: `${product.price.toLocaleString()} 포인트 사용`,
     onConfirm: () => {
-      location.href = `/user/products/order/index.html?id=${product.id}`;
+      location.href = `/user/store/buy?id=${product.id}`;
     },
   });
 }

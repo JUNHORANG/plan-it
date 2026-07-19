@@ -8,7 +8,11 @@
     <link rel="stylesheet" href="/shared/css/layout.css" />
     <link rel="stylesheet" href="/shared/components/app-bar.css" />
     <link rel="stylesheet" href="/shared/components/cta-button.css" />
-    <link rel="stylesheet" href="/user/order/success/index.css" />
+    <link rel="stylesheet" href="/user/store/success.css" />
+    <!-- index.js가 렌더링을 마친 뒤 동적 import로 불러오는 무거운 confetti 번들을 문서
+         파싱과 동시에 미리 받아두게 하는 힌트 — 실행은 안 하니 렌더링을 막지 않으면서
+         실제 동적 import 시점엔 이미 캐시돼 있어 색종이가 더 빨리 붙는다. -->
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@latest/+esm" />
   </head>
   <body>
     <div id="app-bar"></div>
@@ -16,6 +20,6 @@
     <div id="toast-root"></div>
     <div id="overlay-root"></div>
     <div id="desktop-qr" aria-hidden="true"></div>
-    <script type="module" src="/user/order/success/index.js"></script>
+    <script type="module" src="/user/store/success.js"></script>
   </body>
 </html>

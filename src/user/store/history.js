@@ -1,6 +1,7 @@
 /*
-  주문 내역 (/user/profile/orders/)
-  참조: Figma "profile/orders"(4376:1786) — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회)
+  주문 내역 (/user/store/history)
+  참조: Figma "profile/orders"(4376:1786) — Desktop Bridge 플러그인 경로로 실측(REST API rate limit 우회).
+  프로필 하위였던 경로를 §10 폴더 구조 재정리로 상점 시스템(store/) 아래로 이동.
 
   - 페이지 상단 "헤더" 구성은 실측 프레임에 앱바 톤 중복(레이어 잔재)도 있었지만, blueprint.md
     라우팅 표에 이미 "헤더"로 확정돼 있어 그대로 mountHeader() 사용.
@@ -16,10 +17,13 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openModal } from "/shared/components/modal.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProfile, getOrders, cancelOrder, getProducts } from "/shared/js/api.js";
+import { getProfile, getOrders, cancelOrder, getProducts, hasUnreadNotifications } from "/shared/js/api.js";
+import { requireAuth } from "/shared/js/utils.js";
 import { createElement, Info } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
-mountHeader("#header");
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const app = document.querySelector("#app");

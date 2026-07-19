@@ -69,6 +69,7 @@
   font-size: 17px;
   font-weight: var(--font-weight-regular);
   color: var(--color-assist);
+  cursor: pointer;
 }
 
 .wheel-picker__item.is-selected {

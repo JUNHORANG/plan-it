@@ -6,7 +6,6 @@
   spec.md 기재 순서를 그대로 따름. Figma 프레임엔 "계정 탈퇴" 행이 숨김(visible:false) 처리돼
   있었지만 spec.md엔 명시된 요구사항이라 포함 — blueprint.md §9 참조.
 
-  TODO: requireAuth 가드는 아직 없음 (다른 user/* 페이지와 동일한 상태).
 */
 
 import { mountHeader } from "/shared/components/header.js";
@@ -19,14 +18,18 @@ import {
   closeContentDrawer,
 } from "/shared/components/content-drawer.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProfile, setPlanet, logout } from "/shared/js/api.js";
+import { getProfile, setPlanet, logout, hasUnreadNotifications } from "/shared/js/api.js";
 import { planets } from "/shared/js/data.js";
+import { requireAuth } from "/shared/js/utils.js";
 import {
   createElement,
   ChevronRight,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { marked } from "https://cdn.jsdelivr.net/npm/marked@18.0.6/+esm";
 
-mountHeader("#header");
+await requireAuth();
+
+mountHeader("#header", { hasNotification: await hasUnreadNotifications() });
 mountNavDrawer("#nav-drawer");
 
 const SETTINGS = [
@@ -53,11 +56,11 @@ app.innerHTML = `
         <img class="profile__stat-icon point" src="/images/point_icon.png" alt="" />
         <span class="profile__stat-label" data-points></span>
       </div>
-      <a class="profile__stat" href="/user/store/products/">
+      <a class="profile__stat" href="/user/store/">
         <img class="profile__stat-icon store" src="/images/store_icon.png" alt="" />
         <span class="profile__stat-label">STORE</span>
       </a>
-      <a class="profile__stat" href="/user/profile/orders/">
+      <a class="profile__stat" href="/user/store/history">
         <img class="profile__stat-icon orders" src="/images/truck.png" alt="" />
         <span class="profile__stat-label">주문 내역</span>
       </a>
@@ -68,6 +71,8 @@ app.innerHTML = `
 
 renderSettings();
 loadProfile();
+
+let currentProfile = null;
 
 async function loadProfile() {
   const avatarSkeleton = document.querySelector("[data-avatar-skeleton]");
@@ -86,6 +91,7 @@ async function loadProfile() {
   renderSkeleton(points, { width: 53, height: 17 });
 
   const profile = await getProfile();
+  currentProfile = profile;
 
   clearSkeleton(nickname);
   clearSkeleton(email);
@@ -138,7 +144,7 @@ function handleSettingAction(action) {
   if (action === "planet") return openPlanetDrawer();
   if (action === "terms") return openTermsDrawer();
   if (action === "privacy") return openPrivacyDrawer();
-  if (action === "resign") return void (location.href = "/user/auth/resign/");
+  if (action === "resign") return void (location.href = "/user/resign/");
 }
 
 function openLogoutModal() {
@@ -153,12 +159,14 @@ function openLogoutModal() {
   });
 }
 
+// Figma "프로필 - 행성 변경 - 드로워"(4084:669, 잠금 상태 4084:785, 타블렛 4149:1612) 반영.
+// 12종 행성 그리드 — 컬렉션 조건은 아직 없어서(사용자 요청으로 UI만 먼저 구현) "현재 장착
+// 중인 행성"만 보유로 간주하고 나머지는 전부 잠금(회색 원 + 감은 눈) 상태로 표시한다.
+// 조건이 추가되면 collected 판정만 실제 보유 목록 조회로 바꾸면 되도록 분리해 둠.
 function openPlanetDrawer() {
-  const avatar = document.querySelector("[data-avatar]");
-  const current =
-    planets.find((p) => p.image === avatar.getAttribute("src"))?.id ||
-    planets[0].id;
+  const current = currentProfile?.planet || planets[0].id;
   let selected = current;
+  let cta;
 
   openContentDrawer({
     title: "행성 변경",
@@ -167,76 +175,85 @@ function openPlanetDrawer() {
       const grid = body.querySelector("[data-grid]");
 
       planets.forEach((planet) => {
+        const collected = planet.id === current;
+
         const item = document.createElement("button");
         item.type = "button";
-        item.className =
-          "planet-picker__item" +
-          (planet.id === selected ? " is-selected" : "");
+        item.className = "planet-picker__item" + (collected ? "" : " is-locked");
+        item.disabled = !collected;
         item.innerHTML = `
-          <img class="planet-picker__image" src="${planet.image}" alt="${planet.name}" />
-          <span class="planet-picker__name">${planet.name}</span>
+          <span class="planet-picker__image-wrap">
+            ${
+              collected
+                ? `<img class="planet-picker__image" src="${planet.image}" alt="${planet.name}" />`
+                : `<span class="planet-picker__placeholder" aria-hidden="true">
+                     <span class="planet-picker__eye"></span>
+                     <span class="planet-picker__eye"></span>
+                   </span>`
+            }
+          </span>
+          <span class="planet-picker__name${planet.id === selected ? " is-picked" : ""}">${planet.name}</span>
         `;
-        item.addEventListener("click", () => {
-          selected = planet.id;
-          grid
-            .querySelectorAll(".planet-picker__item")
-            .forEach((el) => el.classList.remove("is-selected"));
-          item.classList.add("is-selected");
-        });
+
+        if (collected) {
+          item.addEventListener("click", () => {
+            selected = planet.id;
+            grid
+              .querySelectorAll(".planet-picker__name")
+              .forEach((el) => el.classList.remove("is-picked"));
+            item.querySelector(".planet-picker__name").classList.add("is-picked");
+            cta.setDisabled(selected === current);
+          });
+        }
+
         grid.appendChild(item);
       });
-
-      const cta = createCtaButton({
+    },
+    renderFooter(footer) {
+      cta = createCtaButton({
         label: "행성 변경",
-        disabled: false,
+        disabled: true, // 기본값 = 현재 장착 행성 그대로라 비활성(Figma 타블렛 "비활성화" 상태 그대로)
         onClick: async () => {
           cta.setLoading(true);
           await setPlanet(selected);
           cta.setLoading(false);
+          currentProfile.planet = selected;
           applyAvatar(selected);
           closeContentDrawer();
           showToast("행성을 변경했습니다.");
         },
       });
       cta.el.classList.add("planet-picker__cta");
-      body.appendChild(cta.el);
+      footer.appendChild(cta.el);
     },
   });
 }
 
 function openTermsDrawer() {
-  openContentDrawer({
-    title: "이용 약관",
-    render(body) {
-      body.innerHTML = `<p class="legal-text">${TERMS_TEXT}</p>`;
-    },
-  });
+  openLegalDrawer("이용 약관", "/legal/terms.md");
 }
 
 function openPrivacyDrawer() {
+  openLegalDrawer("개인 정보 처리 방침", "/legal/privacy.md");
+}
+
+// 실제 약관/개인정보 처리방침 본문(public/legal/*.md)을 그대로 가져와 렌더링한다.
+// 표(개인정보 수집 항목 등)·굵게·목록이 포함돼 있어 순수 텍스트로는 구조를 살릴 수
+// 없어서, marked로 실제 HTML로 변환해 붙인다(blueprint.md §9 13번 — 예전엔 자리표시자
+// 텍스트였다가 실제 문서가 생겨서 교체).
+function openLegalDrawer(title, url) {
   openContentDrawer({
-    title: "개인 정보 처리 방침",
-    render(body) {
-      body.innerHTML = `<p class="legal-text">${PRIVACY_TEXT}</p>`;
+    title,
+    async render(body) {
+      body.innerHTML = `<div class="legal-text"></div>`;
+      const el = body.querySelector(".legal-text");
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${url} ${res.status}`);
+        el.innerHTML = marked.parse(await res.text());
+      } catch {
+        el.textContent = "내용을 불러오지 못했습니다.";
+      }
     },
   });
 }
-
-// 정의서에 실제 약관/방침 문구가 없어 자리표시자로 작성 — 실제 문구 확정 시 교체 필요 (blueprint.md §9 참조)
-const TERMS_TEXT = `제1조(목적)
-이 약관은 Plan It(이하 "서비스")의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조(서비스의 제공)
-서비스는 일정 관리, 포인트 적립, 상점 이용 등의 기능을 제공합니다.
-
-제3조(이용자의 의무)
-이용자는 서비스 이용 시 관계 법령과 이 약관을 준수해야 합니다.`;
-
-const PRIVACY_TEXT = `1. 수집하는 개인정보 항목
-서비스는 이메일, 닉네임을 수집합니다.
-
-2. 개인정보의 수집 및 이용목적
-회원 식별, 서비스 제공 및 부정 이용 방지를 위해 이용합니다.
-
-3. 개인정보의 보유 및 이용기간
-회원 탈퇴 시까지 보관하며, 탈퇴 즉시 파기합니다.`;

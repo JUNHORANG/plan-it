@@ -9,24 +9,32 @@
   추가된 에러 토스트("요청에 실패 했습니다.")도 함께 띄운다 — spec.md의 토스트 요구사항 + Figma
   인라인 문구 둘 다 반영 (blueprint.md §9 참조).
 
-  mockLogin은 하드코딩된 이메일이 아니라 getProfile()로 얻은 실제(localStorage 시드) 이메일과
-  비교한다 — 예전엔 "test@planit.com"을 하드코딩해서 data.js의 실제 유저 이메일과 어긋나 있었다
-  (blueprint.md §9 25번 참조). 비밀번호는 스키마에 필드가 없어 데모용 고정값을 그대로 둔다.
+  Supabase Auth(signInWithPassword)로 실제 계정을 검증한다. 관리자 여부는 하드코딩 자격 증명이
+  아니라 profiles.is_admin 플래그로 판단(api.js의 login() 참조).
 */
 
 import { createInput } from "/shared/components/input.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProfile } from "/shared/js/api.js";
+import { login } from "/shared/js/api.js";
+import { supabase } from "/shared/js/supabase-client.js";
+
+// 이미 로그인된 세션이면 로그인 폼을 다시 보여줄 필요 없이 바로 홈으로 보낸다
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+if (session) {
+  location.href = "/user/plans/";
+}
 
 const app = document.querySelector("#app");
 
 app.innerHTML = `
   <div class="login">
     <div class="login__brand">
-      <img class="login__mascot" src="/images/half_titi.png" alt="Plan It 지구 마스코트" />
-      <div class="login__logo">PLAN <em>!</em>T</div>
-      <p class="login__tagline">지구를 지키는 당신의 계획!</p>
+      <img class="login__mascot no-drag" src="/images/half_titi.png" alt="Plan It 지구 마스코트" />
+      <div class="login__logo no-drag">PLAN <em>!</em>T</div>
+      <p class="login__tagline no-drag">지구를 지키는 당신의 계획!</p>
     </div>
     <form class="login__form" id="login-form"></form>
     <p class="login__footer">
@@ -70,28 +78,38 @@ form.append(emailInput.el, passwordInput.el, submit.el);
 form.addEventListener("submit", (event) => event.preventDefault());
 
 function updateSubmitState() {
-  const filled = emailInput.getValue().trim().length > 0 && passwordInput.getValue().length > 0;
+  const filled =
+    emailInput.getValue().trim().length > 0 &&
+    passwordInput.getValue().length > 0;
   submit.setDisabled(!filled);
-  emailInput.setValid(emailInput.getValue().trim().length > 0);
+}
+
+// Figma(4132:661) "활성화"(포커스 중)와 "블러(text 있음)" 상태 구분: 포커스 중엔 항상
+// 활성화(초록 테두리)로 보이고, 포커스를 벗어나 값이 남아 있을 때만 블러 스타일(연두 배경)로
+// 바뀐다. 예전엔 onInput마다 setValid를 호출해서 타이핑 중에도 블러 스타일이 덮어씌워졌었다.
+// 비밀번호 입력창도 동일한 상태 전환이 있어야 하는데 이 배선이 아예 빠져 있어서 blur 후에도
+// 계속 기본(무클래스) 상태 — 옅은 회색 테두리라 비활성화처럼 보였다.
+for (const input of [emailInput, passwordInput]) {
+  input.control.addEventListener("focus", () => input.setValid(false));
+  input.control.addEventListener("blur", () => {
+    input.setValid(input.getValue().trim().length > 0);
+  });
 }
 
 async function handleLogin() {
   submit.setLoading(true);
-  const result = await mockLogin(emailInput.getValue(), passwordInput.getValue());
+  const result = await login(emailInput.getValue(), passwordInput.getValue());
   submit.setLoading(false);
 
   if (result.ok) {
-    location.href = "/user/plans/";
+    location.href = result.isAdmin ? "/admin/orders/" : "/user/plans/";
     return;
   }
 
   emailInput.setError();
-  passwordInput.setError("아이디 또는 비밀번호가 맞지 않습니다! 다시 한번 확인해 주세요.");
+  passwordInput.setError(
+    "아이디 또는 비밀번호가 맞지 않습니다! 다시 한번 확인해 주세요.",
+  );
   submit.setDisabled(true); // Figma(4434:1479): 실패 직후 CTA는 다시 비활성 상태 — 값을 고쳐야 재시도 가능
   showToast("이메일 혹은 비밀번호를 확인해 주세요.", "error");
-}
-
-async function mockLogin(email, password) {
-  const profile = await getProfile(); // getProfile 자체에 지연이 있어 별도 delay 불필요
-  return { ok: email === profile.email && password === "test1234" };
 }
