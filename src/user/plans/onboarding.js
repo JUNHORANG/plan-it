@@ -10,7 +10,11 @@
   모바일("다 모았다면")과 달라 모바일 문구로 통일, 모바일 step2의 건너뛰기 버튼만 강조색(orange)으로
   튀는 것도 나머지 5개 측정값(assist)과 통일.
 */
-import { createElement, ChevronLeft, ChevronRight } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import {
+  createElement,
+  ChevronLeft,
+  ChevronRight,
+} from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { lockScroll, unlockScroll, storage } from "/shared/js/utils.js";
 
@@ -81,7 +85,9 @@ function openOnboarding() {
         <p class="onboarding__headline">${STEPS[step].headline}</p>
         <div class="onboarding__stage">
           <button class="onboarding__nav" type="button" aria-label="이전" data-prev${isFirst ? " disabled" : ""}></button>
-          <img class="onboarding__image onboarding__image--step${step + 1}" src="${STEPS[step].image}" alt="" />
+          <div class="imgContainer">
+            <img class="onboarding__image" src="${STEPS[step].image}" alt="" />
+          </div>
           <button class="onboarding__nav" type="button" aria-label="다음" data-next${isLast ? " disabled" : ""}></button>
         </div>
         <div class="onboarding__cta-slot"></div>
@@ -92,12 +98,20 @@ function openOnboarding() {
     // 렌더링한다(다른 화면에서도 발견된 같은 문제, 예: user/store/buy.js 주석 참조) —
     // {width, height}를 직접 지정해야 실제로 반영된다. size:40으로 지정했었지만 실제로는 계속
     // 24px로 나오고 있었던 게 "화살표가 너무 작다" 문제의 원인.
-    el.querySelector("[data-prev]").appendChild(createElement(ChevronLeft, { width: 44, height: 44 }));
-    el.querySelector("[data-next]").appendChild(createElement(ChevronRight, { width: 44, height: 44 }));
+    el.querySelector("[data-prev]").appendChild(
+      createElement(ChevronLeft, { width: 44, height: 44 }),
+    );
+    el.querySelector("[data-next]").appendChild(
+      createElement(ChevronRight, { width: 44, height: 44 }),
+    );
 
     el.querySelector("[data-skip]").addEventListener("click", close);
-    el.querySelector("[data-prev]").addEventListener("click", () => goTo(step - 1));
-    el.querySelector("[data-next]").addEventListener("click", () => goTo(step + 1));
+    el.querySelector("[data-prev]").addEventListener("click", () =>
+      goTo(step - 1),
+    );
+    el.querySelector("[data-next]").addEventListener("click", () =>
+      goTo(step + 1),
+    );
 
     if (isLast) {
       const cta = createCtaButton({
