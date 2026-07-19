@@ -18,15 +18,15 @@ const STORAGE_KEY = "planit.onboarded";
 
 const STEPS = [
   {
-    image: "/images/Onboarding_step1.png",
+    image: "/images/Onboarding_step1.svg",
     headline: `일정을 채우고 완료하면서,<br />매일 건강한 <span class="onboarding__accent">루틴</span>을 지속해 보세요!`,
   },
   {
-    image: "/images/Onboarding_step2.png",
+    image: "/images/Onboarding_step2.svg",
     headline: `모든 일정을 무사히 완료하면<br /><span class="onboarding__accent">포인트</span>를 지급해 드려요!`,
   },
   {
-    image: "/images/Onboarding_step3.png",
+    image: "/images/Onboarding_step3.svg",
     headline: `<span class="onboarding__accent">포인트</span>를 다 모았다면<br />상점에서 <span class="onboarding__accent">식물</span>을 구매할 수 있어요!`,
   },
 ];
@@ -81,7 +81,7 @@ function openOnboarding() {
         <p class="onboarding__headline">${STEPS[step].headline}</p>
         <div class="onboarding__stage">
           <button class="onboarding__nav" type="button" aria-label="이전" data-prev${isFirst ? " disabled" : ""}></button>
-          <img class="onboarding__image${isLast ? " onboarding__image--step3" : ""}" src="${STEPS[step].image}" alt="" />
+          <img class="onboarding__image onboarding__image--step${step + 1}" src="${STEPS[step].image}" alt="" />
           <button class="onboarding__nav" type="button" aria-label="다음" data-next${isLast ? " disabled" : ""}></button>
         </div>
         <div class="onboarding__cta-slot"></div>
