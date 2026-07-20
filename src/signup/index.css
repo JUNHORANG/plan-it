@@ -68,16 +68,46 @@
   }
 }
 
-/* 완료 화면 (4008:340) */
+/* 완료 화면 (4008:340 실측) — 순서가 이미지 → 제목 → 설명이다(다른 완료 화면과 반대,
+   plan-success/order-success는 제목이 먼저). 이미지는 고정 px가 아니라 #app 패딩을 뺀
+   콘텐츠 폭 그대로(343/375 프레임 실측 = 좌우 16px 마진과 정확히 일치) — width:100%. */
 .signup-complete {
+  position: relative;
+  /* z-index:0으로 이 요소를 독립된 stacking context의 기준점으로 만든다 — 안 그러면
+     아래 confetti canvas(z-index:-1)가 .signup-complete 바깥까지 밀려날 수 있다.
+     (user/store/success.css .order-success와 동일 패턴) */
+  z-index: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 60px 0 140px;
+  /* 137px: 앱바 바로 아래부터 이미지 상단까지 실측값. 140px: 하단 CTA(고정)와 겹치지
+     않도록 다른 화면과 동일한 여유값 확보(Figma 원본은 이 여백이 비어 있어 값 없음). */
+  padding: 137px 0 140px;
+}
+
+.signup-complete__confetti {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 타블렛 실측(4683:1075, 600 프레임): 콘텐츠 폭(552)이 넓어져도 이미지가 같이 안 늘어나고
+   모바일과 같은 343px에서 멈춰 가운데 정렬된다 — width:100%만으로는 타블렛에서 552까지
+   늘어나버려 max-width로 캡을 건다. */
+.signup-complete__illustration {
+  width: 100%;
+  max-width: 343px;
+  height: auto;
+  object-fit: contain;
+  animation: signup-complete-in 0.5s ease;
 }
 
 .signup-complete__title {
+  margin-top: 20px;
   font-family: var(--font-family-brand);
   font-size: 36px;
   font-weight: var(--font-weight-bold);
@@ -91,14 +121,6 @@
   color: var(--color-primary);
 }
 
-.signup-complete__illustration {
-  position: relative;
-  width: 160px;
-  height: 160px;
-  margin-top: 48px;
-  animation: signup-complete-in 0.5s ease;
-}
-
 @keyframes signup-complete-in {
   from {
     opacity: 0;
@@ -108,27 +130,4 @@
     opacity: 1;
     transform: scale(1) translateY(0);
   }
-}
-
-.signup-complete__globe {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.signup-complete__sparkle {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-
-.signup-complete__sparkle--tl {
-  top: -6px;
-  left: -18px;
-}
-
-.signup-complete__sparkle--br {
-  bottom: 10px;
-  right: -18px;
 }

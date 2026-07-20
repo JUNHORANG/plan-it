@@ -30,7 +30,7 @@ export function closeContentDrawer() {
   setTimeout(() => el.remove(), 380);
 }
 
-export function openContentDrawer({ title = "", render, renderFooter } = {}) {
+export function openContentDrawer({ title = "", render, renderFooter, hideScrollbar = false } = {}) {
   closeContentDrawer();
 
   const root = document.querySelector("#overlay-root");
@@ -54,6 +54,8 @@ export function openContentDrawer({ title = "", render, renderFooter } = {}) {
 
   const body = el.querySelector(".content-drawer__body");
   const scrollHint = el.querySelector(".content-drawer__scroll-hint");
+
+  if (hideScrollbar) body.classList.add("content-drawer__body--no-scrollbar");
 
   // 약관/개인정보처리방침처럼 내용이 길어 스크롤이 필요한 드로워는 실제로 overflow-y:auto로
   // 스크롤이 되는데도, OS/브라우저의 오버레이 스크롤바(맥 오토하이드 등)가 평소엔 안 보여서

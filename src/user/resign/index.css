@@ -1,30 +1,49 @@
 /*
   계정 탈퇴 (/user/resign/) 전용 스타일
-  전용 Figma(4589:1159) 미확인(API rate limit) — signup 이메일 인증 스텝(signup/index.css)의
-  타이머 레이아웃 패턴을 그대로 재사용. blueprint.md §9 29번 참조.
+  Figma 계정 탈퇴(4589:1159, 확인 모달 4646:1134) 실측 반영 — signup 이메일 인증 스텝
+  (signup/index.css)의 타이머 레이아웃 패턴은 그대로 재사용. blueprint.md §9 29번 참조.
 */
 
 .resign {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--header-height));
-  padding: 24px 0 120px;
-}
-
-.resign__title {
-  font-size: var(--font-size-header-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-header);
+  min-height: calc(100vh - var(--app-bar-height));
+  /* 실측: 앱바(60) 바로 아래 안내문구까지 8px */
+  padding: 8px 0 120px;
 }
 
 .resign__desc {
-  margin-top: 8px;
   font-size: var(--font-size-body);
   color: var(--color-assist);
 }
 
 .resign__field {
+  position: relative;
   margin-top: 30px;
+}
+
+/* 실측(4589:1159): 이메일 필드가 비활성화 상태라도 회색으로 죽지 않고 기본 입력창과
+   같은 배경(--color-input-bg)을 유지한다 — 계정 정보를 "못 쓰는" 게 아니라 "이미 정해진
+   값이라 못 바꾸는" 것이라 시각적으로 구분한다. */
+.resign__field .input-field__control:disabled {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  cursor: default;
+}
+
+/* 인증 메일 발송 직후 표시되는 체크 아이콘(signup-field__check와 동일한 위치 공식이지만
+   라벨이 없는 필드라 top:2px — shared/components/input.css의 .input-field__toggle과 동일). */
+.resign__email-check {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  pointer-events: none;
 }
 
 /* signup__timer(signup/index.css)와 동일한 이유: 뷰포트 높이와 무관하게 항상 CTA
@@ -59,8 +78,10 @@
 }
 
 @media (min-width: 600px) {
-  /* --header-height는 모바일·타블렛 공통값이라 .resign의 min-height는 그대로 두고
-     CTA 폭/위치만 데스크탑 카드(552px) 기준으로 바꾼다. */
+  .resign {
+    min-height: calc(100vh - var(--app-bar-height-tablet));
+  }
+
   .resign__cta {
     left: 50%;
     right: auto;
