@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="/shared/components/toast.css" />
     <link rel="stylesheet" href="/signup/signup-input.css" />
     <link rel="stylesheet" href="/signup/index.css" />
+    <!-- 완료 화면에서 동적 import로 불러오는 confetti 번들을 미리 받아두는 힌트
+         (user/store/success.html과 동일 패턴) — 실행은 안 하니 렌더링을 막지 않는다. -->
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@latest/+esm" />
   </head>
   <body>
     <div id="app-bar"></div>

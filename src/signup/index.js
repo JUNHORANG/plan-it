@@ -325,13 +325,10 @@ function renderComplete() {
 
   app.innerHTML = `
     <div class="signup-complete">
+      <canvas class="signup-complete__confetti" aria-hidden="true"></canvas>
+      <img class="signup-complete__illustration" src="/images/welcome.png" alt="환영 일러스트" />
       <h1 class="signup-complete__title">환영해요!</h1>
       <p class="signup-complete__desc">회원 가입이 완료 됐어요! 환영해요!</p>
-      <div class="signup-complete__illustration">
-        <img class="signup-complete__sparkle signup-complete__sparkle--tl" src="/images/shining.png" alt="" />
-        <img class="signup-complete__globe" src="/images/front_titi.png" alt="환영 일러스트" />
-        <img class="signup-complete__sparkle signup-complete__sparkle--br" src="/images/shining.png" alt="" />
-      </div>
     </div>
   `;
 
@@ -345,4 +342,18 @@ function renderComplete() {
   });
   cta.el.classList.add("signup__cta");
   document.querySelector(".signup-complete").after(cta.el);
+
+  // user/store/success.js와 동일 패턴: 렌더링이 끝난 뒤 동적 import로 불러와 화면은
+  // 즉시 뜨고 색종이만 한 박자 늦게 붙게 한다.
+  import("https://cdn.jsdelivr.net/npm/@tsparticles/confetti@latest/+esm").then(async ({ confetti }) => {
+    const confettiCanvas = document.querySelector(".signup-complete__confetti");
+    // confetti.create()는 캔버스에 묶인 함수를 담은 Promise를 반환한다 — await로 풀어서
+    // 호출해야 실제로 색종이가 나온다(동기로 쓰면 "not a function" 에러).
+    const fireConfetti = await confetti.create(confettiCanvas, { resize: true, useWorker: true });
+    fireConfetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { x: 0.5, y: 0.4 },
+    });
+  });
 }
