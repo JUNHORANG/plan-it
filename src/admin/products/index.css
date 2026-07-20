@@ -210,12 +210,14 @@
   color: var(--color-body);
 }
 
-.product-form__category-option:not(:last-child) {
-  border-bottom: 1px solid #dadada; /* Figma 4616:1064 옵션 행 구분선 실측 */
-}
+/* .product-form__category-option:not(:last-child) {
+  border-bottom: 1px solid #dadada; 
+} */
 
 .product-form__category-option:hover {
   background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .product-form__cta {

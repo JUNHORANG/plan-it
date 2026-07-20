@@ -18,9 +18,18 @@
 import { mountAdminHeader } from "/shared/components/admin-header.js";
 import { createCtaButton } from "/shared/components/cta-button.js";
 import { showToast } from "/shared/components/toast.js";
-import { getProducts, addProduct, updateProduct, deleteProduct } from "/shared/js/api.js";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "/shared/js/api.js";
 import { requireAdmin } from "/shared/js/utils.js";
-import { createElement, ImageUp, ChevronDown } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import {
+  createElement,
+  ImageUp,
+  ChevronDown,
+} from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
 await requireAdmin();
 
@@ -33,9 +42,11 @@ const CATEGORY_PLACEHOLDER = "카테고리를 선택해 주세요.";
 // DOM에 달린 리스너가 계속 쌓인다 — document 클릭 리스너는 한 번만 붙이고, 그 시점에
 // 열려 있는 드롭다운을 찾아서 닫는 식으로 처리한다.
 document.addEventListener("click", (event) => {
-  document.querySelectorAll(".product-form__category.is-open").forEach((wrap) => {
-    if (!wrap.contains(event.target)) closeCategoryDropdown(wrap);
-  });
+  document
+    .querySelectorAll(".product-form__category.is-open")
+    .forEach((wrap) => {
+      if (!wrap.contains(event.target)) closeCategoryDropdown(wrap);
+    });
 });
 
 const app = document.querySelector("#app");
@@ -62,7 +73,8 @@ async function loadProducts() {
 }
 
 function renderList(items) {
-  document.querySelector("[data-product-count]").textContent = `${items.length}개`;
+  document.querySelector("[data-product-count]").textContent =
+    `${items.length}개`;
 
   const list = document.querySelector("[data-product-list]");
   list.innerHTML = "";
@@ -82,8 +94,12 @@ function renderList(items) {
         <button class="product-row__action" type="button" data-delete>삭제</button>
       </div>
     `;
-    row.querySelector("[data-edit]").addEventListener("click", () => startEdit(product));
-    row.querySelector("[data-delete]").addEventListener("click", () => removeProduct(product.id));
+    row
+      .querySelector("[data-edit]")
+      .addEventListener("click", () => startEdit(product));
+    row
+      .querySelector("[data-delete]")
+      .addEventListener("click", () => removeProduct(product.id));
     list.appendChild(row);
   });
 }
@@ -117,7 +133,7 @@ function renderForm(values = {}) {
     <input class="product-form__input" type="text" placeholder="제품명을 작성해 주세요." data-field="name" value="${values.name ?? ""}" />
 
     <p class="product-form__label">제품 가격</p>
-    <input class="product-form__input" type="number" min="0" placeholder="제품 가격을 작성해 주세요." data-field="price" value="${values.price ?? ""}" />
+    <input class="product-form__input" placeholder="제품 가격을 작성해 주세요." data-field="price" value="${values.price ?? ""}" />
 
     <p class="product-form__label">제품 카테고리</p>
     <div class="product-form__category" data-category>
@@ -133,7 +149,8 @@ function renderForm(values = {}) {
       </button>
       <div class="product-form__category-list" data-category-list role="listbox">
         ${CATEGORIES.map(
-          (c) => `<button type="button" class="product-form__category-option" role="option" data-value="${c}">${c}</button>`,
+          (c) =>
+            `<button type="button" class="product-form__category-option" role="option" data-value="${c}">${c}</button>`,
         ).join("")}
       </div>
       <input type="hidden" data-field="category" value="${values.category ?? ""}" />
@@ -142,7 +159,9 @@ function renderForm(values = {}) {
     <div class="product-form__cta" data-cta-slot></div>
   `;
 
-  formEl.querySelector("[data-category-chevron]").appendChild(createElement(ChevronDown, { size: 18 }));
+  formEl
+    .querySelector("[data-category-chevron]")
+    .appendChild(createElement(ChevronDown, { size: 18 }));
   setupCategoryDropdown(formEl, values.category ?? "");
 
   renderPhotoArea(values.image ?? null);
@@ -155,8 +174,12 @@ function renderForm(values = {}) {
   formEl.querySelector("[data-cta-slot]").appendChild(cta.el);
 
   ["name", "price", "category"].forEach((field) => {
-    formEl.querySelector(`[data-field="${field}"]`).addEventListener("input", refreshDisabled);
-    formEl.querySelector(`[data-field="${field}"]`).addEventListener("change", refreshDisabled);
+    formEl
+      .querySelector(`[data-field="${field}"]`)
+      .addEventListener("input", refreshDisabled);
+    formEl
+      .querySelector(`[data-field="${field}"]`)
+      .addEventListener("change", refreshDisabled);
   });
   refreshDisabled();
 }
@@ -178,7 +201,9 @@ function setupCategoryDropdown(formEl, initialCategory) {
   }
 
   trigger.addEventListener("click", () => {
-    wrap.classList.contains("is-open") ? closeCategoryDropdown(wrap) : openCategoryDropdown(wrap);
+    wrap.classList.contains("is-open")
+      ? closeCategoryDropdown(wrap)
+      : openCategoryDropdown(wrap);
   });
 
   listEl.querySelectorAll("[data-value]").forEach((opt) => {
@@ -195,13 +220,17 @@ function setupCategoryDropdown(formEl, initialCategory) {
 function openCategoryDropdown(wrap) {
   const listEl = wrap.querySelector("[data-category-list]");
   wrap.classList.add("is-open");
-  wrap.querySelector("[data-category-trigger]").setAttribute("aria-expanded", "true");
+  wrap
+    .querySelector("[data-category-trigger]")
+    .setAttribute("aria-expanded", "true");
   listEl.style.maxHeight = `${listEl.scrollHeight}px`;
 }
 
 function closeCategoryDropdown(wrap) {
   wrap.classList.remove("is-open");
-  wrap.querySelector("[data-category-trigger]").setAttribute("aria-expanded", "false");
+  wrap
+    .querySelector("[data-category-trigger]")
+    .setAttribute("aria-expanded", "false");
   wrap.querySelector("[data-category-list]").style.maxHeight = "";
 }
 
@@ -224,19 +253,23 @@ function renderPhotoArea(image) {
       </label>
     `;
 
-  area.querySelector("[data-photo-icon]").appendChild(createElement(ImageUp, { size: 24 }));
+  area
+    .querySelector("[data-photo-icon]")
+    .appendChild(createElement(ImageUp, { size: 24 }));
 
-  area.querySelector("[data-photo-input]").addEventListener("change", (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      currentImage = reader.result;
-      renderPhotoArea(currentImage);
-      refreshDisabled();
-    };
-    reader.readAsDataURL(file);
-  });
+  area
+    .querySelector("[data-photo-input]")
+    .addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentImage = reader.result;
+        renderPhotoArea(currentImage);
+        refreshDisabled();
+      };
+      reader.readAsDataURL(file);
+    });
 }
 
 function refreshDisabled() {

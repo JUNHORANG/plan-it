@@ -107,6 +107,13 @@
   color: var(--color-primary);
 }
 
+/* Figma(4007:333) 실측: 활성 항목 옆 유저 행성 아이콘, 22x22 */
+.nav-drawer__menu-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
 /* 타블렛(참조 프레임 실측 600px 기준, breakpoint 확인 필요 — CLAUDE.md 참조) */
 @media (min-width: 600px) {
   .nav-drawer__header {
