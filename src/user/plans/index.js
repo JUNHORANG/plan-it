@@ -43,7 +43,7 @@ app.innerHTML = `
       <p class="home__plans-title">오늘의 일정 <span class="home__plans-count" data-home-count>0개</span></p>
       <button class="home__add-btn" type="button" aria-label="일정 추가" data-home-add></button>
     </div>
-    <div data-home-body></div>
+    <div class="home__body" data-home-body></div>
   </div>
 `;
 
@@ -123,7 +123,7 @@ function renderList(plans) {
   if (plans.length === 0) {
     bodyEl.innerHTML = `
       <div class="home__empty">
-        <img class="home__empty-image" src="/images/empty_list.png" alt="일정 없음" />
+        <div class="home__empty-image" aria-hidden="true"></div>
       </div>
     `;
     return;

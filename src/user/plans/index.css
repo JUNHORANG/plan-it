@@ -4,6 +4,12 @@
         일정-리스트 완료(4006:786) / 일정-스켈레톤(4095:444)
 */
 
+.home {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height));
+}
+
 .home__meta {
   padding: 20px 0 0;
 }
@@ -69,6 +75,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 40px 0 12px;
+}
+
+.home__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .home__plans-title {
@@ -174,17 +186,24 @@
   color: var(--color-assist);
 }
 
+/* Figma(4066:724) 실측: 빈 상태 일러스트가 "오늘의 일정" 헤더 아래 남는 공간 전체를
+   기준으로 세로 가운데 정렬된 뒤 거기서 20px 위로 올라가 있다 — 그래서 .home__body를
+   flex:1로 남는 공간을 다 채우게 하고, 여기서 다시 세로/가로 중앙 정렬한다. */
 .home__empty {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 60px;
+  justify-content: center;
 }
 
 .home__empty-image {
   width: 196px;
   height: 184px;
-  object-fit: contain;
+  /* margin-top 음수는 flex 중앙정렬 계산에 다시 흡수돼 절반만 밀린다(margin-box가
+     줄어든 채로 재중앙정렬됨) — transform은 레이아웃 계산 이후에 적용돼 20px 그대로 밀린다. */
+  transform: translateY(-20px);
+  background: url("/images/empty_list.png") center / contain no-repeat;
 }
 
 /* 일정 전체 완료 시 나타나는 CTA(4006:786) — 리스트에 이어 붙는 게 아니라 화면 하단에

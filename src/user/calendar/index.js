@@ -154,6 +154,7 @@ function renderSheetSkeleton() {
   renderSkeleton(countSkeleton, { width: 27, height: 21 });
 
   bodyEl.innerHTML = "";
+  bodyEl.classList.remove("calendar-sheet__body--empty");
   const itemSkeleton = document.createElement("div");
   bodyEl.appendChild(itemSkeleton);
   renderSkeleton(itemSkeleton, { width: "100%", height: 60 });
@@ -168,15 +169,9 @@ function renderSheet(plans) {
     `<span class="calendar-sheet__count">${plans.length}개</span>`;
 
   bodyEl.innerHTML = "";
+  bodyEl.classList.toggle("calendar-sheet__body--empty", plans.length === 0);
 
-  if (plans.length === 0) {
-    bodyEl.innerHTML = `
-      <div class="calendar-sheet__empty">
-        <img class="calendar-sheet__empty-image" src="/images/empty_list.png" alt="일정 없음" />
-      </div>
-    `;
-    return;
-  }
+  if (plans.length === 0) return;
 
   const list = document.createElement("div");
   list.className = "calendar-sheet__list";

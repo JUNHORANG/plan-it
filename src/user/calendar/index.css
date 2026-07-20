@@ -265,17 +265,16 @@ body {
   color: var(--color-body);
 }
 
-.calendar-sheet__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 24px;
-}
-
-.calendar-sheet__empty-image {
-  width: 190px;
-  height: 179px;
-  object-fit: contain;
+/* Figma(4107:736 "캘린더 - 기본", 0개 상태) 실측: 일러스트가 시트 바디의 남는 세로 공간
+   중앙보다 10px 위에 있다 — home__empty(20px)와 값은 다르지만 동일한 패턴.
+   처음엔 flex 자식 div(.calendar-sheet__empty)로 넣었는데, 핸들로 시트를 낮게 줄이면
+   .calendar-sheet__body의 overflow-y:auto 때문에 이 flex 항목이(기본 min-height:auto라
+   190x179 이미지 높이 밑으로 안 줄어듦) 콘텐츠처럼 스크롤돼 버렸다 — 일러스트는 데이터가
+   아니라 "비어 있음"을 나타내는 배경일 뿐이라 아예 .calendar-sheet__body 자신의
+   background-image로 옮겨서 스크롤 대상 콘텐츠 자체가 없게 한다(JS가 빈 상태일 때
+   `calendar-sheet__body--empty` 클래스만 토글, DOM에 별도 엘리먼트 없음). */
+.calendar-sheet__body--empty {
+  background: url("/images/empty_list.png") center calc(50% - 10px) / 190px 179px no-repeat;
 }
 
 @media (min-width: 601px) {
