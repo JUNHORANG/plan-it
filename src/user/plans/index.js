@@ -118,6 +118,7 @@ function renderNextTitle(plans) {
 function renderList(plans) {
   const bodyEl = document.querySelector("[data-home-body]");
   bodyEl.innerHTML = "";
+  const isToday = toISODate(selectedDate) === toISODate(new Date());
 
   if (plans.length === 0) {
     bodyEl.innerHTML = `
@@ -135,7 +136,7 @@ function renderList(plans) {
     const item = document.createElement("div");
     item.className = "home__item" + (plan.done ? " is-done" : "");
     item.innerHTML = `
-      <button class="home__item-checkbox" type="button" aria-label="완료 체크" data-checkbox></button>
+      <button class="home__item-checkbox" type="button" aria-label="${isToday ? "완료 체크" : "오늘 일정만 체크할 수 있습니다"}"${isToday ? "" : " disabled"} data-checkbox></button>
       <span class="home__item-time">${plan.time}</span>
       <span class="home__item-title-wrap">
         <span class="home__item-title">${plan.title}</span>
@@ -146,14 +147,18 @@ function renderList(plans) {
     item.querySelector("[data-checkbox]").appendChild(createElement(Check, { size: 16 }));
     item.querySelector("[data-more]").appendChild(createElement(EllipsisVertical, { size: 18 }));
 
-    item.querySelector("[data-checkbox]").addEventListener("click", () => {
-      // 체크할 때마다 서버 재조회 + 스켈레톤을 띄우면 매번 화면이 깜빡여 UX가 나쁘므로,
-      // 로컬 상태를 낙관적으로 바로 반영해 리스트만 다시 그리고 저장 요청은 백그라운드로 보낸다.
-      plan.done = !plan.done;
-      renderNextTitle(plans);
-      renderList(plans);
-      setPlanDone(plan.id, plan.done);
-    });
+    // 오늘 날짜가 아닌 일정은 완료 체크를 비활성화한다 — 지난/다음 날짜 일정을 홈에서
+    // 미리 체크해 완료 처리해버리는 걸 막기 위함(사용자 요청).
+    if (isToday) {
+      item.querySelector("[data-checkbox]").addEventListener("click", () => {
+        // 체크할 때마다 서버 재조회 + 스켈레톤을 띄우면 매번 화면이 깜빡여 UX가 나쁘므로,
+        // 로컬 상태를 낙관적으로 바로 반영해 리스트만 다시 그리고 저장 요청은 백그라운드로 보낸다.
+        plan.done = !plan.done;
+        renderNextTitle(plans);
+        renderList(plans);
+        setPlanDone(plan.id, plan.done);
+      });
+    }
 
     item.querySelector("[data-more]").addEventListener("click", () => {
       openMoreSheet(plan);
@@ -164,7 +169,7 @@ function renderList(plans) {
 
   bodyEl.appendChild(list);
 
-  if (plans.every((p) => p.done)) {
+  if (isToday && plans.every((p) => p.done)) {
     list.classList.add("home__list--complete");
 
     const points = plans.length * 10;

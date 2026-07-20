@@ -113,6 +113,12 @@
   color: var(--color-primary);
 }
 
+/* 오늘이 아닌 날짜의 일정은 체크 자체를 막는다(index.js data-checkbox disabled) */
+.home__item-checkbox:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .home__item-time {
   width: 46px;
   flex-shrink: 0;

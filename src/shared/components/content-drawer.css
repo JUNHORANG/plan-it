@@ -99,6 +99,18 @@
   border-radius: 3px;
 }
 
+/* 약관/개인정보처리방침 드로워는 위 스크롤바 힌트를 오히려 원치 않는다는 피드백 —
+   openContentDrawer({ hideScrollbar: true })가 붙이는 클래스. 스크롤 가능 여부는
+   아래 .content-drawer__scroll-hint(그림자)로만 안내한다. */
+.content-drawer__body--no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content-drawer__body--no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* 오버레이 스크롤바를 쓰는 브라우저/OS(예: 맥 오토하이드)에서는 위 ::-webkit-scrollbar
    커스터마이징도 평소엔 안 보인다(overflow:auto 컨테이너가 스크롤바 몫의 레이아웃 공간을
    아예 확보하지 않기 때문 — CSS로 강제할 방법이 없음) — 그래서 이 그림자를 스크롤 가능

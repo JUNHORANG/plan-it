@@ -244,6 +244,7 @@ function openPrivacyDrawer() {
 function openLegalDrawer(title, url) {
   openContentDrawer({
     title,
+    hideScrollbar: true,
     async render(body) {
       body.innerHTML = `<div class="legal-text"></div>`;
       const el = body.querySelector(".legal-text");
