@@ -6,6 +6,11 @@
   - 로고 클릭 → /user/plans 이동
   - X 아이콘 클릭 / 외부(backdrop) 클릭 → 드로워 닫기
   - 메뉴 항목 클릭 → 각 도메인 이동 (홈/캘린더/스토어/랭킹/프로필/알림)
+  - 현재 활성 메뉴(현재 페이지) 라벨 옆에 유저가 선택한 행성 아이콘(22x22)이 붙는다
+    (Figma 실측: 활성 항목 "홈" 텍스트 바로 뒤 6px — `.nav-drawer__menu-link`의 기존
+    `gap:6px`가 원래 이 아이콘을 위해 준비돼 있었는데 마크업에 실제로 안 넣어져 있었음).
+    profile/index.js의 applyAvatar()와 동일하게 planets에서 profile.planet id로 찾고
+    없으면 planets[0](지구) 기본값.
 
   아이콘: lucide-icons 사용 (프로젝트 공통 규약, CLAUDE.md 참조)
   TODO: shared/js/utils.js의 navigate() 헬퍼가 만들어지면 location.href 직접 대입을 교체할 것.
@@ -15,6 +20,8 @@ import {
   createElement,
   X,
 } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
+import { getProfile } from "/shared/js/api.js";
+import { planets } from "/shared/js/data.js";
 
 const MENU_ITEMS = [
   { label: "홈", path: "/user/plans/" },
@@ -60,6 +67,20 @@ function render() {
   `;
 }
 
+async function applyActivePlanetIcon(root) {
+  const activeLink = root.querySelector(".nav-drawer__menu-link.is-active");
+  if (!activeLink) return;
+
+  const profile = await getProfile();
+  const planet = planets.find((p) => p.id === profile?.planet) || planets[0];
+
+  const icon = document.createElement("img");
+  icon.className = "nav-drawer__menu-icon";
+  icon.src = planet.image;
+  icon.alt = "";
+  activeLink.appendChild(icon);
+}
+
 export function mountNavDrawer(selector) {
   const root = document.querySelector(selector);
   if (!root) return null;
@@ -69,6 +90,7 @@ export function mountNavDrawer(selector) {
   root
     .querySelector(".nav-drawer__close")
     .appendChild(createElement(X, { size: 24 }));
+  applyActivePlanetIcon(root);
 
   const open = () => root.classList.add("is-open");
   const close = () => root.classList.remove("is-open");
