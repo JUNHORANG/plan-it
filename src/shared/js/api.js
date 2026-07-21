@@ -80,6 +80,7 @@ function mapProfile(row) {
     points: row.points,
     planet: row.planet_id,
     isAdmin: row.is_admin,
+    pointsAwardedDate: row.points_awarded_date,
   };
 }
 
@@ -91,7 +92,7 @@ export async function getProfile() {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("nickname, email, points, planet_id, is_admin")
+    .select("nickname, email, points, planet_id, is_admin, points_awarded_date")
     .eq("id", user.id)
     .single();
   if (error) return null;
@@ -116,6 +117,9 @@ export async function setPlanet(id) {
 // award_points RPC(DB에서 원자적으로 points += delta)로 실제 profiles.points에 반영한다.
 // 예전엔 success.html에 애니메이션으로 숫자만 보여주고 실제 잔액엔 반영되지 않던 드리프트
 // 버그가 있었다(blueprint.md §9 25번 참조).
+// RPC는 profiles.points_awarded_date로 하루 한 번만 지급되도록 서버에서도 막는다 —
+// 홈(user/plans/index.js)이 이미 오늘 지급받았으면 CTA 자체를 안 띄우지만, 뒤로가기 등으로
+// 그 가드를 우회해 다시 호출해도 여기서 한 번 더 막는다(같은 날짜면 delta를 더하지 않음).
 export async function awardPoints(points) {
   const { data, error } = await supabase.rpc("award_points", { delta: points });
   if (error) return null;

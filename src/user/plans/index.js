@@ -19,7 +19,7 @@ import { mountNavDrawer } from "/shared/components/nav-drawer.js";
 import { renderSkeleton, clearSkeleton } from "/shared/components/skeleton.js";
 import { openListBottomSheet } from "/shared/components/bottom-sheet.js";
 import { maybeShowOnboarding } from "/user/plans/onboarding.js";
-import { getPlansByDate, setPlanDone, pinPlan, deletePlan, awardPoints, hasUnreadNotifications } from "/shared/js/api.js";
+import { getPlansByDate, setPlanDone, pinPlan, deletePlan, awardPoints, getProfile, hasUnreadNotifications } from "/shared/js/api.js";
 import { getWeekDates, formatFullDateLabel, toISODate, requireAuth } from "/shared/js/utils.js";
 import { createElement, Check, EllipsisVertical, Plus } from "https://cdn.jsdelivr.net/npm/lucide@latest/+esm";
 
@@ -31,6 +31,12 @@ maybeShowOnboarding();
 
 const app = document.querySelector("#app");
 let selectedDate = new Date();
+
+// award_points RPC가 하루 한 번만 지급하도록 DB에서도 막지만(profiles.points_awarded_date),
+// 이미 오늘 받았다면 CTA 자체를 다시 띄우지 않는다 — 전부 완료 상태로 홈에 돌아왔을 때
+// "일정 완료!" 버튼이 또 나타나 다시 누를 수 있는 걸 막기 위함(재지급 시도 자체를 차단).
+const profile = await getProfile();
+const pointsAwardedToday = profile?.pointsAwardedDate === toISODate(new Date());
 
 app.innerHTML = `
   <div class="home">
@@ -132,11 +138,15 @@ function renderList(plans) {
   const list = document.createElement("div");
   list.className = "home__list";
 
+  // 오늘 이미 포인트를 지급받았으면 체크를 더 이상 토글할 수 없다 — 지급 후 다시 풀었다
+  // 채우는 식으로 완료 상태를 흔들어도 재지급되지 않으니, 애초에 건드릴 수 없게 막는다.
+  const checkable = isToday && !pointsAwardedToday;
+
   plans.forEach((plan) => {
     const item = document.createElement("div");
     item.className = "home__item" + (plan.done ? " is-done" : "");
     item.innerHTML = `
-      <button class="home__item-checkbox" type="button" aria-label="${isToday ? "완료 체크" : "오늘 일정만 체크할 수 있습니다"}"${isToday ? "" : " disabled"} data-checkbox></button>
+      <button class="home__item-checkbox" type="button" aria-label="${checkable ? "완료 체크" : isToday ? "포인트를 이미 받았습니다" : "오늘 일정만 체크할 수 있습니다"}"${checkable ? "" : " disabled"} data-checkbox></button>
       <span class="home__item-time">${plan.time}</span>
       <span class="home__item-title-wrap">
         <span class="home__item-title">${plan.title}</span>
@@ -147,9 +157,8 @@ function renderList(plans) {
     item.querySelector("[data-checkbox]").appendChild(createElement(Check, { size: 16 }));
     item.querySelector("[data-more]").appendChild(createElement(EllipsisVertical, { size: 18 }));
 
-    // 오늘 날짜가 아닌 일정은 완료 체크를 비활성화한다 — 지난/다음 날짜 일정을 홈에서
-    // 미리 체크해 완료 처리해버리는 걸 막기 위함(사용자 요청).
-    if (isToday) {
+    // 오늘 날짜가 아닌 일정, 또는 오늘 이미 포인트를 받은 일정은 완료 체크를 비활성화한다.
+    if (checkable) {
       item.querySelector("[data-checkbox]").addEventListener("click", () => {
         // 체크할 때마다 서버 재조회 + 스켈레톤을 띄우면 매번 화면이 깜빡여 UX가 나쁘므로,
         // 로컬 상태를 낙관적으로 바로 반영해 리스트만 다시 그리고 저장 요청은 백그라운드로 보낸다.
@@ -169,7 +178,7 @@ function renderList(plans) {
 
   bodyEl.appendChild(list);
 
-  if (isToday && plans.every((p) => p.done)) {
+  if (isToday && plans.every((p) => p.done) && !pointsAwardedToday) {
     list.classList.add("home__list--complete");
 
     const points = plans.length * 10;

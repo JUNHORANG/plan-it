@@ -32,8 +32,11 @@ const MENU_ITEMS = [
   { label: "알림", path: "/user/notification/" },
 ];
 
+// 각 메뉴 path는 도메인 루트("/user/store/" 등)라 그 하위 서브 라우트(예: /user/store/buy,
+// /user/plans/success)도 같은 도메인이면 활성 표시돼야 한다(스토어 결제/구매 흐름 중 나브를
+// 열어도 "스토어" 항목이 체크되도록) — 정확히 일치할 때뿐 아니라 그 경로로 시작할 때도 활성.
 function isActivePath(path) {
-  return window.location.pathname === path;
+  return window.location.pathname.startsWith(path);
 }
 
 function renderMenu() {
